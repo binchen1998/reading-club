@@ -60,11 +60,12 @@ def start_lesson_worker() -> None:
 
 def enqueue_book(series_id: str, book_slug: str) -> None:
     start_lesson_worker()
-    book_path = BOOKS / series_id / book_slug / "book.json"
-    if not book_path.exists():
+    from .remote_book import book_exists, load_book
+
+    if not book_exists(series_id, book_slug):
         return
     try:
-        book = json.loads(book_path.read_text(encoding="utf-8"))
+        book = load_book(series_id, book_slug)
         chapters = split_chapters(book.get("pages") or [])
     except Exception:
         logger.exception("enqueue book failed %s/%s", series_id, book_slug)

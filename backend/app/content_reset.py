@@ -11,19 +11,12 @@ from sqlalchemy.orm import Session
 
 from .book_pages import split_chapters
 from .config import BOOKS, CATALOG, LESSONS, STORAGE
+from .remote_book import book_slug_of, load_book, peek_book
 from .lesson_gen import lesson_exists, lesson_file
 from .lesson_worker import enqueue_chapter, forget_chapter, is_generating
 from .models import GeneratedAsset
 from .qiniu_upload import ocr_key, qiniu_delete, qiniu_enabled
 
-
-def book_slug_of(title: str, name: str) -> str:
-    raw = (title or name or "book").lower()
-    out = [ch if ch.isalnum() else "-" for ch in raw]
-    slug = "".join(out).strip("-")
-    while "--" in slug:
-        slug = slug.replace("--", "-")
-    return slug or name.lower()
 
 logger = logging.getLogger("content_reset")
 OCR_NAME = re.compile(r"^(\d{3})-([a-f0-9]+)\.json$", re.I)
@@ -36,12 +29,16 @@ def _load_catalog() -> list[dict]:
     return list(data.get("series") or [])
 
 
-def _book_chapters(series_id: str, book_slug: str) -> list[dict]:
-    path = BOOKS / series_id / book_slug / "book.json"
-    if not path.exists():
+def _book_chapters(series_id: str, book_slug: str, fetch: bool = False) -> list[dict]:
+    book = peek_book(series_id, book_slug)
+    if not book and fetch:
+        try:
+            book = load_book(series_id, book_slug)
+        except Exception:
+            book = None
+    if not book:
         return []
     try:
-        book = json.loads(path.read_text(encoding="utf-8"))
         chapters = split_chapters(book.get("pages") or [])
     except Exception:
         logger.exception("read book failed %s/%s", series_id, book_slug)
@@ -117,7 +114,7 @@ def content_tree() -> list[dict]:
         for book in row.get("books") or []:
             slug = book_slug_of(book.get("title") or "", book.get("name") or "")
             seen.add(slug)
-            ready = (BOOKS / series_id / slug / "book.json").exists()
+            ready = True
             chapters = []
             generated = 0
             if ready:
@@ -194,7 +191,7 @@ def _targets(series_id: str, book_slug: str | None, chapter: int | None) -> list
                     if path.parent.name not in slugs:
                         slugs.append(path.parent.name)
         for slug in slugs:
-            chapters = _book_chapters(sid, slug)
+            chapters = _book_chapters(sid, slug, fetch=True)
             if not chapters:
                 lesson_dir = LESSONS / sid / slug
                 if lesson_dir.exists():

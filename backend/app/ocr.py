@@ -243,13 +243,15 @@ def ocr_cache_digest(text: str) -> str:
     return hashlib.md5(f"split:{text}".encode("utf-8")).hexdigest()[:16]
 
 
-def word_boxes_for_text(pages_dir: Path, page_no: int, text: str, cache_dir: Path | None = None) -> list[dict]:
+def word_boxes_from_image(
+    image: Image.Image,
+    paddle_raw,
+    text: str,
+    cache_dir: Path | None = None,
+    page_no: int = 0,
+) -> list[dict]:
     expected = _tokens(text)
     if not expected:
-        return []
-    jpg = pages_dir / f"{page_no:03d}.jpg"
-    paddle = pages_dir / f"{page_no:03d}_paddle.json"
-    if not jpg.exists():
         return []
     digest = ocr_cache_digest(text)
     if cache_dir:
@@ -259,14 +261,8 @@ def word_boxes_for_text(pages_dir: Path, page_no: int, text: str, cache_dir: Pat
                 return json.loads(cached.read_text(encoding="utf-8"))
             except json.JSONDecodeError:
                 pass
-    image = Image.open(jpg).convert("RGB")
     page_w, page_h = image.size
-    lines = []
-    if paddle.exists():
-        try:
-            lines = _line_pixels(json.loads(paddle.read_text(encoding="utf-8")))
-        except json.JSONDecodeError:
-            lines = []
+    lines = _line_pixels(paddle_raw) if paddle_raw else []
     hits = _match_lines(lines, text) if lines else []
     found: list[dict] = []
     if hits:
@@ -284,3 +280,31 @@ def word_boxes_for_text(pages_dir: Path, page_no: int, text: str, cache_dir: Pat
             encoding="utf-8",
         )
     return words
+
+
+def word_boxes_for_text(pages_dir: Path, page_no: int, text: str, cache_dir: Path | None = None) -> list[dict]:
+    jpg = pages_dir / f"{page_no:03d}.jpg"
+    paddle = pages_dir / f"{page_no:03d}_paddle.json"
+    if not jpg.exists():
+        return []
+    raw = None
+    if paddle.exists():
+        try:
+            raw = json.loads(paddle.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            raw = None
+    image = Image.open(jpg).convert("RGB")
+    return word_boxes_from_image(image, raw, text, cache_dir=cache_dir, page_no=page_no)
+
+
+def load_remote_page_ocr(series_id: str, book_slug: str, page_no: int) -> list[dict]:
+    from io import BytesIO
+
+    from .remote_book import page_image_bytes, page_paddle
+
+    raw = page_paddle(series_id, book_slug, page_no)
+    data = page_image_bytes(series_id, book_slug, page_no)
+    if not raw or not data:
+        return []
+    image = Image.open(BytesIO(data))
+    return parse_paddle(raw, image.size[0], image.size[1])

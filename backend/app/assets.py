@@ -168,14 +168,31 @@ def ensure_ocr(series_id: str, book_slug: str, page: int, text: str, purpose: st
     found = lookup_ocr(series_id, book_slug, page, value)
     if found:
         return found
+    from io import BytesIO
+
+    from PIL import Image
+
+    from .ocr import word_boxes_from_image
+    from .remote_book import page_image_bytes, page_paddle
+
     pages_dir, local, key, digest = _ocr_paths(series_id, book_slug, page, value)
-    if not pages_dir.exists():
-        return {"words": [], "exists": False, "created": False, "source": ""}
     with _lock_for(f"ocr:{series_id}:{book_slug}:{page}:{digest}"):
         found = lookup_ocr(series_id, book_slug, page, value)
         if found:
             return found
-        words = word_boxes_for_text(pages_dir, page, value, cache_dir=local.parent)
+        words = word_boxes_for_text(pages_dir, page, value, cache_dir=local.parent) if pages_dir.exists() else []
+        if not words:
+            data = page_image_bytes(series_id, book_slug, page)
+            if not data:
+                return {"words": [], "exists": False, "created": False, "source": ""}
+            image = Image.open(BytesIO(data)).convert("RGB")
+            words = word_boxes_from_image(
+                image,
+                page_paddle(series_id, book_slug, page),
+                value,
+                cache_dir=local.parent,
+                page_no=page,
+            )
         source = "generated"
         try:
             payload = json.dumps(words, ensure_ascii=False).encode("utf-8")

@@ -37,7 +37,7 @@ onUnmounted(() => {
   <div v-if="data" class="space-y-5">
     <div>
       <h1 class="text-3xl font-extrabold text-brand-700">{{ data.book.title }}</h1>
-      <p class="mt-1 font-bold text-brand-600/80">讲解、语音和词框会在后台提前生成，不用等读到那一页。</p>
+      <p class="mt-1 font-bold text-brand-600/80">讲解、语音和词框会在你打开这一页后再生成。</p>
     </div>
     <div class="space-y-3">
       <div v-for="ch in data.chapters" :key="ch.id" class="card flex items-center justify-between gap-4">

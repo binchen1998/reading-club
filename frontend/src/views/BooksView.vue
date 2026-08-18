@@ -15,7 +15,7 @@ onMounted(async () => {
   <div v-if="data" class="space-y-5">
     <div>
       <h1 class="text-3xl font-extrabold text-brand-700">章节书书架</h1>
-      <p class="mt-1 font-bold text-brand-600/80">所有系列都已开放。还没下载到本地的书会显示为仅书目。</p>
+      <p class="mt-1 font-bold text-brand-600/80">页图直接用原站资源，打开就能读。</p>
     </div>
     <div class="grid gap-4 sm:grid-cols-2">
       <router-link

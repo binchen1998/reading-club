@@ -1,4 +1,4 @@
-"""读本地 book.json，切章节，并标出跨页未写完的句子。"""
+"""读原站书目并切章节，标出跨页未写完的句子。"""
 
 from __future__ import annotations
 
@@ -15,14 +15,13 @@ from backend.app.book_pages import (  # noqa: F401
     sentence_complete,
     split_chapters,
 )
-from scripts.paths import BOOKS, CATALOG, book_slug
+from scripts.paths import CATALOG, book_slug
 
 
 def load_book(series_id: str, slug: str) -> dict:
-    path = BOOKS / series_id / slug / "book.json"
-    if not path.exists():
-        raise FileNotFoundError(f"书不在本地：{path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    from backend.app.remote_book import load_book as load_remote_book
+
+    return load_remote_book(series_id, slug)
 
 
 def load_catalog() -> dict:
@@ -44,10 +43,9 @@ def list_local_books(series: str | None = None, book: str | None = None) -> list
             name = (raw.get("name") or "").strip()
             if wanted_book and wanted_book not in {slug.lower(), title.lower(), name.lower()}:
                 continue
-            book_path = BOOKS / series_id / slug / "book.json"
-            if not book_path.exists():
-                continue
-            payload = json.loads(book_path.read_text(encoding="utf-8"))
+            from backend.app.remote_book import load_book as load_remote_book
+
+            payload = load_remote_book(series_id, slug)
             found.append((series_id, slug, payload))
     if wanted_series or wanted_book:
         if not found:

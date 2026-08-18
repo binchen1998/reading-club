@@ -99,16 +99,13 @@ python -m scripts.prebuild_content --series NateTheGreat --book hungry-book-club
 
 `--only` 可以是 `all`（默认，课稿+TTS+OCR）、`lesson`、`tts`、`ocr`。已有 `ch01.json` 默认不覆盖，加 `--force` 才重生成。生成课稿时会看上一页没写完的半句和下一页开头，避免把跨页句子拆错。需要 `QWEN_API_KEY`。
 
-## 下载更多书
+## 书目
 
-书目页显示「仅书目」= 本地还没有 `content/books/{系列}/{slug}/book.json`（页图和页 JSON 也还没下）。先拉书目，再按下基本页资源。**这个脚本不会生成讲解、OCR、TTS**，那些等用户打开阅读页后再由 worker 按需跑。不要用上面的 `prebuild_content` 来「开书」。
+页图和页 JSON 直接复用原站 CDN（`static1.cxy61.com`），不用再跑 `fetch_book` 下载到本地。更新系列列表：
 
 ```powershell
 $env:PYTHONPATH = "D:\git\reading-club"
 python -m scripts.fetch_catalog
-python -m scripts.fetch_book --series FancyNancy
-python -m scripts.fetch_book --series FancyNancy --book "Fancy NANCY and the Boy from Paris"
-python -m scripts.fetch_book --all
 ```
 
-默认 8 路并行；已下完的书会跳过，中断后再跑同一条命令即可续传。加 `--force` 才整本重下。下载完成后刷新书目页，即可点进去读。
+讲解 / OCR / TTS 等用户打开阅读页后再由 worker 按需生成。

@@ -4,11 +4,12 @@ import re
 from fastapi import APIRouter, HTTPException, Query
 
 from ..book_pages import split_chapters
-from ..config import BOOKS, LESSONS
+from ..config import LESSONS
 from ..gen_jobs import job_payload
 from ..lesson_gen import lesson_exists
 from ..lesson_worker import enqueue_book, enqueue_lesson_job, is_generating
-from ..ocr import load_page_ocr
+from ..ocr import load_remote_page_ocr
+from ..remote_book import book_exists, load_book, page_image_url
 
 router = APIRouter(prefix="/api")
 WORD_RE = re.compile(r"[A-Za-z']+")
@@ -38,10 +39,9 @@ def _chapter_num(chapter_id: str) -> int:
 
 @router.get("/books/{series_id}/{book_slug}")
 def book_detail(series_id: str, book_slug: str):
-    path = BOOKS / series_id / book_slug / "book.json"
-    if not path.exists():
-        raise HTTPException(404, "书还没下载到本地")
-    book = json.loads(path.read_text(encoding="utf-8"))
+    if not book_exists(series_id, book_slug):
+        raise HTTPException(404, "没有这本书")
+    book = load_book(series_id, book_slug)
     lesson_dir = LESSONS / series_id / book_slug
     by_id: dict[str, dict] = {}
     if lesson_dir.exists():
@@ -89,7 +89,7 @@ def lesson_detail(
     if not lesson_exists(series_id, book_slug, chapter):
         raise HTTPException(409, "课稿尚未生成")
     lesson = json.loads((LESSONS / series_id / book_slug / f"ch{chapter:02d}.json").read_text(encoding="utf-8"))
-    book = json.loads((BOOKS / series_id / book_slug / "book.json").read_text(encoding="utf-8"))
+    book = load_book(series_id, book_slug)
     pages = {p["page"]: p for p in book.get("pages") or []}
     word_map = {w["en"]: w for w in lesson.get("word_bank") or []}
     phrase_map = {p["en"]: p for p in lesson.get("phrase_bank") or []}
@@ -100,10 +100,10 @@ def lesson_detail(
         beats.append(
             {
                 **beat,
-                "image": f"/media/books/{series_id}/{book_slug}/{page.get('image')}",
+                "image": page_image_url(series_id, book_slug, page_no),
                 "english": page.get("english") or "",
                 "translate": page.get("translate") or "",
-                "ocr": load_page_ocr(BOOKS / series_id / book_slug / "pages", page_no),
+                "ocr": load_remote_page_ocr(series_id, book_slug, page_no),
                 "word_items": [word_map[k] for k in beat.get("words") or [] if k in word_map],
                 "phrase_items": [phrase_map[k] for k in beat.get("phrases") or [] if k in phrase_map],
                 "segments": merge_short_segments(beat.get("segments") or []),
@@ -122,9 +122,8 @@ def lesson_detail(
 @router.post("/lessons/{series_id}/{book_slug}/{chapter_id}/generate")
 def lesson_generate(series_id: str, book_slug: str, chapter_id: str):
     chapter = _chapter_num(chapter_id)
-    book_path = BOOKS / series_id / book_slug / "book.json"
-    if not book_path.exists():
-        raise HTTPException(404, "书还没下载到本地")
+    if not book_exists(series_id, book_slug):
+        raise HTTPException(404, "没有这本书")
     if lesson_exists(series_id, book_slug, chapter):
         return {"exists": True, "job_id": "", "status": "done"}
     job = enqueue_lesson_job(series_id, book_slug, chapter)

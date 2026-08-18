@@ -20,6 +20,7 @@ frontend/.vite/
 
 # generated local data
 storage/audio/
+storage/book-meta/
 storage/ocr/
 storage/dict/
 storage/recordings/

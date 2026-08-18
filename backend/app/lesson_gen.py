@@ -7,7 +7,7 @@ import logging
 import threading
 from pathlib import Path
 
-from .config import BOOKS, LESSONS
+from .config import LESSONS
 from .openai_llm import get_openai_client
 
 logger = logging.getLogger("lesson_gen")
@@ -51,14 +51,15 @@ def generate_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
     with lock:
         if path.exists():
             return json.loads(path.read_text(encoding="utf-8"))
-        book_path = BOOKS / series_id / book_slug / "book.json"
-        if not book_path.exists():
-            raise RuntimeError("书还没下载到本地")
         from scripts.prebuild_content.lesson_llm import generate_chapter_lesson_full
 
         from .book_pages import split_chapters
+        from .remote_book import load_book
 
-        book = json.loads(book_path.read_text(encoding="utf-8"))
+        try:
+            book = load_book(series_id, book_slug)
+        except FileNotFoundError as exc:
+            raise RuntimeError("书目里没有这本书") from exc
         chapters = split_chapters(book.get("pages") or [])
         info = next((row for row in chapters if int(row.get("chapter") or 0) == chapter), None)
         if info is None:

@@ -2,9 +2,9 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException
 
 from ..assets import lookup_ocr
-from ..config import BOOKS
 from ..gen_jobs import job_payload
 from ..lesson_worker import enqueue_ocr_job
+from ..remote_book import book_exists
 
 router = APIRouter(prefix="/api")
 
@@ -20,9 +20,8 @@ class WordOcrBody(BaseModel):
 
 @router.post("/ocr/words")
 def ocr_words(body: WordOcrBody):
-    pages_dir = BOOKS / body.series_id / body.book_slug / "pages"
-    if not pages_dir.exists():
-        raise HTTPException(404, "书页不存在")
+    if not book_exists(body.series_id, body.book_slug):
+        raise HTTPException(404, "没有这本书")
     found = lookup_ocr(body.series_id, body.book_slug, body.page, body.text)
     if found:
         return found
@@ -34,9 +33,8 @@ def ocr_words(body: WordOcrBody):
 
 @router.post("/ocr/words/generate")
 def ocr_words_generate(body: WordOcrBody):
-    pages_dir = BOOKS / body.series_id / body.book_slug / "pages"
-    if not pages_dir.exists():
-        raise HTTPException(404, "书页不存在")
+    if not book_exists(body.series_id, body.book_slug):
+        raise HTTPException(404, "没有这本书")
     found = lookup_ocr(body.series_id, body.book_slug, body.page, body.text)
     if found:
         return {"exists": True, "job_id": "", "status": "done", "result": found, **found}
