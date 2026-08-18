@@ -34,7 +34,8 @@ ORDINALS = {
 }
 SENT_END = re.compile(r'[.!?…]["”\'»」』]?\s*$')
 SKIP_HINT = re.compile(
-    r"copyright|isbn|all rights reserved|manufactured in|remembering\n|yearling book",
+    r"copyright|isbn|all rights reserved|manufactured in|remembering\n|yearling book|"
+    r"have read this book|scholastic inc|honor book|look for",
     re.I,
 )
 
@@ -68,11 +69,11 @@ def is_story_page(page: dict) -> bool:
         return False
     if CHAPTER_HEAD.search(english):
         return True
-    if SKIP_HINT.search(english) and len(english) > 400:
+    if SKIP_HINT.search(english):
         return False
     if page.get("has_text") is False:
         return False
-    return len(_norm(english).split()) >= 8
+    return len(_norm(english).split()) >= 2
 
 
 def chapter_number(english: str) -> int | None:

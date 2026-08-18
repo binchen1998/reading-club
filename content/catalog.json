@@ -4,7 +4,7 @@
       "id": "FlyGuy",
       "level_name": "bridge-books苍蝇小子",
       "title": "Fly Guy 苍蝇小子",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books苍蝇小子/bridge-books苍蝇小子.json",
       "book_count": 16,
       "books": [

@@ -15,6 +15,7 @@ import argparse
 import json
 import logging
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -91,9 +92,17 @@ def process_book(
                 lesson = {"chapter": num, "title": info.get("title") or "", "title_zh": "", "word_bank": [], "phrase_bank": [], "beats": []}
                 seen_w: set[str] = set()
                 seen_p: set[str] = set()
-                for start in range(0, len(pages), 10):
-                    chunk = {**info, "pages": pages[start : start + 10]}
-                    part = generate_chapter_lesson(chunk)
+                chunks = [
+                    {**info, "pages": pages[start : start + 10]}
+                    for start in range(0, len(pages), 10)
+                ]
+                parts: list[dict] = [None] * len(chunks)  # type: ignore[list-item]
+                print(f"[lesson] {label} 并行生成 {len(chunks)} 段", flush=True)
+                with ThreadPoolExecutor(max_workers=min(4, len(chunks))) as pool:
+                    futs = {pool.submit(generate_chapter_lesson, chunk): i for i, chunk in enumerate(chunks)}
+                    for fut in as_completed(futs):
+                        parts[futs[fut]] = fut.result()
+                for part in parts:
                     lesson["title"] = part.get("title") or lesson["title"]
                     lesson["title_zh"] = part.get("title_zh") or lesson["title_zh"]
                     for item in part.get("word_bank") or []:

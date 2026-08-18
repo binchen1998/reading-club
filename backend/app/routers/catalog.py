@@ -18,9 +18,13 @@ def catalog():
                 "title": row["title"],
                 "readable": bool(row.get("readable")),
                 "book_count": row.get("book_count") or len(row.get("books") or []),
-                "cover": f"/media/books/NateTheGreat/hungry-book-club/pages/001.jpg"
-                if row["id"] == "NateTheGreat"
-                else "",
+                "cover": (
+                    f"/media/books/NateTheGreat/hungry-book-club/pages/001.jpg"
+                    if row["id"] == "NateTheGreat"
+                    else f"/media/books/FlyGuy/01-hi-fly-guy/pages/001.jpg"
+                    if row["id"] == "FlyGuy"
+                    else ""
+                ),
             }
         )
     return {"series": series}

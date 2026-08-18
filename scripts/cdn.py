@@ -9,7 +9,7 @@ SERIES = [
         "id": "FlyGuy",
         "level_name": "bridge-books苍蝇小子",
         "title": "Fly Guy 苍蝇小子",
-        "readable": False,
+        "readable": True,
     },
     {
         "id": "FrogAndToad",

@@ -7,6 +7,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from http.client import IncompleteRead
 from pathlib import Path
 
 from scripts.paths import BOOKS, CATALOG, SERIES, book_slug, pages_base
@@ -21,14 +22,23 @@ def download(url: str, dest: Path) -> bool:
         (parts.scheme, parts.netloc, urllib.parse.quote(parts.path, safe="/"), parts.query, parts.fragment)
     )
     req = urllib.request.Request(encoded, headers={"User-Agent": "reading-club/1.0"})
-    try:
-        with urllib.request.urlopen(req, timeout=40) as resp:
-            dest.write_bytes(resp.read())
-        return True
-    except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-            return False
-        raise
+    last_err: Exception | None = None
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=40) as resp:
+                dest.write_bytes(resp.read())
+            return True
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return False
+            last_err = exc
+        except (urllib.error.URLError, TimeoutError, ConnectionError, IncompleteRead) as exc:
+            last_err = exc
+        if dest.exists() and dest.stat().st_size < 200:
+            dest.unlink()
+    if last_err:
+        raise last_err
+    return False
 
 
 def find_series(series_id: str) -> dict:
@@ -92,7 +102,8 @@ def fetch_book(series_id: str, title_or_name: str, max_pages: int = 200) -> Path
                 idx, ok, rec = fut.result()
                 if ok:
                     found[idx] = rec
-                    print(f"  p{idx:03d} text={int(rec['has_text'])} {rec['english'][:48]}", flush=True)
+                    preview = rec["english"][:48].encode("gbk", "replace").decode("gbk")
+                    print(f"  p{idx:03d} text={int(rec['has_text'])} {preview}", flush=True)
                 else:
                     missing = True
                     stop_at = min(stop_at, idx)

@@ -1,0 +1,317 @@
+{
+  "chapter": 1,
+  "title": "Chapter 1: A fly went flying",
+  "title_zh": "第一章：一只苍蝇飞呀飞",
+  "word_bank": [
+    {
+      "en": "fly",
+      "zh": "苍蝇；飞"
+    },
+    {
+      "en": "flying",
+      "zh": "飞行"
+    },
+    {
+      "en": "looking",
+      "zh": "寻找"
+    },
+    {
+      "en": "something",
+      "zh": "某个东西"
+    },
+    {
+      "en": "eat",
+      "zh": "吃"
+    },
+    {
+      "en": "tasty",
+      "zh": "美味的"
+    },
+    {
+      "en": "slimy",
+      "zh": "黏糊糊的"
+    },
+    {
+      "en": "boy",
+      "zh": "男孩"
+    },
+    {
+      "en": "walking",
+      "zh": "走路"
+    },
+    {
+      "en": "catch",
+      "zh": "抓住"
+    },
+    {
+      "en": "smart",
+      "zh": "聪明的"
+    },
+    {
+      "en": "Amazing",
+      "zh": "惊人的"
+    },
+    {
+      "en": "Pet",
+      "zh": "宠物"
+    },
+    {
+      "en": "Show",
+      "zh": "展览；表演"
+    },
+    {
+      "en": "met",
+      "zh": "遇见"
+    },
+    {
+      "en": "caught",
+      "zh": "抓住了"
+    },
+    {
+      "en": "jar",
+      "zh": "罐子"
+    },
+    {
+      "en": "said",
+      "zh": "说"
+    },
+    {
+      "en": "mad",
+      "zh": "生气的"
+    },
+    {
+      "en": "wanted",
+      "zh": "想要"
+    },
+    {
+      "en": "free",
+      "zh": "自由的"
+    },
+    {
+      "en": "stomped",
+      "zh": "跺脚"
+    },
+    {
+      "en": "foot",
+      "zh": "脚"
+    },
+    {
+      "en": "BUZZ",
+      "zh": "嗡嗡声"
+    },
+    {
+      "en": "surprised",
+      "zh": "惊讶的"
+    },
+    {
+      "en": "name",
+      "zh": "名字"
+    },
+    {
+      "en": "smartest",
+      "zh": "最聪明的"
+    },
+    {
+      "en": "world",
+      "zh": "世界"
+    }
+  ],
+  "phrase_bank": [
+    {
+      "en": "Chapter 1",
+      "zh": "第一章"
+    },
+    {
+      "en": "went flying",
+      "zh": "飞起来；飞着"
+    },
+    {
+      "en": "looking for",
+      "zh": "寻找"
+    },
+    {
+      "en": "something to eat",
+      "zh": "吃的东西"
+    },
+    {
+      "en": "something tasty",
+      "zh": "美味的东西"
+    },
+    {
+      "en": "something slimy",
+      "zh": "黏糊糊的东西"
+    },
+    {
+      "en": "went walking",
+      "zh": "去散步"
+    },
+    {
+      "en": "something to catch",
+      "zh": "要抓的东西"
+    },
+    {
+      "en": "The Amazing Pet Show",
+      "zh": "惊人的宠物展"
+    },
+    {
+      "en": "They met",
+      "zh": "他们见面了"
+    },
+    {
+      "en": "in a jar",
+      "zh": "在罐子里"
+    },
+    {
+      "en": "A pet",
+      "zh": "一只宠物"
+    },
+    {
+      "en": "be free",
+      "zh": "获得自由"
+    },
+    {
+      "en": "stomped his foot",
+      "zh": "跺他的脚"
+    },
+    {
+      "en": "my name",
+      "zh": "我的名字"
+    },
+    {
+      "en": "in the world",
+      "zh": "在世界上"
+    }
+  ],
+  "beats": [
+    {
+      "page": 4,
+      "explain": "这是故事的标题页。Chapter 1 表示“第一章”，A fly 指“一只苍蝇”，went flying 表示“飞起来了”或“飞着”。标题很有节奏感，读的时候可以把 fly 和 flying 读得清楚，想象一只小苍蝇开始了它的旅程。",
+      "words": [
+        "fly",
+        "flying"
+      ],
+      "phrases": [
+        "Chapter 1",
+        "went flying"
+      ],
+      "segments": [
+        "Chapter 1",
+        "A fly went flying."
+      ]
+    },
+    {
+      "page": 5,
+      "explain": "小苍蝇正在寻找食物。looking for 是“寻找”，后面的 something to eat 表示“吃的东西”。它想找的可不是普通食物，而是 something tasty 和 something slimy，也就是美味的、黏糊糊的东西。破折号后面是在补充说明它喜欢什么。",
+      "words": [
+        "looking",
+        "something"
+      ],
+      "phrases": [
+        "looking for",
+        "something to eat"
+      ],
+      "segments": [
+        "He was looking for something to eat—",
+        "something tasty, something slimy."
+      ]
+    },
+    {
+      "page": 6,
+      "explain": "画面中出现了另一个角色：一个男孩。A boy 是“一名男孩”，went walking 表示“去散步”或“走着走着”。这里的 went 加上 walking，说明男孩开始行动了。苍蝇在找食物，男孩也在寻找自己的目标，故事中的两条线马上就要碰到一起。",
+      "words": [
+        "boy",
+        "walking"
+      ],
+      "phrases": [
+        "a boy",
+        "went walking"
+      ],
+      "segments": [
+        "A boy",
+        "went walking."
+      ]
+    },
+    {
+      "page": 7,
+      "explain": "男孩也在 looking for，也就是寻找，不过他寻找的是 something to catch——可以抓住的东西。他还希望这个东西很 smart，能参加 The Amazing Pet Show。Amazing 是“惊人的”，Pet Show 是“宠物展”。男孩的目标和苍蝇的目标完全不同。",
+      "words": [
+        "looking",
+        "catch"
+      ],
+      "phrases": [
+        "looking for",
+        "something to catch"
+      ],
+      "segments": [
+        "He was looking for something to catch—",
+        "something smart, something for The Amazing Pet Show."
+      ]
+    },
+    {
+      "page": 9,
+      "explain": "两位主人公终于相遇了。They met 的意思是“他们见面了”。这里的 They 指男孩和苍蝇。句子非常短，却是故事的重要转折：男孩正在寻找宠物，苍蝇正在寻找食物，他们的相遇会带来什么结果呢？",
+      "words": [
+        "They",
+        "met"
+      ],
+      "phrases": [
+        "They met",
+        "met"
+      ],
+      "segments": [
+        "They",
+        "met."
+      ]
+    },
+    {
+      "page": 10,
+      "explain": "男孩抓住了苍蝇，并把它放进一个罐子里。caught 是 catch 的过去式，表示“抓住了”；in a jar 是“在一个罐子里”。男孩很快把苍蝇当成宠物，高兴地说 A pet! 这也为后面苍蝇的反应埋下了伏笔。",
+      "words": [
+        "caught",
+        "fly"
+      ],
+      "phrases": [
+        "in a jar",
+        "A pet"
+      ],
+      "segments": [
+        "The boy caught the fly in a jar.",
+        "“A pet!” he said."
+      ]
+    },
+    {
+      "page": 11,
+      "explain": "苍蝇一点儿也不开心。mad 是“生气的”，wanted to be free 表示“想要自由”。为了表达抗议，它 stomped his foot，也就是跺脚，然后发出 BUZZ! 这个大写词是在模仿苍蝇嗡嗡叫的声音。注意读 BUZZ 时要有力一些。",
+      "words": [
+        "mad",
+        "free"
+      ],
+      "phrases": [
+        "be free",
+        "stomped his foot"
+      ],
+      "segments": [
+        "The fly was mad.",
+        "He wanted to be free.",
+        "He stomped his foot and said— BUZZ!"
+      ]
+    },
+    {
+      "page": 12,
+      "explain": "男孩听到苍蝇发出的声音后非常惊讶。surprised 是“惊讶的”。他以为苍蝇知道他的名字，于是称赞它是 the smartest pet in the world，也就是“世界上最聪明的宠物”。其实苍蝇只是发出了嗡嗡声，但男孩却产生了有趣的误会。",
+      "words": [
+        "surprised",
+        "said"
+      ],
+      "phrases": [
+        "was surprised",
+        "my name"
+      ],
+      "segments": [
+        "The boy was surprised.",
+        "He said, “You know my name!",
+        "You are the smartest pet in the world!”"
+      ]
+    }
+  ]
+}

@@ -1,27 +1,43 @@
 from __future__ import annotations
 
 import logging
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from backend.app.assets import ensure_ocr, ensure_tts
 from backend.app.routers.lessons import merge_short_segments
 from backend.app.tts import collect_lesson_texts
 
 logger = logging.getLogger("prebuild_content")
+TTS_WORKERS = max(2, int(os.getenv("TTS_WORKERS") or "8"))
 
 
 def generate_tts(lesson: dict, label: str) -> tuple[int, int]:
     texts = collect_lesson_texts(lesson)
+    total = len(texts)
     ok = skip = 0
-    for i, text in enumerate(texts, 1):
-        preview = text.replace("\n", " ")[:40]
+    if not texts:
+        return 0, 0
+
+    def one(text: str) -> tuple[str, bool]:
         result = ensure_tts(text, purpose="预生成课稿")
-        created = bool(result.get("created"))
-        if created:
-            ok += 1
-            print(f"[tts] {label} {i}/{len(texts)} new {preview}", flush=True)
-        else:
-            skip += 1
-            print(f"[tts] {label} {i}/{len(texts)} skip {preview}", flush=True)
+        return text, bool(result.get("created"))
+
+    print(f"[tts] {label} 并行 {TTS_WORKERS} 路，共 {total} 条", flush=True)
+    with ThreadPoolExecutor(max_workers=TTS_WORKERS) as pool:
+        futures = {pool.submit(one, text): text for text in texts}
+        done = 0
+        for fut in as_completed(futures):
+            done += 1
+            text, created = fut.result()
+            preview = text.replace("\n", " ")[:40]
+            if created:
+                ok += 1
+                kind = "new"
+            else:
+                skip += 1
+                kind = "skip"
+            print(f"[tts] {label} {done}/{total} {kind} {preview}", flush=True)
     return ok, skip
 
 
