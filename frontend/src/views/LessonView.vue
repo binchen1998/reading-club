@@ -48,7 +48,7 @@ const phraseDone = ref(false)
 const recordDone = ref(false)
 const vocabRetries = ref(0)
 const phraseRetries = ref(0)
-const pageGateHint = ref('')
+const pageGateOpen = ref(false)
 const wrongKeys = ref<Record<number, string[]>>({})
 const flowPaused = ref(false)
 const focusItem = ref<Item | null>(null)
@@ -374,7 +374,7 @@ function startActivity(next: 'vocab' | 'phrase' | 'record') {
   if (next === 'vocab' && !vocabQs.value.length) return
   if (next === 'phrase' && !phraseQs.value.length) return
   stopAudio()
-  pageGateHint.value = ''
+  pageGateOpen.value = false
   step.value = next
   startStep()
 }
@@ -616,10 +616,10 @@ function goToBeat(index: number) {
   const max = (lesson.value?.beats?.length || 1) - 1
   if (index < 0 || index > max || index === beatIndex.value) return
   if (index > beatIndex.value && !pageTasksReady.value) {
-    pageGateHint.value = `先完成：${missingTasks.value.join('、')}`
+    pageGateOpen.value = true
     return
   }
-  pageGateHint.value = ''
+  pageGateOpen.value = false
   clearQuizTimer()
   clearPassTimer()
   if (recording.value) stopRecord()
@@ -778,19 +778,12 @@ onUnmounted(() => {
       <button
         class="rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-brand-700 shadow-pop disabled:opacity-40"
         type="button"
-        :disabled="lastBeat || !pageTasksReady"
-        :title="pageTasksReady || lastBeat ? '' : `先完成：${missingTasks.join('、')}`"
+        :disabled="lastBeat"
         @click="nextPage"
       >
         下一页
       </button>
     </div>
-    <p
-      v-if="pageGateHint || (!pageTasksReady && !lastBeat)"
-      class="fixed left-1/2 top-12 z-[90] -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-xs font-extrabold text-candy shadow-pop"
-    >
-      {{ pageGateHint || `先完成：${missingTasks.join('、')}` }}
-    </p>
     <div class="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
     <section class="relative min-h-[58dvh] min-w-0 flex-1 lg:min-h-0">
       <div class="h-full overflow-hidden rounded-2xl border border-brand-200/60 bg-brand-50">
@@ -1028,6 +1021,16 @@ onUnmounted(() => {
       >
         先跳过这句（不计入完成度）
       </button>
+    </ClubDialog>
+
+    <ClubDialog :open="pageGateOpen" title="还不能翻页" emoji="🔒" @close="pageGateOpen = false">
+      <p class="font-bold text-brand-700">本页任务还没做完，先完成这些：</p>
+      <ul class="mt-3 space-y-2">
+        <li v-for="item in missingTasks" :key="item" class="rounded-2xl bg-brand-50 px-3 py-2 font-extrabold text-candy">
+          {{ item }}
+        </li>
+      </ul>
+      <button class="btn-primary mt-5 w-full" type="button" @click="pageGateOpen = false">知道了</button>
     </ClubDialog>
 
     <ClubDialog :open="!!focusItem" :title="focusItem?.en || ''" emoji="⭐" @close="focusItem = null">
