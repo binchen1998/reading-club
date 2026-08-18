@@ -36,7 +36,12 @@ export async function speakAssistantText(text: string) {
   const value = (text || '').trim()
   if (!value) return
   stopAssistantSpeak()
-  const url = await ensureTts(value, '助教回复')
+  let url = ''
+  try {
+    url = await ensureTts(value, '助教回复')
+  } catch {
+    return
+  }
   if (!url) return
   const audio = new Audio(url)
   current = audio

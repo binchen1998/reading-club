@@ -33,7 +33,14 @@ export async function speakText(text: string, purpose = '单词发音'): Promise
   const value = (text || '').trim()
   if (!value) return
   const cached = urlCache.get(value.toLowerCase())
-  const url = cached || (await ensureTts(value, purpose))
+  let url = cached || ''
+  if (!url) {
+    try {
+      url = await ensureTts(value, purpose)
+    } catch {
+      return
+    }
+  }
   if (!url) return
   if (urlCache.size > 200) urlCache.clear()
   urlCache.set(value.toLowerCase(), url)

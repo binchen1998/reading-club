@@ -43,15 +43,28 @@ function ocrCacheKey(payload: OcrPayload): string {
   return `${payload.series_id}/${payload.book_slug}/${payload.page}:${(payload.text || '').trim()}`
 }
 
-async function waitForAsset<T>(job: AssetJob<T>, purpose: string, silent?: boolean): Promise<T> {
+async function waitForAsset<T>(
+  job: AssetJob<T>,
+  purpose: string,
+  silent?: boolean,
+  fallback?: T,
+): Promise<T> {
   if (silent) {
     job.releaseGenerate()
-    return job.promise
+    try {
+      return await job.promise
+    } catch {
+      return fallback as T
+    }
   }
   await job.checked
   if (job.done || !job.needsGenerate) {
     job.releaseGenerate()
-    return job.promise
+    try {
+      return await job.promise
+    } catch {
+      return fallback as T
+    }
   }
   beginGenerate(purpose)
   await waitGenerateShown()
@@ -138,7 +151,12 @@ function startTtsJob(value: string, purpose: string): AssetJob<string> {
       ttsCache.set(value, ready)
       return ready
     }
-    const res = await waitJobResult<TtsResult>(started.job_id || '')
+    let res: TtsResult
+    try {
+      res = await waitJobResult<TtsResult>(started.job_id || '')
+    } catch {
+      return ''
+    }
     const url = res?.url || ''
     if (url) ttsCache.set(value, url)
     return url
@@ -179,7 +197,12 @@ function startOcrJob(payload: OcrPayload): AssetJob<Array<Record<string, unknown
       ocrCache.set(key, ready)
       return ready
     }
-    const res = await waitJobResult<OcrResult>(started.job_id || '')
+    let res: OcrResult
+    try {
+      res = await waitJobResult<OcrResult>(started.job_id || '')
+    } catch {
+      return []
+    }
     const words = res?.words || []
     ocrCache.set(key, words)
     return words
@@ -201,7 +224,7 @@ export async function ensureTts(text: string, purpose: string, opts?: EnsureOpts
   if (!value) return ''
   const cached = ttsCache.get(value)
   if (cached) return cached
-  return waitForAsset(startTtsJob(value, purpose), purpose, opts?.silent)
+  return waitForAsset(startTtsJob(value, purpose), purpose, opts?.silent, '')
 }
 
 export async function ensureOcr(
@@ -213,7 +236,7 @@ export async function ensureOcr(
   const key = ocrCacheKey({ ...payload, text })
   const cached = ocrCache.get(key)
   if (cached) return cached
-  return waitForAsset(startOcrJob({ ...payload, text }), payload.purpose || '这一句的词框', opts?.silent)
+  return waitForAsset(startOcrJob({ ...payload, text }), payload.purpose || '这一句的词框', opts?.silent, [])
 }
 
 export function prefetchPageAssets(input: {
@@ -221,11 +244,17 @@ export function prefetchPageAssets(input: {
   ocrItems: Array<Omit<OcrPayload, 'purpose'>>
 }) {
   const texts = uniqueTexts(input.texts)
-  void runPool(texts, TTS_PREFETCH_CONCURRENCY, (text) => ensureTts(text, '讲解音频', { silent: true }))
+  void runPool(texts, TTS_PREFETCH_CONCURRENCY, (text) =>
+    ensureTts(text, '讲解音频', { silent: true }),
+  ).catch(() => undefined)
   const ocrItems = input.ocrItems.filter((item) => (item.text || '').trim() && item.page)
   void (async () => {
     for (const item of ocrItems) {
-      await ensureOcr({ ...item, purpose: '这一句的词框' }, { silent: true })
+      try {
+        await ensureOcr({ ...item, purpose: '这一句的词框' }, { silent: true })
+      } catch {
+        /* 预取词框失败不影响阅读 */
+      }
     }
   })()
 }

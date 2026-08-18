@@ -332,6 +332,8 @@ async function playOne(text: string, purpose?: string): Promise<void> {
   let url = ''
   try {
     url = await ensureTts(text, label, silent ? { silent: true } : undefined)
+  } catch {
+    url = ''
   } finally {
     if (gen === playGen) explainWaitingTts.value = false
   }

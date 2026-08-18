@@ -13,7 +13,12 @@ export async function waitJobResult<T = Record<string, unknown>>(jobId: string):
   const user = username()
   const headers = new Headers()
   if (user) headers.set('X-Username', encodeURIComponent(user))
-  const res = await fetch(`/api/jobs/${id}/events`, { headers })
+  let res: Response
+  try {
+    res = await fetch(`/api/jobs/${id}/events`, { headers })
+  } catch {
+    throw new Error('等待生成失败')
+  }
   if (!res.ok || !res.body) throw new Error('等待生成失败')
   const reader = res.body.getReader()
   const decoder = new TextDecoder()
