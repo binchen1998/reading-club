@@ -77,6 +77,8 @@ let quizTimer: number | null = null
 let passTimer: number | null = null
 let recordTimer: number | null = null
 let playGen = 0
+const explainPlaying = ref(false)
+const explainPaused = ref(false)
 
 const lesson = computed(() => data.value?.lesson)
 const beat = computed(() => lesson.value?.beats?.[beatIndex.value])
@@ -248,6 +250,8 @@ async function finishAsk() {
 
 function stopAudio() {
   playGen += 1
+  explainPlaying.value = false
+  explainPaused.value = false
   stopSpeak()
   stopAssistantSpeak()
   if (live) {
@@ -255,6 +259,30 @@ function stopAudio() {
     live.src = ''
     live = null
   }
+}
+
+function pauseExplain() {
+  if (!explainPlaying.value) return
+  explainPaused.value = true
+  live?.pause()
+}
+
+function resumeExplain() {
+  if (explainPlaying.value && explainPaused.value) {
+    explainPaused.value = false
+    live?.play().catch(() => undefined)
+    return
+  }
+  void playExplain(Math.max(0, sentIndex.value))
+}
+
+function toggleExplainPlay() {
+  if (explainPlaying.value && !explainPaused.value) pauseExplain()
+  else resumeExplain()
+}
+
+function restartExplain() {
+  void playExplain(0)
 }
 
 function openTextPopup(box: Box) {
@@ -291,18 +319,35 @@ async function playOne(text: string, purpose?: string): Promise<void> {
   })
 }
 
-async function playExplain() {
+async function waitIfExplainPaused(gen: number) {
+  while (explainPaused.value && gen === playGen) {
+    await sleep(80)
+  }
+}
+
+async function playExplain(from = 0) {
   stopAudio()
+  explainPlaying.value = true
+  explainPaused.value = false
   const gen = playGen
   const list = sentences.value
-  for (let i = 0; i < list.length; i++) {
+  const start = Math.min(Math.max(0, from), Math.max(0, list.length - 1))
+  for (let i = start; i < list.length; i++) {
+    if (gen !== playGen) return
+    await waitIfExplainPaused(gen)
     if (gen !== playGen) return
     sentIndex.value = i
     markSentence(list[i])
     nextTick(() => document.getElementById(`sent-${i}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
     await playOne(list[i])
     if (gen !== playGen) return
+    await waitIfExplainPaused(gen)
+    if (gen !== playGen) return
     if (i < list.length - 1) await sleep(Math.max(0, gapSec.value) * 1000)
+  }
+  if (gen === playGen) {
+    explainPlaying.value = false
+    explainPaused.value = false
   }
 }
 
@@ -709,22 +754,7 @@ function confirmForceNextPage() {
 
 function clickSentence(i: number) {
   if (step.value !== 'explain') return
-  playFrom(i)
-}
-
-async function playFrom(start: number) {
-  stopAudio()
-  const gen = playGen
-  const list = sentences.value
-  for (let i = start; i < list.length; i++) {
-    if (gen !== playGen) return
-    sentIndex.value = i
-    markSentence(list[i])
-    nextTick(() => document.getElementById(`sent-${i}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
-    await playOne(list[i])
-    if (gen !== playGen) return
-    if (i < list.length - 1) await sleep(Math.max(0, gapSec.value) * 1000)
-  }
+  void playExplain(i)
 }
 
 function pauseFlow() {
@@ -851,7 +881,25 @@ onUnmounted(() => {
         </p>
         <section class="card space-y-2 p-3 lg:space-y-3 lg:p-5">
           <div class="flex items-center justify-between gap-2">
-            <p class="text-[11px] font-extrabold uppercase tracking-wide text-brand-600 lg:text-xs">讲解</p>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[11px] font-extrabold uppercase tracking-wide text-brand-600 lg:text-xs">讲解</p>
+              <button
+                class="grid h-7 w-7 place-items-center rounded-full bg-brand-100 text-sm font-black text-brand-700 shadow-sm"
+                type="button"
+                :title="explainPlaying && !explainPaused ? '暂停' : '播放'"
+                @click="toggleExplainPlay"
+              >
+                {{ explainPlaying && !explainPaused ? '⏸' : '▶' }}
+              </button>
+              <button
+                class="grid h-7 w-7 place-items-center rounded-full bg-white text-sm font-black text-brand-600 shadow-sm"
+                type="button"
+                title="重新开始"
+                @click="restartExplain"
+              >
+                ↻
+              </button>
+            </div>
             <label class="flex items-center gap-1 text-[11px] font-bold text-brand-600/70 lg:text-xs">
               句间停
               <input
@@ -879,7 +927,7 @@ onUnmounted(() => {
             </button>
           </div>
           <div class="grid grid-cols-2 gap-1.5 lg:gap-2">
-            <button class="btn-ghost w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs" type="button" @click="playExplain">再听一遍</button>
+            <button class="btn-ghost w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs" type="button" @click="restartExplain">再听一遍</button>
             <button
               class="btn-primary w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs"
               type="button"
