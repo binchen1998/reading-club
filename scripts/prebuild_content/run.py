@@ -15,7 +15,6 @@ import argparse
 import json
 import logging
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,7 +23,7 @@ if str(ROOT) not in sys.path:
 
 from scripts.paths import LESSONS
 from scripts.prebuild_content.assets_gen import generate_ocr, generate_tts
-from scripts.prebuild_content.lesson_llm import generate_chapter_lesson
+from scripts.prebuild_content.lesson_llm import generate_chapter_lesson_full
 from scripts.prebuild_content.pages import list_local_books, load_book, split_chapters
 
 logger = logging.getLogger("prebuild_content")
@@ -86,38 +85,7 @@ def process_book(
         elif need_lesson:
             pages = info.get("pages") or []
             print(f"[lesson] {label} 正在用 AI 生成，页数={len(pages)}", flush=True)
-            if len(pages) <= 12:
-                lesson = generate_chapter_lesson(info)
-            else:
-                lesson = {"chapter": num, "title": info.get("title") or "", "title_zh": "", "word_bank": [], "phrase_bank": [], "beats": []}
-                seen_w: set[str] = set()
-                seen_p: set[str] = set()
-                chunks = [
-                    {**info, "pages": pages[start : start + 10]}
-                    for start in range(0, len(pages), 10)
-                ]
-                parts: list[dict] = [None] * len(chunks)  # type: ignore[list-item]
-                print(f"[lesson] {label} 并行生成 {len(chunks)} 段", flush=True)
-                with ThreadPoolExecutor(max_workers=min(4, len(chunks))) as pool:
-                    futs = {pool.submit(generate_chapter_lesson, chunk): i for i, chunk in enumerate(chunks)}
-                    for fut in as_completed(futs):
-                        parts[futs[fut]] = fut.result()
-                for part in parts:
-                    lesson["title"] = part.get("title") or lesson["title"]
-                    lesson["title_zh"] = part.get("title_zh") or lesson["title_zh"]
-                    for item in part.get("word_bank") or []:
-                        key = item["en"].lower()
-                        if key in seen_w:
-                            continue
-                        seen_w.add(key)
-                        lesson["word_bank"].append(item)
-                    for item in part.get("phrase_bank") or []:
-                        key = item["en"].lower()
-                        if key in seen_p:
-                            continue
-                        seen_p.add(key)
-                        lesson["phrase_bank"].append(item)
-                    lesson["beats"].extend(part.get("beats") or [])
+            lesson = generate_chapter_lesson_full(info)
             write_lesson(dest, lesson)
             print(f"[lesson] {label} 已写入 {dest}", flush=True)
         elif dest.exists():

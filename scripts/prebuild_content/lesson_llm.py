@@ -42,35 +42,19 @@ def load_prompt() -> str:
 
 
 def _client():
-    from backend.app.config import (
-        OPENAI_API_KEY,
-        OPENAI_BASE_URL,
-        OPENROUTER_API_KEY,
-        OPENROUTER_BASE_URL,
-        QWEN_API_KEY,
-    )
-    from openai import OpenAI
+    from backend.app.openai_llm import get_openai_client, openai_base_url
 
-    key = (OPENAI_API_KEY or "").strip()
-    if key:
-        return OpenAI(api_key=key, base_url=OPENAI_BASE_URL or "https://api.openai.com/v1")
-    key = (OPENROUTER_API_KEY or "").strip()
-    if key:
-        return OpenAI(api_key=key, base_url=OPENROUTER_BASE_URL or "https://openrouter.ai/api/v1")
-    key = (QWEN_API_KEY or "").strip()
-    if not key:
+    openai_base_url()
+    client = get_openai_client()
+    if client is None:
         raise RuntimeError("未配置 OPENAI_API_KEY，无法生成课稿")
-    return OpenAI(api_key=key, base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
+    return client
 
 
 def _model_name() -> str:
-    from backend.app.config import OPENAI_API_KEY, OPENAI_TEACHING_MODEL, OPENROUTER_API_KEY, OPENROUTER_MODEL
+    from backend.app.openai_llm import teaching_model
 
-    if (OPENAI_API_KEY or "").strip():
-        return OPENAI_TEACHING_MODEL or "gpt-5.6-luna"
-    if (OPENROUTER_API_KEY or "").strip():
-        return OPENROUTER_MODEL or "openai/gpt-5.6-luna"
-    return "qwen-max"
+    return teaching_model()
 
 
 def _strip_fence(raw: str) -> str:
@@ -99,26 +83,9 @@ def extract_json(raw: str) -> dict[str, Any]:
 
 
 def _complete(client, messages):
-    model = _model_name()
-    attempts = [
-        {"model": model, "messages": messages},
-        {"model": model, "messages": messages, "temperature": 0.2},
-    ]
-    last = None
-    for kwargs in attempts:
-        try:
-            resp = client.chat.completions.create(**kwargs)
-        except Exception as exc:
-            last = exc
-            continue
-        err = getattr(resp, "error", None)
-        if err:
-            last = err
-            continue
-        if resp.choices:
-            return resp
-        last = resp
-    raise RuntimeError(f"课稿模型无有效输出: {last}")
+    from backend.app.openai_llm import complete
+
+    return complete(client, messages, model=_model_name())
 
 
 def generate_chapter_lesson(chapter: dict) -> dict[str, Any]:
@@ -207,5 +174,53 @@ def sanitize_lesson(lesson: dict, chapter: dict) -> dict:
     ]
     lesson["beats"] = beats
     if not beats:
+        raise ValueError("生成结果没有有效 beat")
+    return lesson
+
+
+def generate_chapter_lesson_full(chapter: dict) -> dict[str, Any]:
+    """一章完整课稿；页数多时分段并行，供预生成与在线讲解共用。"""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    pages = chapter.get("pages") or []
+    num = int(chapter.get("chapter") or 1)
+    if len(pages) <= 12:
+        return generate_chapter_lesson(chapter)
+    lesson = {
+        "chapter": num,
+        "title": chapter.get("title") or "",
+        "title_zh": "",
+        "word_bank": [],
+        "phrase_bank": [],
+        "beats": [],
+    }
+    seen_w: set[str] = set()
+    seen_p: set[str] = set()
+    chunks = [
+        {**chapter, "pages": pages[start : start + 10]}
+        for start in range(0, len(pages), 10)
+    ]
+    parts: list[dict] = [{}] * len(chunks)
+    with ThreadPoolExecutor(max_workers=min(4, len(chunks))) as pool:
+        futs = {pool.submit(generate_chapter_lesson, chunk): i for i, chunk in enumerate(chunks)}
+        for fut in as_completed(futs):
+            parts[futs[fut]] = fut.result()
+    for part in parts:
+        lesson["title"] = part.get("title") or lesson["title"]
+        lesson["title_zh"] = part.get("title_zh") or lesson["title_zh"]
+        for item in part.get("word_bank") or []:
+            key = str(item.get("en") or "").lower()
+            if not key or key in seen_w:
+                continue
+            seen_w.add(key)
+            lesson["word_bank"].append(item)
+        for item in part.get("phrase_bank") or []:
+            key = str(item.get("en") or "").lower()
+            if not key or key in seen_p:
+                continue
+            seen_p.add(key)
+            lesson["phrase_bank"].append(item)
+        lesson["beats"].extend(part.get("beats") or [])
+    if not lesson["beats"]:
         raise ValueError("生成结果没有有效 beat")
     return lesson

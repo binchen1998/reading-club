@@ -19,6 +19,7 @@ import { concatClips } from '../utils/concatClips'
 import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
+import { beginGenerate, endGenerate } from '../stores/generate'
 import { ensureOcr, ensureTts } from '../utils/ensureAsset'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
@@ -855,7 +856,14 @@ watch(
 )
 
 onMounted(async () => {
-  data.value = await api(`/api/lessons/${route.params.seriesId}/${route.params.bookSlug}/${route.params.chapterId}`)
+  const path = `/api/lessons/${route.params.seriesId}/${route.params.bookSlug}/${route.params.chapterId}`
+  const check = (await api(`${path}?check=1`)) as { exists?: boolean }
+  if (!check?.exists) beginGenerate('讲解')
+  try {
+    data.value = await api(path)
+  } finally {
+    endGenerate()
+  }
   await loadPageProgress()
   startStep()
 })

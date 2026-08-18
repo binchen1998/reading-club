@@ -1,4 +1,4 @@
-"""课堂助教问答（同步，Qwen）。"""
+"""课堂助教问答（同步，OpenAI nano）。"""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import re
 
 from fastapi import HTTPException
 
-from .config import QWEN_API_KEY
+from .openai_llm import assistant_model, complete, get_openai_client, openai_base_url
 
 logger = logging.getLogger("teaching")
 
@@ -23,15 +23,6 @@ CHAT_SYSTEM = """你是一名专业的中国少儿英语教师，正在给 6—1
 """
 
 
-def _client():
-    key = (QWEN_API_KEY or "").strip()
-    if not key:
-        return None
-    from openai import OpenAI
-
-    return OpenAI(api_key=key, base_url="https://dashscope.aliyuncs.com/compatible-mode/v1")
-
-
 def chat_reply(
     *,
     book_title: str,
@@ -41,9 +32,13 @@ def chat_reply(
     current_script: str,
     messages: list[dict],
 ) -> str:
-    client = _client()
+    client = get_openai_client()
     if client is None:
-        raise HTTPException(status_code=503, detail="未配置 QWEN_API_KEY，无法进行课堂问答")
+        raise HTTPException(status_code=503, detail="未配置 OPENAI_API_KEY，无法进行课堂问答")
+    try:
+        openai_base_url()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     text = (student_text or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="请先说话")
@@ -63,16 +58,21 @@ def chat_reply(
         f"{page_context}\n\n【学生刚说的话】\n{text}\n\n"
         "请结合对话历史与当前页内容，按系统规则生成简短的老师口播回复。"
     )
-    resp = client.chat.completions.create(
-        model="qwen-max",
-        messages=[
-            {"role": "system", "content": CHAT_SYSTEM},
-            {"role": "system", "content": page_context},
-            *history,
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.4,
-    )
+    try:
+        resp = complete(
+            client,
+            [
+                {"role": "system", "content": CHAT_SYSTEM},
+                {"role": "system", "content": page_context},
+                *history,
+                {"role": "user", "content": user_prompt},
+            ],
+            model=assistant_model(),
+            max_completion_tokens=256,
+        )
+    except Exception as exc:
+        logger.exception("assistant chat failed")
+        raise HTTPException(status_code=502, detail=f"助教暂时没有回复：{exc}") from exc
     reply = (resp.choices[0].message.content or "").strip()
     reply = re.sub(r"^```[\s\S]*?```$", "", reply).strip()
     if not reply:
