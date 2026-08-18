@@ -134,32 +134,25 @@ body {
 }
 
 .book-mark-read {
-  background: linear-gradient(
-    105deg,
-    rgba(255, 214, 64, 0.52) 0%,
-    rgba(255, 196, 48, 0.86) 32%,
-    rgba(255, 140, 64, 0.8) 58%,
-    rgba(255, 214, 64, 0.52) 100%
-  );
-  background-size: 280% 100%;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 168, 40, 0.42);
-  animation: book-mark-read-flow 2.8s ease-in-out infinite;
+  background-color: #ffe566;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 140, 40, 0.45);
+  animation: book-mark-read-flow 2.4s ease-in-out infinite;
 }
 
 @keyframes book-mark-read-flow {
   0%,
   100% {
-    background-position: 0% 50%;
+    background-color: #ffe566;
   }
   50% {
-    background-position: 100% 50%;
+    background-color: #ff6a38;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .book-mark-read {
     animation: none;
-    background: rgba(255, 196, 48, 0.78);
+    background-color: #ffc53d;
   }
 }
 
