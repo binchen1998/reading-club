@@ -27,10 +27,15 @@ export function syncUsernameFromUrl(search = window.location.search): string {
   return readUsername()
 }
 
-export function clubLink(path: string, username = readUsername()): string {
+export function urlUsername(search = window.location.search): string {
+  return (new URLSearchParams(search).get('username') || '').trim()
+}
+
+export function clubLink(path: string, username = ''): string {
+  const name = username || urlUsername() || readUsername()
   const [base, hash = ''] = path.split('#')
   const url = new URL(base, 'http://local.test')
-  if (username) url.searchParams.set('username', username)
+  if (name) url.searchParams.set('username', name)
   const realname = getStoredRealname()
   if (realname) url.searchParams.set('realname', realname)
   return `${url.pathname}${url.search}${hash ? `#${hash}` : ''}`

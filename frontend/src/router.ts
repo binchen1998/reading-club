@@ -41,16 +41,16 @@ function queryUsername(query: LocationQuery): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-router.beforeEach((to) => {
-  if (to.path.startsWith('/admin')) return true
-  const fromUrl = syncUsernameFromUrl(to.fullPath.includes('?') ? to.fullPath.slice(to.fullPath.indexOf('?')) : window.location.search)
+router.beforeEach((to, from) => {
   const qUser = queryUsername(to.query)
   if (qUser) writeUsername(qUser)
-  const user = qUser || fromUrl || readUsername()
-  if (to.meta.auth && !user) {
+  const user = qUser || queryUsername(from.query) || syncUsernameFromUrl() || readUsername()
+  if (user && qUser !== user) writeUsername(user)
+
+  if (!to.path.startsWith('/admin') && to.meta.auth && !user) {
     return { path: '/', query: { return_url: to.fullPath } }
   }
-  if (user && to.query.username !== user) {
+  if (user && queryUsername(to.query) !== user) {
     return { path: to.path, query: { ...to.query, username: user }, hash: to.hash, replace: true }
   }
   return true
