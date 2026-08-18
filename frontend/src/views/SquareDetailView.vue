@@ -115,7 +115,6 @@ onMounted(load)
 
 <template>
   <div class="space-y-4">
-    <router-link class="font-extrabold text-brand-600" :to="clubLink('/square')">← 广场</router-link>
     <div v-if="loading" class="card py-10 text-center font-bold text-brand-600/50">加载中…</div>
     <div v-else-if="error && !item" class="card py-10 text-center font-bold text-candy">{{ error }}</div>
     <template v-else-if="item">

@@ -973,7 +973,7 @@ onUnmounted(() => {
         type="button"
         @click="goBack"
       >
-        ← 返回
+        返回
       </button>
       <button
         class="rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-extrabold text-brand-700 shadow-pop disabled:opacity-40 lg:px-4 lg:py-2 lg:text-sm"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 
 import { api } from './api'
 import GenerateBusy from './components/GenerateBusy.vue'
@@ -8,11 +8,15 @@ import { clubLink } from './utils/username'
 import { useUserStore } from './stores/user'
 
 const route = useRoute()
+const router = useRouter()
 const user = useUserStore()
 const unreadCount = ref(0)
 let unreadTimer: number | undefined
 const reading = computed(() => route.path.startsWith('/read/'))
 const adminPage = computed(() => route.path.startsWith('/admin'))
+const secondary = computed(() => !!route.meta.secondary)
+const hideBanner = computed(() => reading.value || adminPage.value || secondary.value)
+const showShellBack = computed(() => secondary.value && !reading.value)
 const onMessages = computed(() => route.path === '/messages')
 const navItems = [
   { path: '/home', label: '首页', match: ['/home', '/day'] },
@@ -33,13 +37,9 @@ function navClass(active: boolean) {
     : 'relative rounded-full px-3 py-1 text-brand-700 hover:bg-white'
 }
 
-const backNav = computed(() => {
-  const seriesId = String(route.params.seriesId || '')
-  const bookSlug = String(route.params.bookSlug || '')
-  if (route.path.startsWith('/series/') && bookSlug) return { label: '← 书架', to: clubLink(`/series/${seriesId}`) }
-  if (route.path.startsWith('/series/')) return { label: '← 全部系列', to: clubLink('/books') }
-  return null
-})
+function goBack() {
+  router.back()
+}
 
 async function loadUnread() {
   if (!user.username || user.isGuest) {
@@ -77,20 +77,13 @@ onUnmounted(() => {
   <div class="app-shell" :class="reading ? 'h-[100dvh] overflow-hidden' : ''">
     <div class="app-shell-inner" :class="reading ? 'h-full overflow-hidden' : ''">
       <header
-        v-if="!reading && !adminPage"
+        v-if="!hideBanner"
         class="sticky top-0 z-30 border-b border-brand-200/50 bg-white/55 backdrop-blur"
       >
         <div class="relative mx-auto flex min-h-[3.5rem] max-w-[1400px] items-center justify-between gap-3 px-4 py-3 lg:px-6">
           <RouterLink :to="clubLink('/home')" class="flex items-center gap-2 text-lg font-extrabold text-brand-700">
             <span class="animate-float">📖</span>
             <span class="max-md:hidden">英语阅读俱乐部</span>
-          </RouterLink>
-          <RouterLink
-            v-if="backNav"
-            class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white/90 px-5 py-2 text-sm font-extrabold text-brand-700 shadow-pop"
-            :to="backNav.to"
-          >
-            {{ backNav.label }}
           </RouterLink>
           <nav class="flex flex-wrap items-center justify-end gap-2 text-sm font-extrabold">
             <RouterLink
@@ -110,9 +103,27 @@ onUnmounted(() => {
           </nav>
         </div>
       </header>
+      <div
+        v-if="showShellBack"
+        class="fixed left-1/2 top-1.5 z-[90] flex -translate-x-1/2 items-center lg:top-2"
+      >
+        <button
+          class="rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-extrabold text-brand-700 shadow-pop lg:px-4 lg:py-2 lg:text-sm"
+          type="button"
+          @click="goBack"
+        >
+          返回
+        </button>
+      </div>
       <main
         class="mx-auto"
-        :class="reading ? 'h-[100dvh] overflow-hidden px-1.5 pb-1.5 pt-11 lg:px-2 lg:pb-2 lg:pt-14' : 'max-w-[1400px] px-4 pb-16 pt-4 lg:px-6'"
+        :class="
+          reading
+            ? 'h-[100dvh] overflow-hidden px-1.5 pb-1.5 pt-11 lg:px-2 lg:pb-2 lg:pt-14'
+            : showShellBack
+              ? 'max-w-[1400px] px-4 pb-16 pt-14 lg:px-6'
+              : 'max-w-[1400px] px-4 pb-16 pt-4 lg:px-6'
+        "
       >
         <RouterView v-slot="{ Component, route: r }">
           <transition name="fade">
