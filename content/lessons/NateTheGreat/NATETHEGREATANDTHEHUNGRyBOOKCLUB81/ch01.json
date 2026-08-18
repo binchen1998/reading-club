@@ -1,0 +1,373 @@
+{
+  "series": "NateTheGreat",
+  "book_name": "NATETHEGREATANDTHEHUNGRyBOOKCLUB81",
+  "title": "Hungry Book Club",
+  "chapter": 1,
+  "chapter_title": "Torn, Ripped, Ruined",
+  "pages": [
+    {
+      "page": 8,
+      "has_text": true,
+      "english": "Chapter One\nTorn, Ripped, Ruined\n\nMy name is Nate the Great.\nI am a detective.\nMy dog, Sludge, is a detective too.\n“Ouch!”\nRight now I am a mumbling, bumbling, tripping detective.\nI have just tripped over a big pile of books that Rosamond left in my house.",
+      "translate": "第一章 撕裂、破损、毁坏\n\n我叫内特·大侦探。 我是一名侦探。 我的狗，斯拉奇，也是侦探。 “哎哟！” 现在，我是一个喃喃自语、笨手笨脚、绊倒的侦探。 我刚刚被罗莎蒙德留在我家的一大堆书绊倒了。",
+      "explain": "第一章题目是 Torn, Ripped, Ruined，撕破、扯破、毁掉。故事开头，小朋友自我介绍：My name is Nate the Great. 他是侦探，detective 就是专门查案子的人。他的狗 Sludge 也是侦探。他刚喊了一声 Ouch，因为被 Rosamond 留在家里的 a pile of books 绊倒了。pile 就是一堆。咱们先把这几句读顺。",
+      "words": [
+        {
+          "en": "detective",
+          "zh": "侦探"
+        },
+        {
+          "en": "pile",
+          "zh": "一堆"
+        },
+        {
+          "en": "tripped",
+          "zh": "绊倒"
+        }
+      ],
+      "phrases": [
+        {
+          "en": "Nate the Great",
+          "zh": "大侦探奈特"
+        },
+        {
+          "en": "a pile of books",
+          "zh": "一大堆书"
+        }
+      ],
+      "review_words": [
+        {
+          "en": "detective",
+          "zh": "侦探"
+        },
+        {
+          "en": "pile",
+          "zh": "一堆"
+        },
+        {
+          "en": "tripped",
+          "zh": "绊倒"
+        }
+      ],
+      "review_phrases": [
+        {
+          "en": "Nate the Great",
+          "zh": "大侦探奈特"
+        },
+        {
+          "en": "a pile of books",
+          "zh": "一大堆书"
+        }
+      ],
+      "segments": [
+        "Chapter One Torn, Ripped, Ruined",
+        "My name is Nate the Great.",
+        "I am a detective.",
+        "My dog, Sludge, is a detective too.",
+        "“Ouch!” Right now I am a mumbling, bumbling, tripping detective.",
+        "I have just tripped over a big pile of books that Rosamond left in my house."
+      ]
+    },
+    {
+      "page": 9,
+      "has_text": true,
+      "english": "Sludge is sniffing them. He has been sniffing them since Rosamond knocked on my door this morning. She was carrying a bunch of books. Three more were piled on her head. Rosamond looked very strange. Rosamond looks strange all the time. \"I have great news,\" she said. \"I have started a book club. I am calling it Rosamond's Ready Readers. But there is trouble in the club. One of the members is trying to wreck my cookbook. Look!\" Rosamond took a book off her head. The other two books fell off. \"Why are you carrying books on top of your head?\" I asked. \"Because I'm president of a club now.",
+      "translate": "淤泥正在嗅它们。自从罗莎蒙德今天早上敲我的门以来，他就一直在嗅它们。她带着一堆书。她头上还堆了三本书。罗莎蒙德看起来很奇怪。罗莎蒙德一直看起来很奇怪。“我有个好消息，”她说，“我成立了一个读书俱乐部。我把它叫做罗莎蒙德的准备读者。但俱乐部里出了问题。一个成员试图破坏我的烹饪书。看！”罗莎蒙德从她头上拿下一本书，另外两本书掉了下来。“你为什么要把书顶在头上？”我问。“因为我现在是俱乐部的主席。”",
+      "explain": "Sludge 一直在 sniffing，就是用鼻子闻那些书。早上 Rosamond 敲门进来，怀里抱着 a bunch of books，头上还顶着三本。她说好消息：自己办了个 book club，叫 Rosamond's Ready Readers。可是俱乐部里有麻烦，有人想 wreck 她的 cookbook。wreck 是搞坏，cookbook 是食谱书。她从脑袋上拿下一本，另外两本掉下来。Nate 问她为什么把书顶在头上，她说因为自己现在是 president，主席。",
+      "words": [
+        {
+          "en": "sniffing",
+          "zh": "闻；嗅"
+        },
+        {
+          "en": "cookbook",
+          "zh": "食谱书"
+        },
+        {
+          "en": "wreck",
+          "zh": "破坏"
+        },
+        {
+          "en": "president",
+          "zh": "主席；会长"
+        }
+      ],
+      "phrases": [
+        {
+          "en": "book club",
+          "zh": "读书俱乐部"
+        },
+        {
+          "en": "a bunch of books",
+          "zh": "一堆书"
+        }
+      ],
+      "review_words": [
+        {
+          "en": "detective",
+          "zh": "侦探"
+        },
+        {
+          "en": "pile",
+          "zh": "一堆"
+        },
+        {
+          "en": "tripped",
+          "zh": "绊倒"
+        },
+        {
+          "en": "sniffing",
+          "zh": "闻；嗅"
+        },
+        {
+          "en": "cookbook",
+          "zh": "食谱书"
+        },
+        {
+          "en": "wreck",
+          "zh": "破坏"
+        },
+        {
+          "en": "president",
+          "zh": "主席；会长"
+        }
+      ],
+      "review_phrases": [
+        {
+          "en": "Nate the Great",
+          "zh": "大侦探奈特"
+        },
+        {
+          "en": "a pile of books",
+          "zh": "一大堆书"
+        },
+        {
+          "en": "book club",
+          "zh": "读书俱乐部"
+        },
+        {
+          "en": "a bunch of books",
+          "zh": "一堆书"
+        }
+      ],
+      "segments": [
+        "Sludge is sniffing them. He has been sniffing them since Rosamond knocked on my door this morning. She was carrying a bunch of books. Three more were piled on her head. Rosamond looked very strange. Rosamond looks strange all the time.",
+        "\"I have great news,\" she said. \"I have started a book club. I am calling it Rosamond's Ready Readers. But there is trouble in the club. One of the members is trying to wreck my cookbook.",
+        "Look!\" Rosamond took a book off her head. The other two books fell off. \"Why are you carrying books on top of your head?\" I asked. \"Because I'm president of a club now."
+      ]
+    },
+    {
+      "page": 10,
+      "has_text": true,
+      "english": "These books help me hold my head high and look like a president.” I, Nate the Great, knew that I was looking at a very strange president.",
+      "translate": "“这些书帮助我昂首挺胸，看起来像个总统。” 我，大侦探内特，知道我看到的是一个非常奇怪的总统。",
+      "explain": "Rosamond 解释：These books help me hold my head high and look like a president. hold my head high 是把头抬高，显得很神气。Nate 心里想，这可是个 very strange president，strange 就是奇怪。书顶在头上当主席，他觉得这件事本身就很怪。",
+      "words": [
+        {
+          "en": "strange",
+          "zh": "奇怪的"
+        }
+      ],
+      "phrases": [
+        {
+          "en": "hold my head high",
+          "zh": "昂首挺胸"
+        },
+        {
+          "en": "look like",
+          "zh": "看起来像"
+        }
+      ],
+      "review_words": [
+        {
+          "en": "detective",
+          "zh": "侦探"
+        },
+        {
+          "en": "pile",
+          "zh": "一堆"
+        },
+        {
+          "en": "tripped",
+          "zh": "绊倒"
+        },
+        {
+          "en": "sniffing",
+          "zh": "闻；嗅"
+        },
+        {
+          "en": "cookbook",
+          "zh": "食谱书"
+        },
+        {
+          "en": "wreck",
+          "zh": "破坏"
+        },
+        {
+          "en": "president",
+          "zh": "主席；会长"
+        },
+        {
+          "en": "strange",
+          "zh": "奇怪的"
+        }
+      ],
+      "review_phrases": [
+        {
+          "en": "Nate the Great",
+          "zh": "大侦探奈特"
+        },
+        {
+          "en": "a pile of books",
+          "zh": "一大堆书"
+        },
+        {
+          "en": "book club",
+          "zh": "读书俱乐部"
+        },
+        {
+          "en": "a bunch of books",
+          "zh": "一堆书"
+        },
+        {
+          "en": "hold my head high",
+          "zh": "昂首挺胸"
+        },
+        {
+          "en": "look like",
+          "zh": "看起来像"
+        }
+      ],
+      "segments": [
+        "These books help me hold my head high and look like a president.” I, Nate the Great, knew that I was looking at a very strange president."
+      ]
+    },
+    {
+      "page": 11,
+      "has_text": true,
+      "english": "“This is my new cookbook,” she said.\n“Yesterday I left it open on my kitchen table after I made treats for the club meeting.\nWhen the meeting was over, I went to get the treats for the members.\nThe page that was open was torn, ripped, ruined!”\nSludge and I looked at the page.\nI, Nate the Great, say that it was torn, ripped, ruined.",
+      "translate": "“这是我的新食谱，”她说。  \n“昨天我在为俱乐部会议做点心后，把它打开放在厨房的桌子上。  \n会议结束后，我去拿给会员们的点心。  \n那页打开的书页被撕了、扯了、毁了！”  \n斯拉奇和我看了那页。  \n我，大侦探内特，说那页被撕了、扯了、毁了。",
+      "explain": "Rosamond 拿出那本新 cookbook。昨天她做好 club meeting 的 treats，点心，把书打开放在 kitchen table 上。会开完去拿点心，发现摊开的那一页 torn, ripped, ruined，撕了、扯了、毁了。Nate 和 Sludge 看了一眼，他也重复这三个词。这一章的谜就在这儿：谁把食谱页弄坏了。",
+      "words": [
+        {
+          "en": "treats",
+          "zh": "点心"
+        },
+        {
+          "en": "torn",
+          "zh": "撕破的"
+        },
+        {
+          "en": "ripped",
+          "zh": "扯破的"
+        },
+        {
+          "en": "ruined",
+          "zh": "毁了的"
+        }
+      ],
+      "phrases": [
+        {
+          "en": "kitchen table",
+          "zh": "厨房桌子"
+        },
+        {
+          "en": "club meeting",
+          "zh": "俱乐部聚会"
+        }
+      ],
+      "review_words": [
+        {
+          "en": "detective",
+          "zh": "侦探"
+        },
+        {
+          "en": "pile",
+          "zh": "一堆"
+        },
+        {
+          "en": "tripped",
+          "zh": "绊倒"
+        },
+        {
+          "en": "sniffing",
+          "zh": "闻；嗅"
+        },
+        {
+          "en": "cookbook",
+          "zh": "食谱书"
+        },
+        {
+          "en": "wreck",
+          "zh": "破坏"
+        },
+        {
+          "en": "president",
+          "zh": "主席；会长"
+        },
+        {
+          "en": "strange",
+          "zh": "奇怪的"
+        },
+        {
+          "en": "treats",
+          "zh": "点心"
+        },
+        {
+          "en": "torn",
+          "zh": "撕破的"
+        },
+        {
+          "en": "ripped",
+          "zh": "扯破的"
+        },
+        {
+          "en": "ruined",
+          "zh": "毁了的"
+        }
+      ],
+      "review_phrases": [
+        {
+          "en": "Nate the Great",
+          "zh": "大侦探奈特"
+        },
+        {
+          "en": "a pile of books",
+          "zh": "一大堆书"
+        },
+        {
+          "en": "book club",
+          "zh": "读书俱乐部"
+        },
+        {
+          "en": "a bunch of books",
+          "zh": "一堆书"
+        },
+        {
+          "en": "hold my head high",
+          "zh": "昂首挺胸"
+        },
+        {
+          "en": "look like",
+          "zh": "看起来像"
+        },
+        {
+          "en": "kitchen table",
+          "zh": "厨房桌子"
+        },
+        {
+          "en": "club meeting",
+          "zh": "俱乐部聚会"
+        }
+      ],
+      "segments": [
+        "“This is my new cookbook,” she said.",
+        "“Yesterday I left it open on my kitchen table after I made treats for the club meeting.",
+        "When the meeting was over, I went to get the treats for the members.",
+        "The page that was open was torn, ripped, ruined!”",
+        "Sludge and I looked at the page.",
+        "I, Nate the Great, say that it was torn, ripped, ruined."
+      ]
+    }
+  ]
+}

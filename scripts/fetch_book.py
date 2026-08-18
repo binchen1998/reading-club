@@ -1,0 +1,123 @@
+"""下载一本书的全部页图 + 页 JSON 到本地。"""
+
+from __future__ import annotations
+
+import json
+import urllib.error
+import urllib.parse
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+
+from scripts.paths import BOOKS, CATALOG, SERIES, book_slug, pages_base
+
+
+def download(url: str, dest: Path) -> bool:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.exists() and dest.stat().st_size > 200:
+        return True
+    parts = urllib.parse.urlsplit(url)
+    encoded = urllib.parse.urlunsplit(
+        (parts.scheme, parts.netloc, urllib.parse.quote(parts.path, safe="/"), parts.query, parts.fragment)
+    )
+    req = urllib.request.Request(encoded, headers={"User-Agent": "reading-club/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=40) as resp:
+            dest.write_bytes(resp.read())
+        return True
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return False
+        raise
+
+
+def find_series(series_id: str) -> dict:
+    return next(s for s in SERIES if s["id"] == series_id)
+
+
+def find_book(series_id: str, title_or_name: str) -> dict:
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    series = next(s for s in catalog["series"] if s["id"] == series_id)
+    key = title_or_name.lower().strip()
+    for book in series["books"]:
+        if key in (book.get("title") or "").lower() or key == (book.get("name") or "").lower():
+            return book
+    raise KeyError(title_or_name)
+
+
+def fetch_book(series_id: str, title_or_name: str, max_pages: int = 200) -> Path:
+    series = find_series(series_id)
+    book = find_book(series_id, title_or_name)
+    slug = book_slug(book["title"], book["name"])
+    dest = BOOKS / series_id / slug
+    dest.mkdir(parents=True, exist_ok=True)
+    pages_dir = dest / "pages"
+    base = pages_base(series, book["name"])
+    def one(n: int) -> tuple[int, bool, dict]:
+        jpg = pages_dir / f"{n:03d}.jpg"
+        js = pages_dir / f"{n:03d}.json"
+        ok = download(f"{base}/{n}.jpg", jpg)
+        if not ok:
+            return n, False, {}
+        download(f"{base}/{n}.json", js)
+        download(f"{base}/{n}_paddle.json", pages_dir / f"{n:03d}_paddle.json")
+        payload = {}
+        if js.exists():
+            try:
+                payload = json.loads(js.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                payload = {}
+        english = (payload.get("学习内容") or "").strip()
+        rec = {
+            "page": n,
+            "image": f"pages/{n:03d}.jpg",
+            "json": f"pages/{n:03d}.json" if js.exists() else "",
+            "guide": (payload.get("导读") or "").strip(),
+            "english": english,
+            "translate": (payload.get("翻译") or "").strip(),
+            "has_text": bool(english),
+        }
+        return n, True, rec
+
+    found: dict[int, dict] = {}
+    stop_at = max_pages
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        # first probe in batches so we stop after first missing page
+        n = 0
+        while n < max_pages:
+            batch = list(range(n, min(n + 8, max_pages)))
+            futures = [pool.submit(one, i) for i in batch]
+            missing = False
+            for fut in as_completed(futures):
+                idx, ok, rec = fut.result()
+                if ok:
+                    found[idx] = rec
+                    print(f"  p{idx:03d} text={int(rec['has_text'])} {rec['english'][:48]}", flush=True)
+                else:
+                    missing = True
+                    stop_at = min(stop_at, idx)
+            if missing:
+                break
+            n += 8
+    pages = [found[i] for i in sorted(found) if i < stop_at]
+    meta = {
+        "series_id": series_id,
+        "slug": slug,
+        "title": book["title"],
+        "name": book["name"],
+        "cdn_pages": base,
+        "page_count": len(pages),
+        "pages": pages,
+    }
+    (dest / "book.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    return dest
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--series", default="NateTheGreat")
+    parser.add_argument("--book", default="Hungry Book Club")
+    args = parser.parse_args()
+    print(fetch_book(args.series, args.book))

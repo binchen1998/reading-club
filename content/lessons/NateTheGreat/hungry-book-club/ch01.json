@@ -1,0 +1,92 @@
+{
+  "chapter": 1,
+  "title": "Chapter One: Torn, Ripped, Ruined",
+  "title_zh": "第一章 撕破、扯破、毁掉",
+  "word_bank": [
+    {"en": "detective", "zh": "侦探"},
+    {"en": "pile", "zh": "一堆"},
+    {"en": "tripped", "zh": "绊倒"},
+    {"en": "sniffing", "zh": "闻；嗅"},
+    {"en": "cookbook", "zh": "食谱书"},
+    {"en": "wreck", "zh": "破坏"},
+    {"en": "president", "zh": "主席；会长"},
+    {"en": "strange", "zh": "奇怪的"},
+    {"en": "treats", "zh": "点心"},
+    {"en": "torn", "zh": "撕破的"},
+    {"en": "ripped", "zh": "扯破的"},
+    {"en": "ruined", "zh": "毁了的"}
+  ],
+  "phrase_bank": [
+    {"en": "Nate the Great", "zh": "大侦探奈特"},
+    {"en": "a pile of books", "zh": "一大堆书"},
+    {"en": "book club", "zh": "读书俱乐部"},
+    {"en": "a bunch of books", "zh": "一堆书"},
+    {"en": "hold my head high", "zh": "昂首挺胸"},
+    {"en": "look like", "zh": "看起来像"},
+    {"en": "kitchen table", "zh": "厨房桌子"},
+    {"en": "club meeting", "zh": "俱乐部聚会"}
+  ],
+  "beats": [
+    {
+      "page": 8,
+      "explain": "第一章题目是 Torn, Ripped, Ruined，撕破、扯破、毁掉。故事开头，小朋友自我介绍：My name is Nate the Great. 他是侦探，detective 就是专门查案子的人。他的狗 Sludge 也是侦探。他刚喊了一声 Ouch，因为被 Rosamond 留在家里的 a pile of books 绊倒了。pile 就是一堆。咱们先把这几句读顺。",
+      "words": ["detective", "pile", "tripped"],
+      "phrases": ["Nate the Great", "a pile of books"],
+      "segments": [
+        "Chapter One Torn, Ripped, Ruined",
+        "My name is Nate the Great.",
+        "I am a detective.",
+        "My dog, Sludge, is a detective too.",
+        "“Ouch!” Right now I am a mumbling, bumbling, tripping detective.",
+        "I have just tripped over a big pile of books that Rosamond left in my house."
+      ]
+    },
+    {
+      "page": 9,
+      "explain": "Sludge 一直在 sniffing，就是用鼻子闻那些书。早上 Rosamond 敲门进来，怀里抱着 a bunch of books，头上还顶着三本。她说好消息：自己办了个 book club，叫 Rosamond's Ready Readers。可是俱乐部里有麻烦，有人想 wreck 她的 cookbook。wreck 是搞坏，cookbook 是食谱书。她从脑袋上拿下一本，另外两本掉下来。Nate 问她为什么把书顶在头上，她说因为自己现在是 president，主席。",
+      "words": ["sniffing", "cookbook", "wreck", "president"],
+      "phrases": ["book club", "a bunch of books"],
+      "segments": [
+        "Sludge is sniffing them.",
+        "He has been sniffing them since Rosamond knocked on my door this morning.",
+        "She was carrying a bunch of books.",
+        "Three more were piled on her head.",
+        "Rosamond looked very strange.",
+        "Rosamond looks strange all the time.",
+        "\"I have great news,\" she said.",
+        "\"I have started a book club.\"",
+        "\"I am calling it Rosamond's Ready Readers.\"",
+        "\"But there is trouble in the club.\"",
+        "\"One of the members is trying to wreck my cookbook. Look!\"",
+        "Rosamond took a book off her head.",
+        "The other two books fell off.",
+        "\"Why are you carrying books on top of your head?\" I asked.",
+        "\"Because I'm president of a club now."
+      ]
+    },
+    {
+      "page": 10,
+      "explain": "Rosamond 解释：These books help me hold my head high and look like a president. hold my head high 是把头抬高，显得很神气。Nate 心里想，这可是个 very strange president，strange 就是奇怪。书顶在头上当主席，他觉得这件事本身就很怪。",
+      "words": ["strange"],
+      "phrases": ["hold my head high", "look like"],
+      "segments": [
+        "These books help me hold my head high and look like a president.”",
+        "I, Nate the Great, knew that I was looking at a very strange president."
+      ]
+    },
+    {
+      "page": 11,
+      "explain": "Rosamond 拿出那本新 cookbook。昨天她做好 club meeting 的 treats，点心，把书打开放在 kitchen table 上。会开完去拿点心，发现摊开的那一页 torn, ripped, ruined，撕了、扯了、毁了。Nate 和 Sludge 看了一眼，他也重复这三个词。这一章的谜就在这儿：谁把食谱页弄坏了。",
+      "words": ["treats", "torn", "ripped", "ruined"],
+      "phrases": ["kitchen table", "club meeting"],
+      "segments": [
+        "“This is my new cookbook,” she said.",
+        "“Yesterday I left it open on my kitchen table after I made treats for the club meeting.",
+        "When the meeting was over, I went to get the treats for the members.",
+        "The page that was open was torn, ripped, ruined!”",
+        "Sludge and I looked at the page.",
+        "I, Nate the Great, say that it was torn, ripped, ruined."
+      ]
+    }
+  ]
+}

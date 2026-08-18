@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+python-multipart
+pillow
+pytesseract
+sqlalchemy
+qiniu>=7.17.0
+redis==5.2.1

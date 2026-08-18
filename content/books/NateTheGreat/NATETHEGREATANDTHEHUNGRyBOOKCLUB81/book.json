@@ -1,0 +1,664 @@
+{
+  "level_name": "NateTheGreat",
+  "name": "NATETHEGREATANDTHEHUNGRyBOOKCLUB81",
+  "title": "Hungry Book Club",
+  "page_count": 82,
+  "pages": [
+    {
+      "page": 0,
+      "image": "000.jpg",
+      "json": "000.json",
+      "english": "Solve the mystery with Nate the Great! WHO'S HUNGRY FOR A GOOD BOOK? There's a book-eating monster on the loose! How else do pages keep going missing at Nate's friend Rosamond's Ready Readers book club? Nate the Great and his dog, Sludge, go to the next meeting ... as undercover detectives! Can Nate and Sludge solve their hungriest case yet? [A] favorite of beginning readers. —Booklist",
+      "translate": "和大侦探内特一起破解这个谜团！谁渴望一本好书？有一个吃书的怪物在四处游荡！否则，内特的朋友罗莎蒙德的“准备阅读者”读书俱乐部的书页怎么会不断消失呢？大侦探内特和他的狗斯拉奇参加了下一次会议……作为卧底侦探！内特和斯拉奇能解决他们迄今为止最饥饿的案件吗？[A] 初学读者的最爱。——《书单》",
+      "has_text": true
+    },
+    {
+      "page": 1,
+      "image": "001.jpg",
+      "json": "001.json",
+      "english": "Nate the Great and the Hungry Book Club by Marjorie Weinman Sharmat and Mitchell Sharmat illustrated by Jody Wheeler",
+      "translate": "《大侦探内特与饥饿的读书俱乐部》作者：玛乔丽·温曼·沙玛特和米切尔·沙玛特，插图：乔迪·惠勒",
+      "has_text": true
+    },
+    {
+      "page": 2,
+      "image": "002.jpg",
+      "json": "002.json",
+      "english": "Nate the Great and the Hungry Book Club",
+      "translate": "内特大侦探与饥饿的读书俱乐部",
+      "has_text": true
+    },
+    {
+      "page": 3,
+      "image": "003.jpg",
+      "json": "003.json",
+      "english": "",
+      "translate": "当然，请提供您需要翻译的英文文本。",
+      "has_text": false
+    },
+    {
+      "page": 4,
+      "image": "004.jpg",
+      "json": "004.json",
+      "english": "Nate the Great and the Hungry Book Club by Marjorie Weinman Sharmat and Mitchell Sharmat illustrated by Jody Wheeler A YEARLING BOOK",
+      "translate": "《大侦探内特与饥饿的读书俱乐部》作者：玛乔丽·温曼·沙玛特和米切尔·沙玛特，插图：乔迪·惠勒，少年文库书籍",
+      "has_text": true
+    },
+    {
+      "page": 5,
+      "image": "005.jpg",
+      "json": "005.json",
+      "english": "We want to thank the members of the Harvard Book Club of Southern Arizona for the inspiration they innocently and inadvertently provided for this book. —Marjorie Weinman Sharmat and Mitchell Sharmat\n\nSale of this book without a front cover may be unauthorized. If the book is coverless, it may have been reported to the publisher as “unsold or destroyed” and neither the author nor the publisher may have received payment for it.\n\nThis is a work of fiction. Names, characters, places, and incidents either are the product of the author’s imagination or are used fictitiously. Any resemblance to actual persons, living or dead, events, or locales is entirely coincidental.\n\nText copyright © 2009 by Marjorie Weinman Sharmat and Mitchell Sharmat\nNew illustrations of Nate the Great, Sludge, Rosamond, Annie, Oliver, Pip, Finley, Claude, Esmeralda, Harry, Fang, and the Hexes by Jody Wheeler based upon the original drawings by Marc Simont. All other images copyright © 2009 by Jody Wheeler\nCover art copyright © 2009 by Jody Wheeler\nExtra Fun Activities: text copyright © 2011 by Emily Costello\nExtra Fun Activities illustrations copyright © 2011 by Jody Wheeler\n\nAll rights reserved. Published in the United States by Yearling, an imprint of Random House Children’s Books, a division of Penguin Random House LLC, New York. Originally published in hardcover in the United States by Delacorte Press, an imprint of Random House Children’s Books, New York, in 2009.\n\nYearling and the jumping horse design are registered trademarks of Penguin Random House LLC.\n\nVisit us on the Web! randomhousekids.com\n\nEducators and librarians, for a variety of teaching tools, visit us at RHTeachersLibrarians.com\n\nThe Library of Congress has cataloged the hardcover edition of this work as follows:\nSharmat, Marjorie Weinman.\nNate the Great and the hungry book club / by Marjorie Weinman Sharmat and Mitchell Sharmat; illustrated by Jody Wheeler in the style of Marc Simont. — First edition.\np. cm.\nSummary: Nate and his dog Sludge help Rosamond discover who has been tearing pages out of her books.\nISBN 978-0-385-73695-4 (hardback) — ISBN 978-0-375-90637-1 (glb) —\nISBN 978-0-385-37674-7 (ebook) [1. Mystery and detective stories. 2. Books and reading—Fiction.]\nI. Sharmat, Mitchell, author. II. Wheeler, Jody, illustrator. III. Title.\nPZ7.S5299 Natp 2009\n[fic]—dc22\n2009003319\n\nISBN 978-0-593-37687-4 (premium)\n\nMANUFACTURED IN CHINA\n10 9 8 7 6 5 4 3 2\n\nRandom House Children’s Books supports the First Amendment and celebrates the right to read.",
+      "translate": "我们要感谢南亚利桑那州哈佛书友会的成员，他们无意中为这本书提供了灵感。——玛乔丽·温曼·沙玛特和米切尔·沙玛特\n\n没有封面的书可能是未经授权的销售。如果书没有封面，可能已被报告给出版商为“未售出或已销毁”，作者和出版商可能都没有收到付款。\n\n这是一部虚构作品。书中的名字、角色、地点和事件要么是作者想象的产物，要么是虚构使用的。任何与实际人物（无论生者或死者）、事件或地点的相似之处纯属巧合。\n\n文字版权 © 2009 玛乔丽·温曼·沙玛特和米切尔·沙玛特\nJody Wheeler 根据 Marc Simont 的原始绘图创作的 Nate the Great、Sludge、Rosamond、Annie、Oliver、Pip、Finley、Claude、Esmeralda、Harry、Fang 和 the Hexes 的新插图。所有其他图像版权 © 2009 Jody Wheeler\n封面艺术版权 © 2009 Jody Wheeler\n额外趣味活动：文字版权 © 2011 Emily Costello\n额外趣味活动插图版权 © 2011 Jody Wheeler\n\n版权所有。由企鹅兰登书屋有限责任公司旗下的儿童图书品牌 Yearling 在美国出版。2009 年由兰登书屋儿童图书品牌 Delacorte Press 在美国首次出版精装版。\n\nYearling 和跳马设计是企鹅兰登书屋有限责任公司的注册商标。\n\n访问我们的网站！randomhousekids.com\n\n教育工作者和图书管理员，请访问 RHTeachersLibrarians.com 获取各种教学工具。\n\n国会图书馆已为本作品的精装版编目如下：\nSharmat, Marjorie Weinman.\nNate the Great and the hungry book club / by Marjorie Weinman Sharmat and Mitchell Sharmat; illustrated by Jody Wheeler in the style of Marc Simont. — 第一版。\np. cm.\n摘要：Nate 和他的狗 Sludge 帮助 Rosamond 发现是谁撕掉了她书中的页面。\nISBN 978-0-385-73695-4 (精装) — ISBN 978-0-375-90637-1 (glb) —\nISBN 978-0-385-37674-7 (电子书) [1. 神秘和侦探故事。2. 书籍和阅读—小说。]\nI. Sharmat, Mitchell, 作者。II. Wheeler, Jody, 插画家。III. 标题。\nPZ7.S5299 Natp 2009\n[fic]—dc22\n2009003319\n\nISBN 978-0-593-37687-4 (高级版)\n\n中国制造\n10 9 8 7 6 5 4 3 2\n\n兰登书屋儿童图书支持第一修正案并庆祝阅读的权利。",
+      "has_text": true
+    },
+    {
+      "page": 6,
+      "image": "006.jpg",
+      "json": "006.json",
+      "english": "Remembering\n\nmy father, Nathan Weinman NATE\nmy mother, Anna Weinman ANNIE\nmy sister, Rosalind Weinman ROSAMOND\nmy uncle, Harry Weinman HARRY\nmy dog, Fritz Melvin Sharmat SLUDGE\n\nand you know them all\n—M.W.S.\n\nFor Trombone Bruce Glasberg\n—J.W.",
+      "translate": "怀念\n\n我的父亲，内森·温曼 内特\n我的母亲，安娜·温曼 安妮\n我的姐姐，罗莎琳德·温曼 罗莎蒙德\n我的叔叔，哈里·温曼 哈里\n我的狗，弗里茨·梅尔文·沙马特 斯拉奇\n\n你都认识他们\n——M.W.S.\n\n献给长号手布鲁斯·格拉斯伯格\n——J.W.",
+      "has_text": true
+    },
+    {
+      "page": 7,
+      "image": "007.jpg",
+      "json": "007.json",
+      "english": "The boy is looking for a book. There are many books on the floor. The dog is watching.",
+      "translate": "男孩正在找一本书。地板上有很多书。狗在看着。",
+      "has_text": true
+    },
+    {
+      "page": 8,
+      "image": "008.jpg",
+      "json": "008.json",
+      "english": "Chapter One\nTorn, Ripped, Ruined\n\nMy name is Nate the Great.\nI am a detective.\nMy dog, Sludge, is a detective too.\n“Ouch!”\nRight now I am a mumbling, bumbling, tripping detective.\nI have just tripped over a big pile of books that Rosamond left in my house.",
+      "translate": "第一章 撕裂、破损、毁坏\n\n我叫内特·大侦探。 我是一名侦探。 我的狗，斯拉奇，也是侦探。 “哎哟！” 现在，我是一个喃喃自语、笨手笨脚、绊倒的侦探。 我刚刚被罗莎蒙德留在我家的一大堆书绊倒了。",
+      "has_text": true
+    },
+    {
+      "page": 9,
+      "image": "009.jpg",
+      "json": "009.json",
+      "english": "Sludge is sniffing them. He has been sniffing them since Rosamond knocked on my door this morning. She was carrying a bunch of books. Three more were piled on her head. Rosamond looked very strange. Rosamond looks strange all the time. \"I have great news,\" she said. \"I have started a book club. I am calling it Rosamond's Ready Readers. But there is trouble in the club. One of the members is trying to wreck my cookbook. Look!\" Rosamond took a book off her head. The other two books fell off. \"Why are you carrying books on top of your head?\" I asked. \"Because I'm president of a club now.",
+      "translate": "淤泥正在嗅它们。自从罗莎蒙德今天早上敲我的门以来，他就一直在嗅它们。她带着一堆书。她头上还堆了三本书。罗莎蒙德看起来很奇怪。罗莎蒙德一直看起来很奇怪。“我有个好消息，”她说，“我成立了一个读书俱乐部。我把它叫做罗莎蒙德的准备读者。但俱乐部里出了问题。一个成员试图破坏我的烹饪书。看！”罗莎蒙德从她头上拿下一本书，另外两本书掉了下来。“你为什么要把书顶在头上？”我问。“因为我现在是俱乐部的主席。”",
+      "has_text": true
+    },
+    {
+      "page": 10,
+      "image": "010.jpg",
+      "json": "010.json",
+      "english": "These books help me hold my head high and look like a president.” I, Nate the Great, knew that I was looking at a very strange president.",
+      "translate": "“这些书帮助我昂首挺胸，看起来像个总统。” 我，大侦探内特，知道我看到的是一个非常奇怪的总统。",
+      "has_text": true
+    },
+    {
+      "page": 11,
+      "image": "011.jpg",
+      "json": "011.json",
+      "english": "“This is my new cookbook,” she said.\n“Yesterday I left it open on my kitchen table after I made treats for the club meeting.\nWhen the meeting was over, I went to get the treats for the members.\nThe page that was open was torn, ripped, ruined!”\nSludge and I looked at the page.\nI, Nate the Great, say that it was torn, ripped, ruined.",
+      "translate": "“这是我的新食谱，”她说。  \n“昨天我在为俱乐部会议做点心后，把它打开放在厨房的桌子上。  \n会议结束后，我去拿给会员们的点心。  \n那页打开的书页被撕了、扯了、毁了！”  \n斯拉奇和我看了那页。  \n我，大侦探内特，说那页被撕了、扯了、毁了。",
+      "has_text": true
+    },
+    {
+      "page": 12,
+      "image": "012.jpg",
+      "json": "012.json",
+      "english": "Chapter Two\nThe Crime Scene\nRosamond pulled something out of her pocket.\n\"Here is a photo of the crime scene,\" she said.\nI looked at the photo. \"Your kitchen was a crime scene?\"\n\"Of course. Keep this photo and study it. You can see that my cookbook is in the middle of my huge, high table.",
+      "translate": "第二章  \n犯罪现场  \n罗莎蒙德从口袋里拿出了一样东西。  \n“这是犯罪现场的照片，”她说。  \n我看了看照片。“你的厨房是犯罪现场？”  \n“当然。留着这张照片，好好研究一下。你可以看到我的食谱在我那个巨大的高桌子中间。”",
+      "has_text": true
+    },
+    {
+      "page": 13,
+      "image": "013.jpg",
+      "json": "013.json",
+      "english": "The torn page had a recipe for tuna fish pie. The bits of pie that fell on the page are gone too. I want you to find the evil monster who did this!” “Monster?” “Yes. The Evil Page Monster,” Rosamond said.",
+      "translate": "撕掉的那页上有金枪鱼派的食谱。掉在那页上的派屑也不见了。我想让你找到那个干这事的邪恶怪物！”“怪物？”“是的。邪恶的页面怪物，”罗莎蒙德说。",
+      "has_text": true
+    },
+    {
+      "page": 14,
+      "image": "014.jpg",
+      "json": "014.json",
+      "english": "“Now, here is my plan. The next meeting will be at my house this afternoon. You and Sludge can come undercover. Just pretend you are new members. I’ll be using this cookbook again. Meanwhile, I’ll leave these other books here, where they’ll be safe. I left one book at home. The members will be reading it at today’s meeting.” Rosamond piled her books on my floor. “You are so lucky to have this case!”",
+      "translate": "“现在，这是我的计划。下一次会议将在今天下午在我家举行。你和斯拉奇可以秘密前来。就假装你们是新成员。我会再次使用这本食谱。同时，我会把这些其他书留在这里，这样它们就安全了。我把一本书留在家里。成员们将在今天的会议上阅读它。” 罗莎蒙德把她的书堆在我的地板上。“你真幸运有这个案子！”",
+      "has_text": true
+    },
+    {
+      "page": 15,
+      "image": "015.jpg",
+      "json": "015.json",
+      "english": "I, Nate the Great, did not agree.\n\"Perhaps this is a case for a bookworm,\" I said.\n\"Enjoy being a bookworm,\" Rosamond said.\nI looked at Sludge.\nWe both knew that if I didn't take the case, Rosamond would come back.\nAnd back. And back.\nAnd back.",
+      "translate": "我，大侦探内特，不同意。  \n“也许这是一桩书虫的案子，”我说。  \n“享受当书虫吧，”罗莎蒙德说。  \n我看了看斯拉奇。  \n我们都知道，如果我不接这个案子，罗莎蒙德会再来。  \n一次又一次。  \n一次又一次。",
+      "has_text": true
+    },
+    {
+      "page": 16,
+      "image": "016.jpg",
+      "json": "016.json",
+      "english": "Chapter Three\nA Book Case\nI wrote a note to my mother.\nDear Mother,\nSludge and I are going to Rosamond's house. I am on what Rosamond thinks is a case. A book case. We are looking for an evil monster who tears, rips and twirls. I will be back. I hope.\nLove,\nNate the Great",
+      "translate": "第三章  \n书的案件  \n\n我给我妈妈写了一张便条。  \n亲爱的妈妈：  \n斯拉奇和我要去罗莎蒙德家。我正在处理罗莎蒙德认为是一个案件的事情。一个书的案件。我们正在寻找一个撕扯、撕裂和旋转的邪恶怪物。我会回来的。我希望如此。  \n爱你的，  \n大侦探内特",
+      "has_text": true
+    },
+    {
+      "page": 17,
+      "image": "017.jpg",
+      "json": "017.json",
+      "english": "It was afternoon. Sludge and I went to Rosamond’s house. She answered the door. She had only one book on her head. I peered inside her house. I saw Oliver, Pip, Finley, Claude, Esmeralda, Annie, and Annie’s little brother, Harry, sitting in a circle. Also sitting in the circle were Annie’s dog, Fang, and Rosamond’s four cats, Plain Hex, Little Hex, Big Hex, and Super Hex.",
+      "translate": "那是下午。我和Sludge去了Rosamond的家。她来开门。她头上只顶着一本书。我往她家里看去，看到Oliver、Pip、Finley、Claude、Esmeralda、Annie和Annie的小弟弟Harry坐成一个圈。圈里还有Annie的狗Fang和Rosamond的四只猫，Plain Hex、Little Hex、Big Hex和Super Hex。",
+      "has_text": true
+    },
+    {
+      "page": 18,
+      "image": "018.jpg",
+      "json": "018.json",
+      "english": "READING IS PEACE",
+      "translate": "阅读是宁静",
+      "has_text": true
+    },
+    {
+      "page": 19,
+      "image": "019.jpg",
+      "json": "019.json",
+      "english": "I stepped back. “The Hexes and Fang belong to your book club?” “Sure,” Rosamond said. “Everybody loves stories. And treats. I serve tuna fish pie to the cats and meat patties to Fang. Everybody else gets cookies.",
+      "translate": "我退后了一步。“那些猫和獠牙是你读书俱乐部的一员？”“当然，”罗莎蒙德说。“每个人都喜欢故事和点心。我给猫们提供金枪鱼派，给獠牙提供肉饼。其他人则吃饼干。”",
+      "has_text": true
+    },
+    {
+      "page": 20,
+      "image": "020.jpg",
+      "json": "020.json",
+      "english": "This is a very hungry book club. Come in. “I, Nate the Great, am not in the mood for cookies or circles,” I said. “Sludge and I will sit in a corner.”",
+      "translate": "这是一个非常饥饿的读书俱乐部。进来吧。“我，大侦探内特，现在不想吃饼干或画圈，”我说。“斯拉奇和我会坐在角落里。”",
+      "has_text": true
+    },
+    {
+      "page": 21,
+      "image": "021.jpg",
+      "json": "021.json",
+      "english": "Chapter Five\nMeet Harvard Hedgehog\n\nRosamond sat down in a big chair.\nShe took the book off her head.\nShe held it up.\n“This is our book for today,”\nshe announced.\n“Harvard Hedgehog.\nWe will take turns reading it out loud.\nThen we will talk about the book.\nI will start.",
+      "translate": "第五章\n遇见哈佛刺猬\n\n罗莎蒙德坐在一把大椅子上。\n她把书从头上拿下来。\n她举起书。\n“这是我们今天的书，”她宣布。\n“哈佛刺猬。我们将轮流大声朗读。\n然后我们会讨论这本书。\n我先开始。",
+      "has_text": true
+    },
+    {
+      "page": 22,
+      "image": "022.jpg",
+      "json": "022.json",
+      "english": "‘Harvard Hedgehog was always late.\nHe arrived at parties just in time\nto bump into everyone leaving.\nHe nibbled leftover cake crumbs\nand lapped melted ice cream.\nThen he sat in a corner\nand exclaimed, “Wonderful party!”\nto the empty room.’",
+      "translate": "哈佛刺猬总是迟到。  \n他到达派对时，正好撞上所有人离开。  \n他啃食剩下的蛋糕屑，舔食融化的冰淇淋。  \n然后他坐在角落里，对着空荡荡的房间感叹：“精彩的派对！”",
+      "has_text": true
+    },
+    {
+      "page": 23,
+      "image": "023.jpg",
+      "json": "023.json",
+      "english": "I, Nate the Great, was sitting in a corner like Harvard Hedgehog. I pretended to go to sleep. But I was watching, watching. The book went from member to member. Nobody was tearing pages. It was Esmeralda's turn to read.",
+      "translate": "我，大侦探内特，像哈佛刺猬一样坐在角落里。我假装要睡觉，但我在观察，观察着。书在成员之间传递。没有人撕书页。轮到埃斯梅拉达读书了。",
+      "has_text": true
+    },
+    {
+      "page": 24,
+      "image": "024.jpg",
+      "json": "024.json",
+      "english": "“When Harvard went to the movies, he always got there when the movie was over. As everyone was going out, Harvard was going in. He would sit down on stale popcorn and look up at the big, empty screen. “Great show!” he exclaimed to no one. Harvard meant to be on time, but he never was. . . .”",
+      "translate": "“每次哈佛去看电影，他总是在电影结束时才到。当所有人都在往外走时，哈佛却在往里走。他会坐在陈旧的爆米花上，抬头看着空荡荡的大银幕。‘好极了！’他对着空气感叹。哈佛本想准时到达，但他从来没有做到过……”",
+      "has_text": true
+    },
+    {
+      "page": 25,
+      "image": "025.jpg",
+      "json": "025.json",
+      "english": "Suddenly Esmeralda stopped reading. She looked puzzled. \"A page is missing,\" she said. Rosamond looked straight at me. \"A ripped page in one book and now a missing page from another. When I bought this book, there were no pages missing. I know because I read the entire book before I bought it!\" I, Nate the Great, looked at Sludge. I now knew we had a real case.",
+      "translate": "突然，埃斯梅拉达停止了阅读。她看起来很困惑。“有一页不见了，”她说。罗莎蒙德直视着我。“一本书里有撕掉的页面，现在另一本书里有缺失的页面。我买这本书的时候，没有缺页。我知道，因为我在买之前读完了整本书！”我，大侦探内特，看了看斯拉奇。我现在知道我们有一个真正的案子了。",
+      "has_text": true
+    },
+    {
+      "page": 26,
+      "image": "026.jpg",
+      "json": "026.json",
+      "english": "Chapter Six\nDouble Trouble\nRosamond raised her arms.\n\"As president of Rosamond’s Ready Readers, I will not let this stop our book club meeting.\nMembers, who would like to tell me what you think of the book so far?\"\nEsmeralda raised her hand. \"At first I thought that Harvard needed a watch, but now I know he needs a page.\"",
+      "translate": "第六章  \n双重麻烦  \n罗莎蒙德举起了手臂。  \n“作为罗莎蒙德读书俱乐部的主席，我不会让这件事阻止我们的读书会。  \n各位成员，谁愿意告诉我你们对这本书的看法？”  \n埃斯梅拉达举起了手。“起初我以为哈佛需要一块手表，但现在我知道他需要一页书。”",
+      "has_text": true
+    },
+    {
+      "page": 27,
+      "image": "027.jpg",
+      "json": "027.json",
+      "english": "Claude raised his hand. Claude was always losing things. \"I don’t like the book because Harvard doesn’t lose anything,\" he said. \"If you never lose anything, you never have a chance to find what you didn’t lose.\" \"Excellent thought,\" Rosamond said.",
+      "translate": "克劳德举起了手。克劳德总是丢东西。“我不喜欢这本书，因为哈佛从不丢东西，”他说。“如果你从不丢东西，你就没有机会找到你没有丢的东西。”“很好的想法，”罗莎蒙德说。",
+      "has_text": true
+    },
+    {
+      "page": 28,
+      "image": "028.jpg",
+      "json": "028.json",
+      "english": "Oliver spoke up. “I follow people. Everyone knows I do. Harvard doesn’t follow anybody. Harvard is a very boring hedgehog.”\n\n“Thank you for sharing that with us,” Rosamond said.\n\n“Me, me, me!” Harry was jumping up and down. “I like the book. I like the picture of Harvard smiling in front of the big clock the best.”\n\nRosamond smiled. “Well, we have a nice happy Harvard, and a happy Harry,” she said.",
+      "translate": "奥利弗开口说道：“我跟随别人。大家都知道我这样做。哈佛不跟随任何人。哈佛是一只非常无聊的刺猬。”\n\n“谢谢你和我们分享这些，”罗莎蒙德说。\n\n“我，我，我！”哈利跳上跳下。“我喜欢这本书。我最喜欢哈佛在大钟前微笑的那张图片。”\n\n罗莎蒙德笑了。“好吧，我们有一个快乐的哈佛，还有一个快乐的哈利，”她说。",
+      "has_text": true
+    },
+    {
+      "page": 29,
+      "image": "029.jpg",
+      "json": "029.json",
+      "english": "I am proud of all my members. Except whoever ripped a page and took a page.",
+      "translate": "我为我所有的成员感到自豪。除了撕了一页和拿走一页的人。",
+      "has_text": true
+    },
+    {
+      "page": 30,
+      "image": "030.jpg",
+      "json": "030.json",
+      "english": "I, Nate the Great, was thinking. Who would rip a page of the cookbook and take a page of Harvard Hedgehog? Someone who liked the books, or someone who disliked the books? Or someone who couldn’t decide? And where was the missing page? “I would like to see the book,” I said.",
+      "translate": "我，大侦探内特，正在思考。是谁会撕掉一本烹饪书的页面并拿走一本《哈佛刺猬》的页面呢？是喜欢这些书的人，还是不喜欢这些书的人？或者是无法决定的人？那丢失的页面在哪里呢？“我想看看那本书，”我说。",
+      "has_text": true
+    },
+    {
+      "page": 31,
+      "image": "031.jpg",
+      "json": "031.json",
+      "english": "Rosamond handed it to me. “I see that the missing page would have been numbered 15 on one side and 16 on the other,” I said. “Numbers, crumbers,” Rosamond said. “You have a double mystery. Just solve it!”",
+      "translate": "罗莎蒙德把它递给我。“我看到缺失的那页一面是15号，另一面是16号，”我说。“数字，数字，”罗莎蒙德说。“你有一个双重谜题。快去解开它吧！”",
+      "has_text": true
+    },
+    {
+      "page": 32,
+      "image": "032.jpg",
+      "json": "032.json",
+      "english": "Rosamond stood up. “Now it’s time for treats,” she said. “The animals are getting restless.” Sludge and I followed Rosamond to the kitchen. It was a mess. But Sludge sniffed and sniffed. He liked this case because it smelled good. I saw a cookbook on the table.",
+      "translate": "罗莎蒙德站了起来。“现在是吃点心的时间了，”她说。“动物们开始坐不住了。”斯拉奇和我跟着罗莎蒙德走向厨房。厨房一团糟。但斯拉奇不停地嗅来嗅去。他喜欢这个案子，因为闻起来很香。我看到桌子上有一本食谱。",
+      "has_text": true
+    },
+    {
+      "page": 33,
+      "image": "033.jpg",
+      "json": "033.json",
+      "english": "This time the book was open to a recipe for meat patties. There were bits of meat on the page. Rosamond must have been using the cookbook today to make her treats. This page had no rips. Hmmm.",
+      "translate": "这次书翻开到一个肉饼的食谱。书页上有些肉屑。罗莎蒙德今天一定是用这本食谱书来做她的美食了。这一页没有撕痕。嗯。",
+      "has_text": true
+    },
+    {
+      "page": 34,
+      "image": "034.jpg",
+      "json": "034.json",
+      "english": "Fang and the Hexes walked in. Fang sniffed the table. He started to jump up and reach for the cookbook. \"Stop!\" Rosamond yelled. \"You, Fang, are the Evil Page Monster!\"",
+      "translate": "方和巫术团走了进来。方嗅了嗅桌子。他开始跳起来，想要拿到那本食谱。“停下！”罗莎蒙德喊道。“你，方，是邪恶的书页怪物！”",
+      "has_text": true
+    },
+    {
+      "page": 35,
+      "image": "035.jpg",
+      "json": "035.json",
+      "english": "I, President Rosamond, have solved this case. Fang must have sneaked in during yesterday’s meeting, eaten the bits of food, and ripped the page. And now I’ve stopped him from doing it again.” Rosamond folded her arms and looked at me. “Time to find the missing page,” she said. I, Nate the Great, had two choices. I could search for the missing page or I could go home and eat pancakes and think.",
+      "translate": "我，罗莎蒙德总统，已经解决了这个案子。方一定是在昨天的会议期间偷偷溜进来，吃掉了食物碎屑，并撕掉了那一页。而现在我已经阻止他再次这样做了。”罗莎蒙德双臂交叉，看着我。“是时候找回那张丢失的页面了，”她说。我，大侦探内特，有两个选择。我可以去寻找那张丢失的页面，或者我可以回家吃煎饼并思考。",
+      "has_text": true
+    },
+    {
+      "page": 36,
+      "image": "036.jpg",
+      "json": "036.json",
+      "english": "I ate my pancakes while Sludge ate a bone. Then Sludge walked around the room. He was looking for something. And he found it. It was the photo Rosamond had left here. He sniffed it and sniffed it and sniffed it. Was he trying to tell me something?",
+      "translate": "我吃煎饼的时候，斯拉奇在啃骨头。然后斯拉奇在房间里走来走去。他在找什么东西。然后他找到了。那是罗莎蒙德留在这里的照片。他闻了又闻。他是在试图告诉我什么吗？",
+      "has_text": true
+    },
+    {
+      "page": 37,
+      "image": "037.jpg",
+      "json": "037.json",
+      "english": "Was the ripped-page case really solved? Did Fang really do it? I looked at the photo again. The page in the cookbook had no food on it. The page I had seen at Rosamond’s house had tiny bits of meat on it.",
+      "translate": "撕页事件真的解决了吗？方真的做了吗？我再次看了照片。食谱中的那一页上没有食物。我在罗莎蒙德家看到的那一页上有小块的肉。",
+      "has_text": true
+    },
+    {
+      "page": 38,
+      "image": "038.jpg",
+      "json": "038.json",
+      "english": "The recipe in the photo was for tuna fish pie. The recipe at her house was for meat patties. One recipe for cats, one recipe for dogs. “Good work, Sludge,” I said.",
+      "translate": "照片中的食谱是金枪鱼派。她家里的食谱是肉饼。一个食谱给猫，一个食谱给狗。“干得好，斯拉奇，”我说。",
+      "has_text": true
+    },
+    {
+      "page": 39,
+      "image": "039.jpg",
+      "json": "039.json",
+      "english": "Chapter Nine\nNot So Fast\n\nI called Rosamond.\n'I am coming back to your house,' I said.\n'And I need Annie and Fang to be there.'\nI put the photo of the tuna fish pie page in my pocket.",
+      "translate": "第九章\n别那么快\n\n我打电话给罗莎蒙德。\n“我要回你家，”我说。\n“我需要安妮和方在那里。”\n我把金枪鱼派那一页的照片放进口袋。",
+      "has_text": true
+    },
+    {
+      "page": 40,
+      "image": "040.jpg",
+      "json": "040.json",
+      "english": "Sludge and I rushed to Rosamond’s house. Rosamond was waiting for us at the door. “Your ripped-page case is not solved,” I said.",
+      "translate": "我和斯拉吉赶到了罗莎蒙德的家。罗莎蒙德在门口等着我们。“你的撕页案件还没有解决，”我说。",
+      "has_text": true
+    },
+    {
+      "page": 41,
+      "image": "041.jpg",
+      "json": "041.json",
+      "english": "“That fangy Fang did it!” Rosamond said. “And here he comes down the street with Annie.” “We must all go into the kitchen,” I said. Rosamond, Annie, Fang, Sludge, and I went into the kitchen. The cookbook was still open on the table. Fang sniffed and ran to the table. “Ho hum,” Rosamond said. “We already know that Fang ripped a page yesterday.”",
+      "translate": "“是那个尖牙的方干的！”罗莎蒙德说。“他和安妮一起从街上过来了。” “我们都得进厨房去，”我说。罗莎蒙德、安妮、方、斯拉奇和我一起进了厨房。食谱书仍然摊开在桌子上。方嗅了嗅，跑到桌子旁。“哎呀，”罗莎蒙德说。“我们已经知道方昨天撕了一页。”",
+      "has_text": true
+    },
+    {
+      "page": 42,
+      "image": "042.jpg",
+      "json": "042.json",
+      "english": "“Wait!” I said.\nFang jumped up and put his front paws on the table.\nHe opened his jaws.\nHe stretched.\nBut he couldn’t reach the cookbook.\n“This table is too high and big for Fang,” I said.\n“Poor Fang,” Annie said. “He’s big and smart, but he isn’t that stretchy.”",
+      "translate": "“等一下！”我说。 方跳起来，把前爪放在桌子上。 他张开了嘴巴。 他伸展着。 但他够不到那本食谱。 “这张桌子对方来说太高太大了，”我说。 “可怜的方，”安妮说。“他又大又聪明，但他没有那么灵活。”",
+      "has_text": true
+    },
+    {
+      "page": 43,
+      "image": "043.jpg",
+      "json": "043.json",
+      "english": "I, Nate the Great, already knew that. Fang would have grabbed the bits of meat during the meeting if he could have reached them! Rosamond sighed. “Okay, so Fang couldn’t have ripped the page yesterday.” “Correct,” I said. “Also, he doesn’t like tuna fish pie.” I pulled the cookbook photo out of my pocket.",
+      "translate": "我，大侦探内特，早就知道了。如果方能够够到那些肉块，他早就在会议期间抓住它们了！罗莎蒙德叹了口气。“好吧，所以方昨天不可能撕掉那页。”“没错，”我说，“而且，他不喜欢金枪鱼派。”我从口袋里拿出那张食谱的照片。",
+      "has_text": true
+    },
+    {
+      "page": 44,
+      "image": "044.jpg",
+      "json": "044.json",
+      "english": "“This photo shows the cookbook open to a tuna fish pie recipe. But the open pages have no bits of tuna fish on them.” “I already knew that,” Rosamond said. “I, Nate the Great, say that someone reached for those tuna fish bits and was scratching and tearing to get every last bite.” “Who?” Rosamond asked.",
+      "translate": "这张照片显示了食谱书翻开到金枪鱼派的食谱。但是打开的页面上没有金枪鱼的碎屑。“我早就知道了，”罗莎蒙德说。“我，大侦探内特，说有人伸手去拿那些金枪鱼碎屑，拼命抓挠撕扯，想要吃到最后一口。”“谁？”罗莎蒙德问。",
+      "has_text": true
+    },
+    {
+      "page": 45,
+      "image": "045.jpg",
+      "json": "045.json",
+      "english": "“Little Hex,” I said. “He can leap high. Also, he can hide in small spaces. He is so small that he could have gone into the kitchen and come back without your seeing him.” Rosamond clapped her hands. “Little Hex is growing up! My darling little Page Monster.” “I, Nate the Great, say that the ripped-page case is solved. And you should try to keep your kitchen neater. Clean clues are better.” I took two bones from my pocket and gave one to Fang and one to Sludge. Rosamond kept clapping. “Little Hex must have taken the Harvard Hedgehog page too. What a talent he has!” “Not so fast,” I said.",
+      "translate": "“小赫克斯，”我说，“他能跳得很高。而且，他能藏在小空间里。他小到可以进厨房又出来而你都没看到。”罗莎蒙德拍着手说：“小赫克斯在长大！我亲爱的小书页怪物。” “我，大侦探内特，宣布撕页案已解决。你应该尽量保持厨房整洁。干净的线索更好。”我从口袋里拿出两根骨头，给了一根给方，一根给斯拉奇。罗莎蒙德继续拍手：“小赫克斯一定也拿了哈佛刺猬的那页。他真有才！” “别那么快下结论，”我说。",
+      "has_text": true
+    },
+    {
+      "page": 46,
+      "image": "046.jpg",
+      "json": "046.json",
+      "english": "What are you doing? I'm making a cake. But it's very messy!",
+      "translate": "你在做什么？我在做蛋糕。但是弄得一团糟！",
+      "has_text": true
+    },
+    {
+      "page": 47,
+      "image": "047.jpg",
+      "json": "047.json",
+      "english": "“You are trying to reuse a clue.\nLittle Hex might not have taken\nthe page.\nTell me everything about\nyour Harvard Hedgehog book.”\n“Well, yesterday Annie and I went to the\nbook sale at the school around the corner.\nI bought the book there.\nI read it before I bought it.\nThere weren’t any missing pages.\nAfter I bought the book,\nI kept it with me.\nIn my hands. On my head.",
+      "translate": "你在试图重复使用一个线索。小赫克斯可能没有拿那一页。告诉我关于你的《哈佛刺猬》这本书的一切。  \n“嗯，昨天我和安妮去了拐角处学校的书展。我在那里买了这本书。我在买之前读过它。没有缺页。在我买了这本书之后，我一直把它带在身边。在我手里。在我头上。”",
+      "has_text": true
+    },
+    {
+      "page": 48,
+      "image": "048.jpg",
+      "json": "048.json",
+      "english": "I even slept with it.”\n“Is there anything else\nI should know?” I asked.\n“No. I’m a president. I think\nof everything.”\n“Then I must leave,” I said.\n“Leave? But you just came.”\n“That’s how it is\nin the detective business,” I said.\n“We come. We go.\nWe go where the clues take us.”\nI, Nate the Great, knew that\nI needed more clues.\nIf the book was with Rosamond\nall the time,\nhow could a page be missing?",
+      "translate": "“我甚至还抱着它睡觉。”\n\n“还有什么是我应该知道的吗？”我问。\n\n“没有。我是总统。我考虑到了一切。”\n\n“那我必须离开了，”我说。\n\n“离开？但你才刚来。”\n\n“侦探行业就是这样的，”我说。\n\n“我们来，我们去。我们去线索指引我们的地方。”\n\n我，大侦探内特，知道我需要更多的线索。\n\n如果书一直在罗莎蒙德那里，怎么会有一页不见了呢？",
+      "has_text": true
+    },
+    {
+      "page": 49,
+      "image": "049.jpg",
+      "json": "049.json",
+      "english": "Annie, Fang, Sludge, and I left Rosamond’s house. “I am looking for a new clue,” I said to Annie. “A missing-page clue.” “I don’t have any clue,” Annie said. “But I want you to know that Fang can be stretchy some of the time. You should have seen him at the school book sale.”",
+      "translate": "安妮、方、斯拉奇和我离开了罗莎蒙德的家。“我在寻找一个新的线索，”我对安妮说。“一个丢失页面的线索。”“我没有任何线索，”安妮说。“但我想让你知道，方有时候可以很有弹性。你应该看看他在学校书展上的表现。”",
+      "has_text": true
+    },
+    {
+      "page": 50,
+      "image": "050.jpg",
+      "json": "050.json",
+      "english": "“What?” I said. “He was there?”\n“I brought him along when\nI went with Rosamond,” Annie said.\n“Tell me exactly how\nFang was stretchy there,” I said.\n“Well, we went to the Used Books table.\nA lady there told us that some books\nmight have food stains,\nloose bindings, and faded pages.\nRosamond began picking through books\nand reading them.\nIf she liked a book, she put it in a pile\non the table.\nSuddenly Fang put his paws on the table\nand started to sniff a book.\nThere were stains on it\nthat looked like\nchicken noodle soup.\nFang licked the book.",
+      "translate": "“什么？”我说。“他在那里？”\n“我和罗莎蒙德一起去的时候带上了他，”安妮说。\n“告诉我方是怎么在那里伸展的，”我说。\n“嗯，我们去了旧书摊。\n那里的一个女士告诉我们，有些书可能有食物污渍、松散的装订和褪色的页面。\n罗莎蒙德开始翻阅书籍并阅读。\n如果她喜欢一本书，就把它放在桌子上的一堆书里。\n突然，方把爪子放在桌子上，开始嗅一本书。\n上面有看起来像鸡汤的污渍。\n方舔了那本书。",
+      "has_text": true
+    },
+    {
+      "page": 51,
+      "image": "051.jpg",
+      "json": "051.json",
+      "english": "Then he pawed through more books and licked pages. Lots of books fell to the floor. Fang was really stretchy. It was his kind of table.",
+      "translate": "然后他翻动了更多的书，舔了舔书页。许多书掉到了地上。方真的很灵活。这是他喜欢的桌子。",
+      "has_text": true
+    },
+    {
+      "page": 52,
+      "image": "052.jpg",
+      "json": "052.json",
+      "english": "Then what happened? I picked up the books that Fang had licked and I bought them. Rosamond’s pile had toppled over, but she scooped up her books from the table and the floor and bought them.",
+      "translate": "然后发生了什么？我捡起了方舔过的书并买下了它们。罗莎蒙德的书堆倒了，但她从桌子和地板上捡起她的书并买下了它们。",
+      "has_text": true
+    },
+    {
+      "page": 53,
+      "image": "053.jpg",
+      "json": "053.json",
+      "english": "We both went home with full bags. Since Fang had licked and liked the books, I put them all in his doghouse. “Thank you for the information,” I said. I turned to Sludge. “You and I are going to school!”",
+      "translate": "我们俩都带着满满的袋子回家了。由于方舔过并喜欢这些书，我把它们全放在他的狗屋里。“谢谢你的信息，”我说。我转向斯拉奇。“你和我要去上学了！”",
+      "has_text": true
+    },
+    {
+      "page": 54,
+      "image": "054.jpg",
+      "json": "054.json",
+      "english": "Sludge and I rushed to the school. The book sale was in the gym. A lady walked up to us. I knew she was a librarian because she had a badge on her shirt that said LIBRARIAN. Sometimes being a detective is easy.",
+      "translate": "斯拉奇和我冲向学校。书展在体育馆里。一位女士走向我们。我知道她是图书管理员，因为她的衬衫上有一个写着“图书管理员”的徽章。有时候，当侦探很简单。",
+      "has_text": true
+    },
+    {
+      "page": 55,
+      "image": "055.jpg",
+      "json": "055.json",
+      "english": "“Hello,” I said. “I am looking for Harvard Hedgehog.”\n“You’re in luck,” the librarian said.\n“We’ve sold two copies of Harvard, but we still have one left.\nAnd here he is on the table.”\n“Do you have pages 15 and 16?” I asked.\n“Yes. The pages are in good shape.\nClean, and with strong binding.”",
+      "translate": "“你好，”我说。“我在找《哈佛刺猬》。”\n“你很幸运，”图书管理员说。\n“我们已经卖出了两本《哈佛》，但我们还有一本剩下。\n他就在桌子上。”\n“你有第15页和第16页吗？”我问。\n“有。这些页面状况良好。\n干净且装订牢固。”",
+      "has_text": true
+    },
+    {
+      "page": 56,
+      "image": "056.jpg",
+      "json": "056.json",
+      "english": "“No chicken noodle soup?” I said.\n“What?”\n“I was just thinking.\nI’m a detective.\nI think a lot.\nI think I will buy this book.”\nI bought the book and thanked the librarian.\nThen Sludge and I went home.",
+      "translate": "“没有鸡肉面汤吗？”我说。  \n“什么？”  \n“我只是在想。我是个侦探。我经常思考。我想我会买这本书。”  \n我买了这本书，并感谢了图书管理员。然后我和斯拉奇回家了。",
+      "has_text": true
+    },
+    {
+      "page": 57,
+      "image": "057.jpg",
+      "json": "057.json",
+      "english": "I sat down in my favorite chair. I opened my Harvard Hedgehog book. I turned to page 15. There was a picture of Harvard getting his photo taken in front of a big clock.",
+      "translate": "我坐在我最喜欢的椅子上，打开了我的《哈佛刺猬》书。我翻到第15页，上面有一张哈佛在一个大钟前拍照的图片。",
+      "has_text": true
+    },
+    {
+      "page": 58,
+      "image": "058.jpg",
+      "json": "058.json",
+      "english": "He looked proud. And he was smiling. But why would anyone take that page? I, Nate the Great, say that there must be far better things in this world to watch than a hedgehog posing for his photo. And then I remembered something. What I had just seen in the book was not news to me. I had already heard about it. I, Nate the Great, was about to solve this case.",
+      "translate": "他看起来很自豪。而且他在微笑。但是为什么会有人拿走那一页呢？我，大侦探内特，认为这个世界上一定有比看一只刺猬摆姿势拍照更好的事情。然后我想起了一些事情。我刚刚在书中看到的内容对我来说并不新鲜。我已经听说过这件事。我，大侦探内特，即将破解这个案件。",
+      "has_text": true
+    },
+    {
+      "page": 59,
+      "image": "059.jpg",
+      "json": "059.json",
+      "english": "Chapter Thirteen\nReading Together\nI had two clues.\nSchool clues.\nI was told that the pages in my book were in good shape.\nClean. Strong binding.\nAnnie was told that some books had loose bindings.\nHmmm. Pages. Bindings.",
+      "translate": "第十三章  \n一起阅读  \n我有两个线索。  \n学校的线索。  \n有人告诉我，我书里的页面状况良好。  \n干净。装订牢固。  \n有人告诉安妮，有些书的装订松散。  \n嗯。页面。装订。",
+      "has_text": true
+    },
+    {
+      "page": 60,
+      "image": "060.jpg",
+      "json": "060.json",
+      "english": "I, Nate the Great, say that a loose binding could cause a loose page, and a loose page could become a missing page. There had been three copies of the Harvard Hedgehog book at the Used Books table.",
+      "translate": "我，大侦探内特，说松散的装订可能导致页面松动，而松动的页面可能会变成缺失的页面。在二手书桌上曾经有三本《哈佛刺猬》书。",
+      "has_text": true
+    },
+    {
+      "page": 61,
+      "image": "061.jpg",
+      "json": "061.json",
+      "english": "Rosamond had picked a good copy. But when her pile fell down, she must have grabbed the copy that had the missing page. She didn’t know it. Annie must have bought the good copy that Rosamond had picked out, and she didn’t know it.",
+      "translate": "罗莎蒙德挑了一本不错的副本。但当她的书堆倒下时，她一定是抓到了那本缺页的副本。她不知道这一点。安妮一定是买了罗莎蒙德挑选的那本好副本，而她也不知道。",
+      "has_text": true
+    },
+    {
+      "page": 62,
+      "image": "062.jpg",
+      "json": "062.json",
+      "english": "And how did I, Nate the Great, know it? Because I now remembered where I had heard about Harvard Hedgehog smiling in front of a big clock. From Harry! At the book club meeting. But how could Harry have known what was on page 15, since it was missing? Because he had seen the book at home! Harry must have been looking at Fang’s books. And he saw the Harvard Hedgehog picture.",
+      "translate": "我，大侦探内特，是怎么知道的呢？因为我现在想起来我在哪里听说过哈佛刺猬在大钟前微笑的事了。是从哈利那里！在读书俱乐部的会议上。但是哈利是怎么知道第15页上的内容的呢，因为那一页不见了？因为他在家里看过这本书！哈利一定是在看方的书。他看到了哈佛刺猬的图片。",
+      "has_text": true
+    },
+    {
+      "page": 63,
+      "image": "063.jpg",
+      "json": "063.json",
+      "english": "I turned to Sludge.\n“I must give this book to Rosamond and tell her that the case is solved.\nI must also tell Annie to feed Fang plenty of chicken noodle soup.",
+      "translate": "我转向斯拉奇。  \n“我必须把这本书交给罗莎蒙德，并告诉她案件已经解决。  \n我还必须告诉安妮给方多喂些鸡肉面汤。”",
+      "has_text": true
+    },
+    {
+      "page": 64,
+      "image": "064.jpg",
+      "json": "064.json",
+      "english": "But there is something else I want to do first.” I, Nate the Great, picked up every book that Rosamond had brought over and carefully put them on a shelf. “Just where they should be,” I said.",
+      "translate": "“但我还有别的事情想先做。”我，大侦探内特，捡起罗莎蒙德带来的每一本书，小心翼翼地把它们放在书架上。“它们应该在的地方，”我说。",
+      "has_text": true
+    },
+    {
+      "page": 65,
+      "image": "065.jpg",
+      "json": "065.json",
+      "english": "Then I took my Harvard Hedgehog book and sat down in my chair. 'I am going to read this book as a reader and not as a detective,' I said. 'Let's read it together.' Sludge jumped up on my lap. And I, Nate the Great, read and read until I reached . . .",
+      "translate": "然后我拿起我的《哈佛刺猬》书，坐在椅子上。“我要以读者的身份来读这本书，而不是以侦探的身份，”我说。“让我们一起读吧。”斯拉奇跳到我腿上。我，伟大的内特，读啊读，直到我看到……",
+      "has_text": true
+    },
+    {
+      "page": 66,
+      "image": "066.jpg",
+      "json": "066.json",
+      "english": "Extra Fun Activities!",
+      "translate": "额外的趣味活动！",
+      "has_text": true
+    },
+    {
+      "page": 67,
+      "image": "067.jpg",
+      "json": "067.json",
+      "english": "Table of Contents",
+      "translate": "目录",
+      "has_text": true
+    },
+    {
+      "page": 68,
+      "image": "068.jpg",
+      "json": "068.json",
+      "english": "Table of Contents",
+      "translate": "目录",
+      "has_text": true
+    },
+    {
+      "page": 69,
+      "image": "069.jpg",
+      "json": "069.json",
+      "english": "NATE'S NOTES: Hedgehogs\n\nHedgehogs are animals about the size of a guinea pig. They like to root around in hedges. They're not searching for clues. They're searching for food! They make a hog-like snort while they search. That's how they got their name! Hedge + hog = hedgehog.\n\nDon't look for wild hedgehogs in the United States. They live in Africa, Britain, and Asia.",
+      "translate": "内特的笔记：刺猬\n\n刺猬是一种大小约为豚鼠的动物。它们喜欢在树篱中翻找。它们不是在寻找线索，而是在寻找食物！在寻找食物时，它们会发出类似猪的哼声。这就是它们名字的由来！树篱 + 猪 = 刺猬。\n\n不要在美国寻找野生刺猬。它们生活在非洲、英国和亚洲。",
+      "has_text": true
+    },
+    {
+      "page": 70,
+      "image": "070.jpg",
+      "json": "070.json",
+      "english": "About five thousand short, prickly spines cover a hedgehog’s back. These spines are called quills. Quills are hollow shafts like the shafts of bird feathers. They aren’t poisonous or barbed. Still, they are weapons. If you get poked with one, it hurts!\n\nWhen they’re scared, hedgehogs roll into a tight ball. Their quills protect their face, eyes, arms, legs, and bellies. Pet hedgehogs usually weigh less than a pound. Wild ones get a little bigger.",
+      "translate": "大约五千根短而刺人的刺覆盖在刺猬的背上。这些刺被称为刺毛。刺毛是中空的轴，就像鸟类羽毛的轴一样。它们既不带毒也没有倒钩。然而，它们仍然是武器。如果你被刺到，会很痛！\n\n当感到害怕时，刺猬会卷成一个紧紧的球。它们的刺毛保护着它们的脸、眼睛、手臂、腿和腹部。宠物刺猬通常重不到一磅。野生的刺猬会稍微大一些。",
+      "has_text": true
+    },
+    {
+      "page": 71,
+      "image": "071.jpg",
+      "json": "071.json",
+      "english": "In the wild, hedgehogs live by themselves. They are nocturnal. That means they sleep during the day. They eat and play at night. Hedgehogs can’t see very well, but they have a great sense of smell.\n\nLike bears, hedgehogs hibernate during winter. That means they go to sleep for days on end. On warm days, hedgehogs may wake up to eat and drink. But mostly they sleep in burrows or piles of leaves until spring.",
+      "translate": "在野外，刺猬是独居的。它们是夜行性动物，这意味着它们在白天睡觉，晚上吃东西和玩耍。刺猬的视力不太好，但它们的嗅觉非常灵敏。\n\n像熊一样，刺猬在冬天会冬眠。这意味着它们会连续睡上好几天。在温暖的日子里，刺猬可能会醒来吃东西和喝水。但大多数时候，它们会在洞穴或落叶堆中睡觉，直到春天。",
+      "has_text": true
+    },
+    {
+      "page": 72,
+      "image": "072.jpg",
+      "json": "072.json",
+      "english": "Hedgehogs: purr when they are happy. squeal when they are frightened. grunt like pigs when they are looking for tasty food. A baby hedgehog is called a hoglet.",
+      "translate": "刺猬：开心时会发出呼噜声。害怕时会尖叫。寻找美味食物时会像猪一样咕噜咕噜叫。小刺猬被称为小刺。",
+      "has_text": true
+    },
+    {
+      "page": 73,
+      "image": "073.jpg",
+      "json": "073.json",
+      "english": "Hedgehogs like to eat slugs, earthworms, moths, and other bugs. They steal eggs from ground-nesting birds' nests and gobble them down. Hedgehogs sometimes twist their head around and spit on their quills! Then they spread the spit around with their tongues. Nobody knows why they do this. Some scientists say it happens when they sniff a good-smelling frog or worm. Maybe they are fighting off ticks. Nate thinks it's too gross to think about much.",
+      "translate": "刺猬喜欢吃蛞蝓、蚯蚓、飞蛾和其他虫子。它们会从地面筑巢的鸟类的巢中偷蛋并吞下。有时，刺猬会把头转过来，把唾液吐在刺上！然后它们用舌头把唾液涂抹开。没有人知道它们为什么这样做。一些科学家说，这发生在它们闻到气味好的青蛙或蚯蚓时。也许它们是在抵御蜱虫。内特觉得这太恶心了，不愿多想。",
+      "has_text": true
+    },
+    {
+      "page": 74,
+      "image": "074.jpg",
+      "json": "074.json",
+      "english": "Some people keep hedgehogs as pets. Hedgehog quills lie flat unless the animal feels threatened. A human who develops a trusting relationship with a hedgehog can pet it from its face to its back. Some hedgehogs will also cuddle in people’s hands or laps. Of course, there are hedgehogs who don’t like to cuddle, just like there are people who prefer to be left alone. Pet hedgehogs eat cat food.",
+      "translate": "有些人把刺猬当作宠物饲养。刺猬的刺通常是平躺的，除非它感到受到威胁。与刺猬建立信任关系的人可以从它的脸部抚摸到背部。有些刺猬还会在人的手中或腿上依偎。当然，也有一些刺猬不喜欢依偎，就像有些人喜欢独处一样。宠物刺猬吃猫粮。",
+      "has_text": true
+    },
+    {
+      "page": 75,
+      "image": "075.jpg",
+      "json": "075.json",
+      "english": "Q: What happened when Sludge wrote the story of his life? A: It got on the best smellers' list. Q: Why did the librarian slip and fall? A: She was in the non-friction section.",
+      "translate": "问：当Sludge写下他的生平故事时发生了什么？  \n答：它上了畅销书排行榜。  \n\n问：为什么图书管理员滑倒了？  \n答：因为她在非小说区。",
+      "has_text": true
+    },
+    {
+      "page": 76,
+      "image": "076.jpg",
+      "json": "076.json",
+      "english": "Q: Why was the T. rex afraid to go to the library?\nA: Because his books were 60 million years overdue.\n\nQ: Why didn’t the book club like the phone book?\nA: It had too many characters.\n\nQ: What did the librarian hang over her baby’s crib?\nA: A book mobile.",
+      "translate": "问：为什么霸王龙害怕去图书馆？  \n答：因为他的书已经过期六千万年了。\n\n问：为什么读书俱乐部不喜欢电话簿？  \n答：因为它有太多的人物。\n\n问：图书管理员在她宝宝的摇篮上挂了什么？  \n答：一本书的移动装置。",
+      "has_text": true
+    },
+    {
+      "page": 77,
+      "image": "077.jpg",
+      "json": "077.json",
+      "english": "Q: Why does the elephant use his trunk as a bookmark? A: That way he nose where he stopped reading. Q: What did the mummy do at the library? A: Got wrapped up in a good mystery. Q: Why are frogs librarians’ favorite animals? A: Because frogs say “Rrredit, rrredit, rrredit.”",
+      "translate": "问：为什么大象用他的鼻子作为书签？  \n答：这样他就知道（nose）他读到哪里了。  \n\n问：木乃伊在图书馆做了什么？  \n答：沉浸在一个很好的悬疑故事中。  \n\n问：为什么青蛙是图书管理员最喜欢的动物？  \n答：因为青蛙说“读（Rrredit），读（rrredit），读（rrredit）。”",
+      "has_text": true
+    },
+    {
+      "page": 78,
+      "image": "078.jpg",
+      "json": "078.json",
+      "english": "The Nate the Great series is good fun and has been entertaining children for over forty years. These books are also valuable learning tools in and out of the classroom. Nate’s world—his home, his friends, his neighborhood—is one that every young person recognizes. Nate introduces beginning readers and those who have graduated to early chapter books to the detective mystery genre, and they respond to Nate’s commitment to solving the case and helping his friends. What’s more, as Nate the Great solves his cases, readers learn with him. Nate unravels mysteries by using evidence collection, cogent reasoning, problem-solving, analytical skills, and logic in a way that teaches readers to develop critical-thinking abilities. The stories help children start discussions about how to approach difficult situations and give them tools to resolve them. When you read a Nate the Great book with a child, or when a child reads a Nate the Great mystery on his or her own, the child is guaranteed a satisfying ending that will have taught him or her important classroom and life skills. We know that you and your children will enjoy reading and learning from Nate the Great’s wonderful stories as much as we do. Find out more at NatetheGreatBooks.com. Happy reading and learning with Nate!",
+      "translate": "《大侦探内特》系列书籍非常有趣，四十多年来一直在娱乐着孩子们。这些书在课堂内外都是宝贵的学习工具。内特的世界——他的家、朋友和邻居——是每个年轻人都能认同的。内特将初学阅读的孩子和那些已经开始阅读早期章节书的孩子引入侦探推理的类型，他们对内特致力于解决案件和帮助朋友的态度产生共鸣。更重要的是，随着大侦探内特解决案件，读者也在与他一起学习。内特通过收集证据、合理推理、解决问题、分析技能和逻辑来解开谜团，这种方式教会读者培养批判性思维能力。这些故事帮助孩子们开始讨论如何应对困难情况，并为他们提供解决问题的工具。当你和孩子一起阅读《大侦探内特》的书，或者当孩子自己阅读《大侦探内特》的推理故事时，孩子们一定会得到一个令人满意的结局，并从中学到重要的课堂和生活技能。我们相信你和你的孩子会像我们一样享受阅读和学习《大侦探内特》的精彩故事。更多信息请访问NatetheGreatBooks.com。祝你和内特一起快乐阅读和学习！",
+      "has_text": true
+    },
+    {
+      "page": 79,
+      "image": "079.jpg",
+      "json": "079.json",
+      "english": "Nate the Great\nNate the Great Goes Undercover\nNate the Great and the Lost List\nNate the Great and the Phony Clue\nNate the Great and the Sticky Case\nNate the Great and the Missing Key\nNate the Great and the Snowy Trail\nNate the Great and the Fishy Prize\nNate the Great Stalks Stupidweed\nNate the Great and the Boring Beach Bag\nNate the Great Goes Down in the Dumps\nNate the Great and the Halloween Hunt\nNate the Great and the Musical Note\nNate the Great and the Stolen Base\nNate the Great and the Pillowcase\nNate the Great and the Mushy Valentine\nNate the Great and the Tardy Tortoise",
+      "translate": "大侦探内特  \n大侦探内特秘密出动  \n大侦探内特与丢失的清单  \n大侦探内特与虚假的线索  \n大侦探内特与黏糊糊的案件  \n大侦探内特与失踪的钥匙  \n大侦探内特与雪地踪迹  \n大侦探内特与可疑的奖品  \n大侦探内特追踪愚蠢草  \n大侦探内特与无聊的沙滩包  \n大侦探内特陷入困境  \n大侦探内特与万圣节寻宝  \n大侦探内特与音乐符号  \n大侦探内特与被盗的垒包  \n大侦探内特与枕套  \n大侦探内特与黏糊糊的情人节  \n大侦探内特与迟到的乌龟",
+      "has_text": true
+    },
+    {
+      "page": 80,
+      "image": "080.jpg",
+      "json": "080.json",
+      "english": "Table of Contents",
+      "translate": "目录",
+      "has_text": true
+    },
+    {
+      "page": 81,
+      "image": "081.jpg",
+      "json": "081.json",
+      "english": "MARJORIE WEINMAN SHARMAT has written more than 130 books for children and young adults, as well as movie and TV novelizations. Her books have been translated into twenty-four languages. The award-winning Nate the Great series, hailed in Booklist as \"groundbreaking,\" has resulted in Nate’s real-world appearances in many New York Times crossword puzzles and residing on more than 28 million boxes of Cheerios, sporting a milk mustache in magazines and posters, and touring the country in musical theater. Marjorie Weinman Sharmat and her husband, Mitchell Sharmat, have also coauthored many books, including titles in both the Nate the Great and the Olivia Sharp series.\n\nMITCHELL SHARMAT, a graduate of Harvard University, has written numerous picture books, easy readers, and novels, and is a contributor to many textbook reading programs. He is best known for the classic Gregory, the Terrible Eater, a Reading Rainbow Feature Selection and a New York Times Critics’ Pick. His membership in the Harvard Book Club of Southern Arizona was the inspiration for Nate the Great’s becoming a book club detective.\n\nJODY WHEELER developed a greater-than-average interest in children’s books at an early age, having been influenced and encouraged by her great-aunt Opal Wheeler, a prolific writer of books for young readers in the 1950s. Since being trained as a fine artist and educator, Jody has enjoyed working on projects ranging from picture books to educational texts and magazines, and from greeting cards to coloring books. Jody Wheeler divides her time between Manhattan and Siesta Key, Florida.",
+      "translate": "玛乔丽·温曼·沙玛特（Marjorie Weinman Sharmat）创作了超过130本儿童和青少年的书籍，以及电影和电视的小说化作品。她的书籍被翻译成24种语言。获奖的《大侦探内特》系列在《书单》杂志中被誉为“开创性”作品，使得内特在许多《纽约时报》填字游戏中出现，并出现在超过2800万盒的Cheerios麦片盒上，带着牛奶胡子出现在杂志和海报中，并在全国进行音乐剧巡演。玛乔丽·温曼·沙玛特和她的丈夫米切尔·沙玛特（Mitchell Sharmat）也共同创作了许多书籍，包括《大侦探内特》和《奥利维亚·夏普》系列中的作品。\n\n米切尔·沙玛特（Mitchell Sharmat）毕业于哈佛大学，创作了许多图画书、简单读物和小说，并为许多教科书阅读项目做出贡献。他最著名的作品是经典的《格雷戈里，糟糕的食客》，这本书是《阅读彩虹》精选书目和《纽约时报》评论家推荐书。他在南亚利桑那州哈佛书友会的会员身份启发了《大侦探内特》成为书友会侦探。\n\n乔迪·惠勒（Jody Wheeler）在年幼时就对儿童书籍产生了超乎寻常的兴趣，受到她的姨婆奥普尔·惠勒（Opal Wheeler）的影响和鼓励，后者是20世纪50年代多产的儿童读物作家。经过专业艺术家和教育家的培训后，乔迪乐于参与从图画书到教育文本和杂志，以及从贺卡到涂色书的各种项目。乔迪·惠勒在曼哈顿和佛罗里达州的西耶斯塔礁之间分配时间。",
+      "has_text": true
+    }
+  ]
+}

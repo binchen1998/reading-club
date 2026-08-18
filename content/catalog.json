@@ -1,0 +1,1418 @@
+{
+  "series": [
+    {
+      "id": "FlyGuy",
+      "level_name": "bridge-books苍蝇小子",
+      "title": "Fly Guy 苍蝇小子",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books苍蝇小子/bridge-books苍蝇小子.json",
+      "book_count": 16,
+      "books": [
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 1,
+          "title": "01.Hi!.Fly.Guy",
+          "name": "01.Hi!.Fly.Guy",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 2,
+          "title": "02.Super.Fly.Guy",
+          "name": "02.Super.Fly.Guy",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 3,
+          "title": "03.Shoo,Fly.Guy!",
+          "name": "03.Shoo,Fly.Guy!",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 4,
+          "title": "04.There.Was.An.Old.Lady.Who.Swallowed.FLY.GUY",
+          "name": "04.There.Was.An.Old.Lady.Who.Swallowed.FLY.GUY",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 5,
+          "title": "05.Fly.High,Fly.Guy!",
+          "name": "05.Fly.High,Fly.Guy!",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 6,
+          "title": "06.Hooray.For.Fly.Guy!",
+          "name": "06.Hooray.For.Fly.Guy!",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 7,
+          "title": "07.I.Spy.Fly.Guy!",
+          "name": "07.I.Spy.Fly.Guy!",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 8,
+          "title": "08.Fly.Guy.Meets.Fly.Girl",
+          "name": "08.Fly.Guy.Meets.Fly.Girl",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 9,
+          "title": "09.Buzz.Boy.And.Fly.Guy",
+          "name": "09.Buzz.Boy.And.Fly.Guy",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 10,
+          "title": "10.Fly.Guy.vs..The.Flyswatter!",
+          "name": "10.Fly.Guy.vs..The.Flyswatter!",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 11,
+          "title": "11.Ride,.Fly.Guy,.Ride!",
+          "name": "11.Ride,.Fly.Guy,.Ride!",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 12,
+          "title": "12.There's.A.Fly.Guy.in.My.Soup",
+          "name": "12.There's.A.Fly.Guy.in.My.Soup",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 13,
+          "title": "13.Fly.Guy.and.the.Frankenfly",
+          "name": "13.Fly.Guy.and.the.Frankenfly",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 14,
+          "title": "14.Fly.Guy's.Amazing.Tricks",
+          "name": "14.Fly.Guy's.Amazing.Tricks",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 15,
+          "title": "15.Prince.Fly.Guy",
+          "name": "15.Prince.Fly.Guy",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "bridge-books苍蝇小子",
+          "number": 16,
+          "title": "16.A.Pet.for.Fly.Guy",
+          "name": "16.A.Pet.for.Fly.Guy",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "FrogAndToad",
+      "level_name": "files",
+      "title": "Frog and Toad 青蛙与蟾蜍",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/files/files.json",
+      "book_count": 10,
+      "books": [
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 1,
+          "title": "SMALL PIG",
+          "name": "AnICanReadBook2SMALLPIG-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 2,
+          "title": "Days With Frog and Toad",
+          "name": "ICANREAD!2DAYSWITHFROGANDTOAD-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 3,
+          "title": "Frog and Toad Are Friends",
+          "name": "ICANREAD!2FROGANDTOADAREFRIENDS-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 4,
+          "title": "Frog and Toad All Year",
+          "name": "ICanRead!2FROGANDTOADALLYEAR-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 5,
+          "title": "Frog and Toad Together",
+          "name": "ICanRead!2FROGANDTOADTOGETHER-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 6,
+          "title": "GRASSHOPPER ON THE ROAD",
+          "name": "ICanRead!2GRASSHOPPERONTHEROAD-64",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 7,
+          "title": "MOUSE SOUP",
+          "name": "ICanRead!2MOUSESOUP-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 8,
+          "title": "MOUSE TALES",
+          "name": "ICanRead!2MOUSETALES-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 9,
+          "title": "OWL AT HOME",
+          "name": "ICanRead!2OWLATHOME-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Frog and Toad 青蛙与蟾蜍",
+          "number": 10,
+          "title": "UNCLE ELEPHANT",
+          "name": "ICanRead!2UNCLEELEPHANT-66",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "FancyNancy",
+      "level_name": "Nancy",
+      "title": "Fancy Nancy 漂亮的南希",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/Nancy/files/Nancy.json",
+      "book_count": 5,
+      "books": [
+        {
+          "level": "Fancy Nancy 漂亮的南希",
+          "number": 1,
+          "title": "Fancy NANCY and the Boy from Paris",
+          "name": "ICanRead!1FANCYNANCYANDTHEBOYFROMPARIS-34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Fancy Nancy 漂亮的南希",
+          "number": 2,
+          "title": "Fancy NANCY Poison Ivy Expert",
+          "name": "ICanRead!1FANCYNANCYPOISONIVYEXPERT-34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Fancy Nancy 漂亮的南希",
+          "number": 3,
+          "title": "Fancy NANCY The Dazzling Book Report",
+          "name": "ICanRead!1FANCYNANCYTHEDAZZLINGBOOKREPORT-34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Fancy Nancy 漂亮的南希",
+          "number": 4,
+          "title": "Fancy NANCY at the Museum",
+          "name": "ICanRead!1FANCYNANCYATTHEMUSEUM-34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Fancy Nancy 漂亮的南希",
+          "number": 5,
+          "title": "Fancy NANCY Sees Stars",
+          "name": "ICanRead!1FANCYNANCYSEESSTARS-34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "WinnieAndWilbur",
+      "level_name": "WinnieAndWilbur",
+      "title": "Winnie And Wilbur 女巫温妮",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/WinnieAndWilbur/files/WinnieAndWilbur.json",
+      "book_count": 12,
+      "books": [
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 1,
+          "title": "AROUND THE WORLD",
+          "name": "WinnieandWilburAROUNDTHEWORLD34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 2,
+          "title": "AT CHINESE NEW YEAR",
+          "name": "WinnieandWilburATCHINESENEWYEAR34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 3,
+          "title": "AT THE SEASIDE",
+          "name": "WinnieandWilburATTHESEASIDE34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 4,
+          "title": "HAPPY BIRTHDAY,WINNIE",
+          "name": "WinnieandWilburHAPPYBIRTHDAY%2CWINNIE34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 5,
+          "title": "IN WINTER",
+          "name": "WinnieandWilburINWINTER34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 6,
+          "title": "MEET SANTA",
+          "name": "WinnieandWilburMEETSANTA34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 7,
+          "title": "THE BIG BAD ROBOT",
+          "name": "WinnieandWilburTHEBIGBADROBOT34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 8,
+          "title": "THE BUG SAFARI",
+          "name": "WinnieandWilburTHEBUGSAFARI34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 9,
+          "title": "THE HAUNTED HOUSE",
+          "name": "WinnieandWilburTHEHAUNTEDHOUSE34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 10,
+          "title": "THE MONSTER MYSTERY",
+          "name": "WinnieandWilburTHEMONSTERMYSTERY34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 11,
+          "title": "THE NAUGHTY KNIGHT",
+          "name": "WinnieandWilburTHENAUGHTYKNIGHT34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Winnie And Wilbur 女巫温妮",
+          "number": 12,
+          "title": "UNDER THE SEA",
+          "name": "WinnieandWilburUNDERTHESEA34",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "MagicTreeHouse",
+      "level_name": "MagicTreeHouse",
+      "title": "Magic Tree House 神奇树屋",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/MagicTreeHouse/files/MagicTreeHouse.json",
+      "book_count": 4,
+      "books": [
+        {
+          "level": "Magic Tree House 神奇书屋",
+          "number": 1,
+          "title": "DINOSAURS BEFORE DARK",
+          "name": "1DINOSAURSBEFOREDARK82",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Magic Tree House 神奇书屋",
+          "number": 2,
+          "title": "THE KNIGHT AT DAWN",
+          "name": "2THEKNIGHTATDAWN82",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Magic Tree House 神奇书屋",
+          "number": 3,
+          "title": "MUMMIESIN THE MORNING",
+          "name": "3MUMMIESINTHEMORNING82",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Magic Tree House 神奇书屋",
+          "number": 4,
+          "title": "PIRATES PAST NOON",
+          "name": "4PIRATESPASTNOON82",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "CuriousGeorge",
+      "level_name": "CuriousGeorge",
+      "title": "Curious George 好奇的乔治",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/CuriousGeorge/files/CuriousGeorge.json",
+      "book_count": 6,
+      "books": [
+        {
+          "level": "Curious George 好奇的乔治",
+          "number": 1,
+          "title": "Curious George",
+          "name": "CuriousGeorge62",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Curious George 好奇的乔治",
+          "number": 2,
+          "title": "Flies a Kite",
+          "name": "FliesaKite86",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Curious George 好奇的乔治",
+          "number": 3,
+          "title": "Goes to the Hospital",
+          "name": "GoestotheHospital54",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Curious George 好奇的乔治",
+          "number": 4,
+          "title": "Learns the Alphabet",
+          "name": "LearnstheAlphabet78",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Curious George 好奇的乔治",
+          "number": 5,
+          "title": "Rides a bike",
+          "name": "Ridesabike54",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Curious George 好奇的乔治",
+          "number": 6,
+          "title": "gets a medal",
+          "name": "getsamedal54",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "NateTheGreat",
+      "level_name": "NateTheGreat",
+      "title": "Nate the Great 大侦探奈特",
+      "readable": true,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/NateTheGreat/files/NateTheGreat.json",
+      "book_count": 30,
+      "books": [
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 1,
+          "title": "San Francisco Detective",
+          "name": "NATETHEGREAT.SANFRANCISCODETECTIVE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 2,
+          "title": "Where Are You?",
+          "name": "NATETHEGREAT.WHEREAREYOU81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 3,
+          "title": "Nate The Great",
+          "name": "NATETHEGREAT81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 4,
+          "title": "The Case of the Fleeing Fang",
+          "name": "NATETHEGREATANDME.THECASEOFTHEFLEEINGFANG65",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 5,
+          "title": "Big Sniff",
+          "name": "NATETHEGREATANDTHEBIGSNIFF",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 6,
+          "title": "Boring Beach bag",
+          "name": "NATETHEGREATANDTHEBORINGBEACHBAG81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 7,
+          "title": "Crunchy Christmas",
+          "name": "NATETHEGREATANDTHECRUNCHYCHRISTMAS81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 8,
+          "title": "Earth Day Robot",
+          "name": "NATETHEGREATANDTHEEARTHDAYROBOT81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 9,
+          "title": "Fishy Prize",
+          "name": "NATETHEGREATANDTHEFISHYPRIZE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 10,
+          "title": "Halloween Hunt",
+          "name": "NATETHEGREATANDTHEHALLOWEENHUNT81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 11,
+          "title": "Hungry Book Club",
+          "name": "NATETHEGREATANDTHEHUNGRyBOOKCLUB81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 12,
+          "title": "Lost List",
+          "name": "NATETHEGREATANDTHELOSTLIST81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 13,
+          "title": "Missing Brithday Snake",
+          "name": "NATETHEGREATANDTHEMISSINGBIRTHDAYSNAKE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 14,
+          "title": "Missing Key",
+          "name": "NATETHEGREATANDTHEMISSINGKEY81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 15,
+          "title": "Monster Mess",
+          "name": "NATETHEGREATANDTHEMONSTERMESS81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 16,
+          "title": "Mushy Valentine",
+          "name": "NATETHEGREATANDTHEMUSHYVALENTINE78",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 17,
+          "title": "Musical Note",
+          "name": "NATETHEGREATANDTHEMUSICALNOTE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 18,
+          "title": "Phony Clue",
+          "name": "NATETHEGREATANDTHEPHONYCLUE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 19,
+          "title": "Pillowcase",
+          "name": "NATETHEGREATANDTHEPILLOWCASE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 20,
+          "title": "Snowy Trail",
+          "name": "NATETHEGREATANDTHESNOWYTRAIL81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 21,
+          "title": "Sticky Case",
+          "name": "NATETHEGREATANDTHESTICKYCASE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 22,
+          "title": "Stolen Base",
+          "name": "NATETHEGREATANDTHESTOLENBASE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 23,
+          "title": "Tardy Tortoise",
+          "name": "NATETHEGREATANDTHETARDYTORTOISE81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 24,
+          "title": "Wandering Word",
+          "name": "NATETHEGREATANDTHEWANDERINGWORD81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 25,
+          "title": "Goes Down in the Dumps",
+          "name": "NATETHEGREATGOESDOWNINTHEDUMPS81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 26,
+          "title": "Goes Undercover",
+          "name": "NATETHEGREATGOESUNDERCOVER81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 27,
+          "title": "Owl Express",
+          "name": "NATETHEGREATONTHEOWLEXPRESS81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 28,
+          "title": "Saves the King of Sweden",
+          "name": "NATETHEGREATSAVESTHEKINGOFSWEDEN81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 29,
+          "title": "Stalks Stupidweed",
+          "name": "NATETHEGREATSTALKSSTUPIDWEED81",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Nate the Great 大侦探奈特",
+          "number": 30,
+          "title": "Talks Turkey",
+          "name": "NATETHEGREATTALKSTURKEY97",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "AToZ",
+      "level_name": "AToZ",
+      "title": "A to Z Mysteries 神秘案件",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/AToZ/files/AToZ.json",
+      "book_count": 26,
+      "books": [
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 1,
+          "title": "THE KIDNAPPED KING",
+          "name": "A1THEKIDNAPPEDKING100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 2,
+          "title": "THE QUICKSAND QUESTION",
+          "name": "A2THEQUICKSANDQUESTION100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 3,
+          "title": "THE HAUNTED HOTEL",
+          "name": "A3THEHAUNTEDHOTEL100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 4,
+          "title": "THE EMPTY ENVELOPE",
+          "name": "A4THEEMPTYENVELOPE100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 5,
+          "title": "THE DEADLY DUNGEON",
+          "name": "A5THEDEADLYDUNGEON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 6,
+          "title": "THE MISSING MUMMY",
+          "name": "A6THETHEMISSINGMUMMY100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 7,
+          "title": "THE ZOMBIE ZONE",
+          "name": "A7THEZOMBIEZONE100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 8,
+          "title": "THE JAGUAR'S JEWEL",
+          "name": "A8THEJAGUARSJEWEL100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 9,
+          "title": "THE ORANGE OUTLAW",
+          "name": "A9THEORANGEOUTLAW100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 10,
+          "title": "THE PANDA PUZZLE",
+          "name": "A10THEPANDAPUZZLE100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 11,
+          "title": "THE NINTH NUGGET",
+          "name": "A11THENINTHNUGGET100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 12,
+          "title": "THE INVISIBLE ISLAND",
+          "name": "A12THEINVISIBLEISLAND100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 13,
+          "title": "THE GOOSE'S GOLD",
+          "name": "A13THEGOOSESGOLD100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 14,
+          "title": "THE LUCKY LOTTERY",
+          "name": "A14THELUCKYLOTTERY100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 15,
+          "title": "THE FALCON'S FEATHERS",
+          "name": "A15THEFALCONSFEATHERS100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 16,
+          "title": "THE YELLOW YACHT",
+          "name": "A16THEYELLOWYACHT100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 17,
+          "title": "THE CANARY CAPER",
+          "name": "A17THECANARYCAPER100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 18,
+          "title": "THE BALD BANDIT",
+          "name": "A18THEBALDBANDIT100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 19,
+          "title": "THE ABSENT AUTHOR",
+          "name": "A19THEABSENTAUTHOR100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 20,
+          "title": "THE X'ED-OUT X-RAY",
+          "name": "A20THEXEDOUTXRAY100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 21,
+          "title": "THE WHITE WOLF",
+          "name": "A21THEWHITEWOLF100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 22,
+          "title": "THE VAMPIRE'S VACATION",
+          "name": "A22THEVAMPIRESVACATION100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 23,
+          "title": "THE UNWILLING UMPIRE",
+          "name": "A23THEUNWILLINGUMPIRE100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 24,
+          "title": "THE TALKING T.REX",
+          "name": "A24THETALKINGTREX100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 25,
+          "title": "THE SCHOOL SKELETON",
+          "name": "A25THESCHOOLSKELETON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "A to Z Mysteries神秘案件",
+          "number": 26,
+          "title": "THE RUNAWAY RACEHORSE",
+          "name": "A26THERUNAWAYRACEHORSE100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "CatAndMouse",
+      "level_name": "CatAndMouse",
+      "title": "老鼠记者",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/CatAndMouse/files/CatAndMouse.json",
+      "book_count": 10,
+      "books": [
+        {
+          "level": "老鼠记者",
+          "number": 1,
+          "title": "CAT AND MOUSE IN A HAUNTED HOUSE",
+          "name": "C1CATANDMOUSEINAHAUNTEDHOUSE132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 2,
+          "title": "I'M TOO FOND OF MY FUR!",
+          "name": "C2I'MTOOFONDOFMYFUR132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 3,
+          "title": "PAWS OFF,CHEDDARFACE!",
+          "name": "C3PAWSOFF.CHEDDARFACE132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 4,
+          "title": "THE CURSE OF THE CHEESE PYRAMID",
+          "name": "C4THECURSEOFTHECHEESEPYRAMID132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 5,
+          "title": "LOST TREASURE OF THE EMERALD EYE",
+          "name": "C5LOSTTREASUREOFTHEEMERALDEYE132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 6,
+          "title": "ATTACK OF THE BANDIT CATS",
+          "name": "C6ATTACKOFTHEBANDITCATS132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 7,
+          "title": "FOUR MICE DEEP IN THE JUNGLE",
+          "name": "C7FOURMICEDEEPINTHEJUNGLE132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 8,
+          "title": "RED PIZZAS FOR A BLUE COUNT",
+          "name": "C8REDPIZZASFORABLUECOUNT132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 9,
+          "title": "ALL BECAUSE OF A CUP OF COFFEE",
+          "name": "C9ALLBECAUSELRACUPOFCOFFEE132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "老鼠记者",
+          "number": 10,
+          "title": "A FABUMOUSE VACATION FOR GERONIMO",
+          "name": "C10AFABUMOUSEVACATIONFORGERONIMO132",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    },
+    {
+      "id": "DragonMasters",
+      "level_name": "DraonMasters",
+      "title": "Dragon Masters 驯龙大师",
+      "readable": false,
+      "catalog_url": "https://static1.cxy61.com/bridge-books/DraonMasters/files/DraonMasters.json",
+      "book_count": 27,
+      "books": [
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 1,
+          "title": "RISE OF THE EARTH DRAGON",
+          "name": "B1RISEOFTHEEARTHDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 2,
+          "title": "SAVING THE SUN DRAGON",
+          "name": "B2SAVINGTHESUNDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 3,
+          "title": "SECRET OF THE WATER DRAGON",
+          "name": "B3SECRETOFTHEWATERDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 4,
+          "title": "POWER OF THE FIRE DRAGON",
+          "name": "B4POWEROFTHEFIREDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 5,
+          "title": "SONG OF THE POISON DRAGON",
+          "name": "B5SONGOFTHEPOISONDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 6,
+          "title": "FLIGHT OF THE MOON DRAGON",
+          "name": "B6FLIGHTOFTHEMOONDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 7,
+          "title": "SEARCH FOR THE LIGHTNING DRAGON",
+          "name": "B7SEARCHFORTHELIGHTNINGDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 8,
+          "title": "ROAR OF THE THUNDER DRAGON",
+          "name": "B8ROAROFTHETHUNDERDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 9,
+          "title": "CHILL OF THE ICE DRAGON",
+          "name": "B9CHILLOFTHEICEDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 10,
+          "title": "WAKING THE RAINBOW DRAGON",
+          "name": "B10WAKINGTHERAINBOWDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 11,
+          "title": "SHINE OF THE SILOVER DRAGON",
+          "name": "B11SHINEOFTHESILOVERDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 12,
+          "title": "TREASURE OF THE GOLD DRAGON",
+          "name": "B12TREASUREOFTHEGOLDDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 13,
+          "title": "EYE OF THE EARTHQUAKE DRAGON",
+          "name": "B13EYEOFTHEEARTHQUAKEDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 14,
+          "title": "LAND OF THE SPRING DRAGON",
+          "name": "B14LANDOFTHESPRINGDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 15,
+          "title": "FUTURE OF THE TIME DRAGON",
+          "name": "B15FUTUREOFTHETIMEDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 16,
+          "title": "CALL OF THE SOUND DRAGON",
+          "name": "B16CALLOFTHESOUNDDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 17,
+          "title": "FORTRESS OF THE STONE DRAGON",
+          "name": "B17FORTRESSOFTHESTONGDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 18,
+          "title": "HEAT OF THE LAVA DRAGON",
+          "name": "B18HEATOFTHELAVADRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 19,
+          "title": "WAVE OF THE SEA DRAGON",
+          "name": "B19WAVEOFTHESEADRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 20,
+          "title": "HOWL OF THE WIND DRAGON",
+          "name": "B20HOWLLFTHEWINDDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 21,
+          "title": "BLOOM OF THE FLOWER DRAGON",
+          "name": "B21BLOOMOFTHEFLOWERDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 22,
+          "title": "GUARDING THE INVISIBLE DRAGONS",
+          "name": "B22GUARDINGTHEINVISIBLEDRAGONS100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 23,
+          "title": "CURSE OF THE SHADOW DRAGON",
+          "name": "B23CURSEOFTHESHADOWDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 24,
+          "title": "DAWN OF THE LIGHT DRAGON",
+          "name": "B24DAWNOFTHELIGHTDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 25,
+          "title": "LEGEND OF THE STAR DRAGON",
+          "name": "B25LEGENDOFTHESTARDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 26,
+          "title": "CAVE OF THE CRYSTAL DRAGON",
+          "name": "B26CAVEOFTHECRYSTALDRAGON100",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        },
+        {
+          "level": "Dragon Masters驯龙大师",
+          "number": 27,
+          "title": "Guide for Dragon Masters",
+          "name": "B27DRAGONMASTERSGRIFFITHS148",
+          "clr": "",
+          "num_pages": 19,
+          "full": ""
+        }
+      ]
+    }
+  ]
+}
