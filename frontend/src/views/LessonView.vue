@@ -19,7 +19,6 @@ import { concatClips } from '../utils/concatClips'
 import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
-import { beginGenerate, endGenerate, waitGenerateShown } from '../stores/generate'
 import { ensureOcr, ensureTts, prefetchPageAssets } from '../utils/ensureAsset'
 import { waitJobResult } from '../utils/jobSse'
 import { stopSpeak } from '../utils/speak'
@@ -53,6 +52,8 @@ const recordDone = ref(false)
 const vocabRetries = ref(0)
 const phraseRetries = ref(0)
 const readPromptOpen = ref(false)
+const explainBusy = ref(false)
+const explainBusyError = ref('')
 const wrongKeys = ref<Record<number, string[]>>({})
 const flowPaused = ref(false)
 const focusItem = ref<Item | null>(null)
@@ -317,7 +318,7 @@ async function playOne(text: string, purpose?: string): Promise<void> {
   const label =
     purpose ||
     (step.value === 'phrase' ? '短语发音' : step.value === 'vocab' ? '单词发音' : '讲解音频')
-  const url = await ensureTts(text, label)
+  const url = await ensureTts(text, label, step.value === 'explain' ? { silent: true } : undefined)
   if (!url || gen !== playGen) return
   await new Promise<void>((resolve) => {
     const audio = new Audio(url)
@@ -865,17 +866,20 @@ function beatNeedsLesson(row: { english?: string; generated?: boolean; explain?:
   return true
 }
 
-async function requestPageLesson(page: number, withDialog: boolean) {
+async function requestPageLesson(page: number, gen: number) {
   const path = lessonApiPath()
-  if (withDialog) {
-    beginGenerate('讲解')
-    await waitGenerateShown()
-  }
+  explainBusy.value = true
+  explainBusyError.value = ''
   try {
     const job = (await apiPost(`${path}/generate?page=${page}`)) as { exists?: boolean; job_id?: string }
     if (job?.job_id && !job.exists) await waitJobResult(job.job_id)
+  } catch (err) {
+    if (gen === pagePrepGen) {
+      explainBusyError.value = err instanceof Error ? err.message : '讲解生成失败'
+    }
+    throw err
   } finally {
-    if (withDialog) endGenerate()
+    if (gen === pagePrepGen) explainBusy.value = false
   }
 }
 
@@ -904,13 +908,18 @@ async function requestNextPageLesson() {
 
 async function prepareOpenedPage() {
   const gen = ++pagePrepGen
+  explainBusy.value = false
+  explainBusyError.value = ''
   await nextTick()
-  await waitGenerateShown()
   if (gen !== pagePrepGen) return
   const current = beat.value
   if (!current) return
   if (beatNeedsLesson(current)) {
-    await requestPageLesson(Number(current.page), true)
+    try {
+      await requestPageLesson(Number(current.page), gen)
+    } catch {
+      return
+    }
     if (gen !== pagePrepGen) return
     await refreshLesson()
     if (gen !== pagePrepGen) return
@@ -1145,18 +1154,33 @@ onUnmounted(() => {
               秒
             </label>
           </div>
-          <div class="hidden max-h-[42vh] space-y-2 overflow-y-auto pr-1 lg:block">
-            <button
-              v-for="(sent, i) in sentences"
-              :id="`sent-${i}`"
-              :key="i"
-              type="button"
-              class="block w-full rounded-2xl px-3 py-2 text-left leading-7"
-              :class="i === sentIndex ? 'bg-sunny/80 font-bold text-brand-700' : 'font-bold text-brand-700/80 hover:bg-brand-50'"
-              @click="clickSentence(i)"
+          <div class="max-h-[28vh] space-y-2 overflow-y-auto pr-1 lg:max-h-[42vh]">
+            <div
+              v-if="explainBusy"
+              class="rounded-2xl bg-sunny/80 px-3 py-2 font-bold leading-7 text-brand-700"
             >
-              {{ sent }}
-            </button>
+              你是第一个读这页的人，正在生成讲解，请稍等。
+              <p class="mt-1 text-sm font-bold text-brand-600/70">生成后会保存，后面的人不用再等。</p>
+            </div>
+            <p
+              v-else-if="explainBusyError"
+              class="rounded-2xl bg-candy/15 px-3 py-2 font-bold leading-7 text-candy"
+            >
+              {{ explainBusyError }}
+            </p>
+            <template v-else>
+              <button
+                v-for="(sent, i) in sentences"
+                :id="`sent-${i}`"
+                :key="i"
+                type="button"
+                class="block w-full rounded-2xl px-3 py-2 text-left leading-7"
+                :class="i === sentIndex ? 'bg-sunny/80 font-bold text-brand-700' : 'font-bold text-brand-700/80 hover:bg-brand-50'"
+                @click="clickSentence(i)"
+              >
+                {{ sent }}
+              </button>
+            </template>
           </div>
           <div class="grid grid-cols-2 gap-1.5 lg:gap-2">
             <button class="btn-ghost w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs" type="button" @click="restartExplain">再听一遍</button>
