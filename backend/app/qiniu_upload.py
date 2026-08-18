@@ -123,8 +123,9 @@ def ocr_key(series_id: str, book_slug: str, page: int, digest: str) -> str:
     return f"{QINIU_ASSET_PREFIX}/ocr/{series_id}/{book_slug}/{page:03d}-{digest}.json"
 
 
-def series_cover_key(series_id: str) -> str:
-    return f"{QINIU_ASSET_PREFIX}/covers/{series_id}.jpg"
+def series_cover_key(series_id: str, version: str = "") -> str:
+    suffix = f"-{version}" if version else ""
+    return f"{QINIU_ASSET_PREFIX}/covers/{series_id}{suffix}.jpg"
 
 
 def covers_json_key() -> str:

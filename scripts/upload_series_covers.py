@@ -32,7 +32,7 @@ COVER_PAGES = [
     {"id": "NateTheGreat", "slug": "san-francisco-detective", "page": 1},
     {"id": "AToZ", "slug": "the-kidnapped-king", "page": 1},
     {"id": "CatAndMouse", "slug": "cat-and-mouse-in-a-haunted-house", "page": 1},
-    {"id": "DragonMasters", "slug": "rise-of-the-earth-dragon", "page": 1},
+    {"id": "DragonMasters", "slug": "rise-of-the-earth-dragon", "page": 1, "version": "v2"},
 ]
 
 
@@ -44,11 +44,23 @@ def _local_cover(series_id: str, slug: str, page: int) -> bytes | None:
     return None
 
 
+def _encode_jpeg(data: bytes) -> bytes:
+    from io import BytesIO
+
+    from PIL import Image, ImageFile
+
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
+    image = Image.open(BytesIO(data)).convert("RGB")
+    out = BytesIO()
+    image.save(out, format="JPEG", quality=90, optimize=True)
+    return out.getvalue()
+
+
 def _cover_bytes(series_id: str, slug: str, page: int) -> bytes:
     data = _local_cover(series_id, slug, page) or page_image_bytes(series_id, slug, page)
     if not data:
         raise RuntimeError(f"找不到封面 {series_id}/{slug} p{page}")
-    return data
+    return _encode_jpeg(data)
 
 
 def main() -> None:
@@ -67,7 +79,7 @@ def main() -> None:
             raise RuntimeError(f"书目里没有 {series_id}/{slug}")
         print(f"[cover] {series_id} {slug} p{page}", flush=True)
         image = _cover_bytes(series_id, slug, page)
-        key = series_cover_key(series_id)
+        key = series_cover_key(series_id, pick.get("version") or "")
         qiniu_put_bytes(key, image, mime_type="image/jpeg")
         cover_url = cdn_url(key)
         items.append(
