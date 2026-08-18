@@ -5,8 +5,9 @@ from fastapi import APIRouter, HTTPException, Query
 
 from ..book_pages import split_chapters
 from ..config import BOOKS, LESSONS
-from ..lesson_gen import ensure_lesson, lesson_exists
-from ..lesson_worker import enqueue_book, is_generating
+from ..gen_jobs import job_payload
+from ..lesson_gen import lesson_exists
+from ..lesson_worker import enqueue_book, enqueue_chapter, enqueue_lesson_job, is_generating
 from ..ocr import load_page_ocr
 
 router = APIRouter(prefix="/api")
@@ -86,7 +87,9 @@ def lesson_detail(
     chapter = _chapter_num(chapter_id)
     if check:
         return {"exists": lesson_exists(series_id, book_slug, chapter)}
-    lesson = ensure_lesson(series_id, book_slug, chapter)
+    if not lesson_exists(series_id, book_slug, chapter):
+        raise HTTPException(409, "课稿尚未生成")
+    lesson = json.loads((LESSONS / series_id / book_slug / f"ch{chapter:02d}.json").read_text(encoding="utf-8"))
     book = json.loads((BOOKS / series_id / book_slug / "book.json").read_text(encoding="utf-8"))
     pages = {p["page"]: p for p in book.get("pages") or []}
     word_map = {w["en"]: w for w in lesson.get("word_bank") or []}
@@ -115,3 +118,16 @@ def lesson_detail(
             "phrase_bank": lesson.get("phrase_bank") or [],
         }
     }
+
+
+@router.post("/lessons/{series_id}/{book_slug}/{chapter_id}/generate")
+def lesson_generate(series_id: str, book_slug: str, chapter_id: str):
+    chapter = _chapter_num(chapter_id)
+    book_path = BOOKS / series_id / book_slug / "book.json"
+    if not book_path.exists():
+        raise HTTPException(404, "书还没下载到本地")
+    if lesson_exists(series_id, book_slug, chapter):
+        return {"exists": True, "job_id": "", "status": "done"}
+    job = enqueue_lesson_job(series_id, book_slug, chapter)
+    enqueue_chapter(series_id, book_slug, chapter)
+    return job_payload(job)

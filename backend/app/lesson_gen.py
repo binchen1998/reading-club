@@ -7,8 +7,6 @@ import logging
 import threading
 from pathlib import Path
 
-from fastapi import HTTPException
-
 from .config import BOOKS, LESSONS
 from .openai_llm import get_openai_client
 
@@ -39,19 +37,15 @@ def _write_lesson(path: Path, lesson: dict) -> None:
     path.write_text(json.dumps(lesson, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def ensure_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
+def generate_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
     path = lesson_file(series_id, book_slug, chapter)
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     if get_openai_client() is None:
-        raise HTTPException(status_code=503, detail="未配置 OPENAI_API_KEY，无法生成讲解")
-    try:
-        from .openai_llm import openai_base_url
+        raise RuntimeError("未配置 OPENAI_API_KEY，无法生成讲解")
+    from .openai_llm import openai_base_url
 
-        openai_base_url()
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
+    openai_base_url()
     key = f"{series_id}/{book_slug}/ch{chapter:02d}"
     lock = _lock_for(key)
     with lock:
@@ -59,7 +53,7 @@ def ensure_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
             return json.loads(path.read_text(encoding="utf-8"))
         book_path = BOOKS / series_id / book_slug / "book.json"
         if not book_path.exists():
-            raise HTTPException(status_code=404, detail="书还没下载到本地")
+            raise RuntimeError("书还没下载到本地")
         from scripts.prebuild_content.lesson_llm import generate_chapter_lesson_full
 
         from .book_pages import split_chapters
@@ -68,12 +62,16 @@ def ensure_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
         chapters = split_chapters(book.get("pages") or [])
         info = next((row for row in chapters if int(row.get("chapter") or 0) == chapter), None)
         if info is None:
-            raise HTTPException(status_code=404, detail="这一章还没开放")
+            raise RuntimeError("这一章还没开放")
         logger.info("online lesson generate %s pages=%s", key, len(info.get("pages") or []))
         try:
             lesson = generate_chapter_lesson_full(info)
         except Exception as exc:
             logger.exception("online lesson generate failed %s", key)
-            raise HTTPException(status_code=502, detail=f"讲解生成失败：{exc}") from exc
+            raise RuntimeError(f"讲解生成失败：{exc}") from exc
         _write_lesson(path, lesson)
         return lesson
+
+
+def ensure_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
+    return generate_lesson(series_id, book_slug, chapter)

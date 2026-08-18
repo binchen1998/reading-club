@@ -12,6 +12,7 @@ from .routers import (
     assets,
     catalog,
     dict as dict_router,
+    jobs,
     lessons,
     media,
     ocr,
@@ -51,6 +52,7 @@ RECORDINGS.mkdir(parents=True, exist_ok=True)
 
 app.include_router(catalog.router)
 app.include_router(lessons.router)
+app.include_router(jobs.router)
 app.include_router(media.router)
 app.include_router(assets.router)
 app.include_router(ocr.router)

@@ -12,11 +12,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .book_pages import split_chapters
 from .config import BOOKS, LESSONS
-from .lesson_gen import ensure_lesson, lesson_exists
+from .gen_jobs import mark_done, mark_error, mark_running, next_interactive_job
+from .lesson_gen import generate_lesson, lesson_exists
+from .ocr import ocr_cache_digest
+from .tts import audio_id
 
 logger = logging.getLogger("lesson_worker")
 WORD_RE = re.compile(r"[A-Za-z']+")
 TTS_WORKERS = 6
+INTERACTIVE_WORKERS = 4
 RETRY_AFTER_SEC = 90
 
 _queue: queue.Queue[tuple[str, str, int, str]] = queue.Queue()
@@ -45,6 +49,8 @@ def start_lesson_worker() -> None:
             return
         _started = True
     threading.Thread(target=_loop, daemon=True, name="lesson-worker").start()
+    for i in range(INTERACTIVE_WORKERS):
+        threading.Thread(target=_interactive_loop, daemon=True, name=f"gen-worker-{i}").start()
     try:
         enqueue_all_local()
     except Exception:
@@ -149,7 +155,7 @@ def _generate_one(series_id: str, book_slug: str, chapter: int, key: str) -> Non
             logger.warning("skip lesson %s: no OPENAI_API_KEY", key)
             return
         logger.info("background lesson %s", key)
-        ensure_lesson(series_id, book_slug, chapter)
+        generate_lesson(series_id, book_slug, chapter)
     path = LESSONS / series_id / book_slug / f"ch{chapter:02d}.json"
     if not path.exists():
         return
@@ -197,3 +203,97 @@ def _fill_ocr(series_id: str, book_slug: str, lesson: dict, label: str) -> None:
             ensure_ocr(series_id, book_slug, page, text, purpose="后台预生成")
         except Exception:
             logger.exception("background ocr failed %s p%s %s", label, page, text[:40])
+
+
+def enqueue_lesson_job(series_id: str, book_slug: str, chapter: int):
+    from .gen_jobs import submit_job
+
+    start_lesson_worker()
+    return submit_job(
+        "lesson",
+        f"lesson:{series_id}/{book_slug}/ch{chapter:02d}",
+        {"series_id": series_id, "book_slug": book_slug, "chapter": chapter},
+        priority=0,
+    )
+
+
+def enqueue_tts_job(text: str, purpose: str = "讲解音频"):
+    from .gen_jobs import submit_job
+
+    start_lesson_worker()
+    value = (text or "").strip()
+    return submit_job("tts", f"tts:{audio_id(value)}", {"text": value, "purpose": purpose}, priority=1)
+
+
+def enqueue_ocr_job(series_id: str, book_slug: str, page: int, text: str, purpose: str = "这一句的词框"):
+    from .gen_jobs import submit_job
+
+    start_lesson_worker()
+    value = (text or "").strip()
+    digest = ocr_cache_digest(value)
+    return submit_job(
+        "ocr",
+        f"ocr:{series_id}/{book_slug}/{page}:{digest}",
+        {
+            "series_id": series_id,
+            "book_slug": book_slug,
+            "page": page,
+            "text": value,
+            "purpose": purpose,
+        },
+        priority=2,
+    )
+
+
+def _interactive_loop() -> None:
+    logger.info("interactive generate worker started")
+    while True:
+        job = next_interactive_job()
+        if job is None:
+            continue
+        mark_running(job.id)
+        try:
+            result = _run_interactive(job.kind, job.payload)
+            mark_done(job.id, result)
+        except Exception as exc:
+            logger.exception("interactive generate failed %s", job.key)
+            mark_error(job.id, str(exc) or "生成失败")
+
+
+def _run_interactive(kind: str, payload: dict) -> dict:
+    if kind == "lesson":
+        generate_lesson(payload["series_id"], payload["book_slug"], int(payload["chapter"]))
+        return {"exists": True}
+    if kind == "tts":
+        from .assets import ensure_tts
+
+        return ensure_tts(payload["text"], payload.get("purpose") or "讲解音频")
+    if kind == "ocr":
+        from .assets import ensure_ocr
+
+        return ensure_ocr(
+            payload["series_id"],
+            payload["book_slug"],
+            int(payload["page"]),
+            payload["text"],
+            payload.get("purpose") or "这一句的词框",
+        )
+    if kind == "chat":
+        from fastapi import HTTPException
+
+        from .teaching import chat_reply
+
+        try:
+            reply = chat_reply(
+                book_title=payload.get("book_title") or "",
+                student_text=payload.get("student_text") or "",
+                current_page=payload.get("current_page"),
+                current_english=payload.get("current_english") or "",
+                current_script=payload.get("current_script") or "",
+                messages=payload.get("messages") or [],
+            )
+        except HTTPException as exc:
+            detail = exc.detail
+            raise RuntimeError(detail if isinstance(detail, str) else "助教暂时没有回复") from exc
+        return {"reply": reply, "ok": True}
+    raise RuntimeError(f"未知任务类型: {kind}")

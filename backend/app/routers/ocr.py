@@ -1,8 +1,10 @@
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException
 
-from ..assets import ensure_ocr, lookup_ocr
+from ..assets import lookup_ocr
 from ..config import BOOKS
+from ..gen_jobs import job_payload
+from ..lesson_worker import enqueue_ocr_job
 
 router = APIRouter(prefix="/api")
 
@@ -21,7 +23,22 @@ def ocr_words(body: WordOcrBody):
     pages_dir = BOOKS / body.series_id / body.book_slug / "pages"
     if not pages_dir.exists():
         raise HTTPException(404, "书页不存在")
+    found = lookup_ocr(body.series_id, body.book_slug, body.page, body.text)
+    if found:
+        return found
     if body.check:
-        found = lookup_ocr(body.series_id, body.book_slug, body.page, body.text)
-        return found or {"words": [], "exists": False, "created": False, "source": ""}
-    return ensure_ocr(body.series_id, body.book_slug, body.page, body.text, body.purpose)
+        return {"words": [], "exists": False, "created": False, "source": ""}
+    job = enqueue_ocr_job(body.series_id, body.book_slug, body.page, body.text, body.purpose)
+    return {"words": [], "exists": False, "created": False, "source": "", **job_payload(job)}
+
+
+@router.post("/ocr/words/generate")
+def ocr_words_generate(body: WordOcrBody):
+    pages_dir = BOOKS / body.series_id / body.book_slug / "pages"
+    if not pages_dir.exists():
+        raise HTTPException(404, "书页不存在")
+    found = lookup_ocr(body.series_id, body.book_slug, body.page, body.text)
+    if found:
+        return {"exists": True, "job_id": "", "status": "done", "result": found, **found}
+    job = enqueue_ocr_job(body.series_id, body.book_slug, body.page, body.text, body.purpose)
+    return job_payload(job)

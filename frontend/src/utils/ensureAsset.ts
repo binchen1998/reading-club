@@ -1,5 +1,6 @@
 import { apiGet, apiPost } from '../api'
 import { beginGenerate, endGenerate } from '../stores/generate'
+import { waitJobResult } from './jobSse'
 
 type TtsResult = { url?: string; exists?: boolean; created?: boolean; source?: string }
 type OcrResult = { words?: Array<Record<string, unknown>>; exists?: boolean; created?: boolean; source?: string }
@@ -107,9 +108,19 @@ function startTtsJob(value: string, purpose: string): AssetJob<string> {
     }
     state.needsGenerate = true
     markChecked()
-    const res = (await apiGet(
-      `/api/assets/tts?text=${encodeURIComponent(value)}&purpose=${encodeURIComponent(purpose)}`,
-    )) as TtsResult
+    const started = (await apiPost('/api/assets/tts/generate', { text: value, purpose })) as {
+      exists?: boolean
+      status?: string
+      job_id?: string
+      url?: string
+      result?: TtsResult
+    }
+    const ready = started?.result?.url || started?.url || ''
+    if (ready && (started.exists || started.status === 'done' || !started.job_id)) {
+      ttsCache.set(value, ready)
+      return ready
+    }
+    const res = await waitJobResult<TtsResult>(started.job_id || '')
     const url = res?.url || ''
     if (url) ttsCache.set(value, url)
     return url
@@ -137,7 +148,19 @@ function startOcrJob(payload: OcrPayload): AssetJob<Array<Record<string, unknown
     }
     state.needsGenerate = true
     markChecked()
-    const res = (await apiPost('/api/ocr/words', { ...payload, purpose, check: false })) as OcrResult
+    const started = (await apiPost('/api/ocr/words/generate', { ...payload, purpose })) as {
+      exists?: boolean
+      status?: string
+      job_id?: string
+      words?: Array<Record<string, unknown>>
+      result?: OcrResult
+    }
+    const ready = started?.result?.words || started?.words
+    if (ready && (started.exists || started.status === 'done' || !started.job_id)) {
+      ocrCache.set(key, ready)
+      return ready
+    }
+    const res = await waitJobResult<OcrResult>(started.job_id || '')
     const words = res?.words || []
     ocrCache.set(key, words)
     return words

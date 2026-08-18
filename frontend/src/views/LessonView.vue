@@ -21,6 +21,7 @@ import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
 import { beginGenerate, endGenerate } from '../stores/generate'
 import { ensureOcr, ensureTts, prefetchPageAssets } from '../utils/ensureAsset'
+import { waitJobResult } from '../utils/jobSse'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
 import { sound } from '../utils/sound'
@@ -244,20 +245,25 @@ async function finishAsk() {
   try {
     const heard = await recognizeAudio(blob, 'zh')
     if (!heard) throw new Error('没听清，再说一次')
-    const res = await apiPost('/api/teaching/chat', {
+    const job = (await apiPost('/api/teaching/chat', {
       book_title: lesson.value?.title || '',
       current_page_number: beat.value?.page,
       current_english: beat.value?.english || '',
       current_script: beat.value?.explain || '',
       student_text: heard,
       messages: chatHistory.value,
-    })
+    })) as { job_id?: string; result?: { reply?: string } }
+    const reply =
+      job.result?.reply ||
+      (job.job_id ? (await waitJobResult<{ reply?: string }>(job.job_id)).reply : '') ||
+      ''
+    if (!reply) throw new Error('助教暂时没听清')
     chatHistory.value = [
       ...chatHistory.value,
       { role: 'user', content: heard },
-      { role: 'assistant', content: res.reply },
+      { role: 'assistant', content: reply },
     ].slice(-20)
-    await speakAssistantText(res.reply)
+    await speakAssistantText(reply)
   } catch (e: any) {
     askError.value = e?.message || '助教暂时没听清'
   } finally {
@@ -938,7 +944,16 @@ watch(
 onMounted(async () => {
   const path = `/api/lessons/${route.params.seriesId}/${route.params.bookSlug}/${route.params.chapterId}`
   const check = (await api(`${path}?check=1`)) as { exists?: boolean }
-  if (!check?.exists) beginGenerate('讲解')
+  if (!check?.exists) {
+    beginGenerate('讲解')
+    try {
+      const job = (await apiPost(`${path}/generate`)) as { exists?: boolean; job_id?: string }
+      if (job?.job_id && !job.exists) await waitJobResult(job.job_id)
+    } catch (err) {
+      endGenerate()
+      throw err
+    }
+  }
   try {
     data.value = await api(path)
   } finally {
