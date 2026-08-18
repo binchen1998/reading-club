@@ -60,6 +60,7 @@ const focusItem = ref<Item | null>(null)
 const segIndex = ref(0)
 const sentIndex = ref(-1)
 const overlay = ref<Box[]>([])
+const pageOcr = ref<Box[]>([])
 const karaokeWords = ref<Box[]>([])
 const recording = ref(false)
 const recordedUrl = ref('')
@@ -88,6 +89,7 @@ let passTimer: number | null = null
 let recordTimer: number | null = null
 let playGen = 0
 let pagePrepGen = 0
+const pageOcrCache = new Map<string, Box[]>()
 const explainPlaying = ref(false)
 const explainPaused = ref(false)
 
@@ -96,6 +98,15 @@ const beat = computed(() => lesson.value?.beats?.[beatIndex.value])
 const firstBeat = computed(() => beatIndex.value <= 0)
 const lastBeat = computed(() => beatIndex.value >= (lesson.value?.beats?.length || 1) - 1)
 const sentences = computed(() => splitSentences(beat.value?.explain || ''))
+const pageHasStoryText = computed(
+  () => !!String(beat.value?.english || '').trim() || sentences.value.length > 0,
+)
+const explainHint = computed(() => {
+  if (explainBusy.value) return ''
+  if (!pageHasStoryText.value) return '这一页没有文字，看看图就好。'
+  if (explainBusyError.value) return '讲解还没准备好，过一会儿再听。'
+  return ''
+})
 const vocabQs = computed(() => {
   void quizSeed.value
   return makeQuiz(beat.value?.word_items || [], lesson.value?.word_bank || [])
@@ -140,7 +151,7 @@ const displayBoxes = computed(() => {
   return raw.map((box) => inflateBox(box))
 })
 const bookKey = computed(() => `${route.params.seriesId}/${route.params.bookSlug}`)
-const pageHotspots = computed(() => (beat.value?.ocr || []) as Box[])
+const pageHotspots = computed(() => pageOcr.value)
 const dictBanks = computed<DictItem[]>(() => [
   ...(lesson.value?.word_bank || []),
   ...(lesson.value?.phrase_bank || []),
@@ -189,7 +200,7 @@ function makeQuiz(items: Item[], bank: Item[]) {
 }
 
 function markNeedles(needles: string[]) {
-  overlay.value = boxesFor(needles, beat.value?.ocr || [])
+  overlay.value = boxesFor(needles, pageOcr.value)
 }
 
 function markSentence(text: string) {
@@ -875,7 +886,9 @@ async function requestPageLesson(page: number, gen: number) {
     if (job?.job_id && !job.exists) await waitJobResult(job.job_id)
   } catch (err) {
     if (gen === pagePrepGen) {
-      explainBusyError.value = err instanceof Error ? err.message : '讲解生成失败'
+      explainBusyError.value = pageHasStoryText.value
+        ? '讲解还没准备好，过一会儿再听。'
+        : '这一页没有文字，看看图就好。'
     }
     throw err
   } finally {
@@ -918,13 +931,13 @@ async function prepareOpenedPage() {
     try {
       await requestPageLesson(Number(current.page), gen)
     } catch {
-      return
+      /* 没有文字或讲解未就绪时仍展示本页 */
     }
     if (gen !== pagePrepGen) return
     await refreshLesson()
     if (gen !== pagePrepGen) return
   }
-  await loadPageProgress()
+  await Promise.all([loadPageOcr(), loadPageProgress()])
   if (gen !== pagePrepGen) return
   startStep()
   saveCursor()
@@ -942,9 +955,39 @@ function goToBeat(index: number) {
   closeTextPopup()
   celebrating.value = false
   focusItem.value = null
+  pageOcr.value = []
+  overlay.value = []
   beatIndex.value = index
   step.value = 'explain'
   void prepareOpenedPage()
+}
+
+async function loadPageOcr() {
+  const current = beat.value
+  const page = Number(current?.page || 0)
+  if (!current || !Number.isFinite(page)) {
+    pageOcr.value = []
+    return
+  }
+  const key = `${route.params.seriesId}/${route.params.bookSlug}/${page}`
+  const cached = pageOcrCache.get(key)
+  if (cached) {
+    pageOcr.value = cached
+    return
+  }
+  try {
+    const q = new URLSearchParams({
+      series_id: String(route.params.seriesId || ''),
+      book_slug: String(route.params.bookSlug || ''),
+      page: String(page),
+    })
+    const row = await api(`/api/ocr/page?${q}`)
+    const boxes = (row?.ocr || []) as Box[]
+    pageOcrCache.set(key, boxes)
+    pageOcr.value = boxes
+  } catch {
+    pageOcr.value = []
+  }
 }
 
 async function loadPageProgress() {
@@ -1165,10 +1208,10 @@ onUnmounted(() => {
               <p class="mt-1 text-sm font-bold text-brand-600/70">生成后会保存，后面的人不用再等。</p>
             </div>
             <p
-              v-else-if="explainBusyError"
-              class="rounded-2xl bg-candy/15 px-3 py-2 font-bold leading-7 text-candy"
+              v-else-if="explainHint"
+              class="rounded-2xl bg-brand-50 px-3 py-2 text-sm font-bold leading-7 text-brand-600/80"
             >
-              {{ explainBusyError }}
+              {{ explainHint }}
             </p>
             <template v-else>
               <button
