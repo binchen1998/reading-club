@@ -1002,7 +1002,7 @@ onUnmounted(() => {
               :title="recordLocked ? (phraseLocked ? '请先完成单词复习' : '请先完成短语复习') : ''"
               @click="startActivity('record')"
             >
-              {{ recordDone ? '朗读已录 ✓' : '开始录制' }}
+              {{ recordDone ? '朗读已录 ✓' : '自主朗读' }}
             </button>
           </div>
         </section>
@@ -1160,7 +1160,7 @@ onUnmounted(() => {
         讲解听完了。请先自己把这一页读一遍，然后复习单词和短语。
       </p>
       <p class="mt-3 text-sm font-bold text-brand-600/70">
-        单词过了才能复习短语，短语过了才能开始录制。
+        单词过了才能复习短语，短语过了才能自主朗读。
       </p>
       <div class="mt-5 flex flex-col gap-2">
         <button
