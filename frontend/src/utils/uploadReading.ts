@@ -48,6 +48,7 @@ export async function saveReadingLocal(input: {
 export async function uploadReadingCloud(input: {
   id: number
   clip: PageClip
+  isPublic?: boolean
   onProgress?: (text: string) => void
 }): Promise<ReadingRecord> {
   input.onProgress?.('准备上传…')
@@ -71,7 +72,7 @@ export async function uploadReadingCloud(input: {
   input.onProgress?.('正在保存…')
   return api(`/api/practice/${input.id}/cloud`, {
     method: 'POST',
-    body: JSON.stringify({ video_key: prepared.video_key }),
+    body: JSON.stringify({ video_key: prepared.video_key, is_public: Boolean(input.isPublic) }),
   }) as Promise<ReadingRecord>
 }
 

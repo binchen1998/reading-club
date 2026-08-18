@@ -44,6 +44,7 @@ def serialize_public(row: Recording, nickname: str = "", avatar: str = "") -> di
         "videoUrl": row.video_url,
         "thumbUrl": row.thumb_url,
         "likeCount": row.like_count,
+        "isPublic": row.is_public,
     }
 
 
@@ -163,10 +164,11 @@ def square_detail(
     db: Session = Depends(get_db),
     user: User | None = Depends(get_optional_user),
 ):
-    key = SQUARE_DETAIL.format(recording_id=recording_id)
-    cached = cache_get(key)
     rec = db.get(Recording, recording_id)
-    if rec is None or rec.status != "completed" or not rec.is_public:
+    if rec is None or rec.status != "completed":
+        raise HTTPException(status_code=404, detail="作品不存在")
+    is_owner = bool(user and user.username == rec.username)
+    if not rec.is_public and not is_owner:
         raise HTTPException(status_code=404, detail="作品不存在")
     owner = db.get(User, rec.username)
     liked = False
@@ -187,9 +189,14 @@ def square_detail(
             display_avatar(owner),
         ),
         "liked": liked,
+        "isOwner": is_owner,
     }
-    if not isinstance(cached, dict):
-        cache_set(key, {k: v for k, v in payload.items() if k != "liked"}, indexes=[SQUARE_DETAIL_INDEX])
+    if rec.is_public:
+        key = SQUARE_DETAIL.format(recording_id=recording_id)
+        cached = cache_get(key)
+        if isinstance(cached, dict):
+            return {**cached, "liked": liked, "isOwner": is_owner, "isPublic": rec.is_public}
+        cache_set(key, {k: v for k, v in payload.items() if k not in {"liked", "isOwner"}}, indexes=[SQUARE_DETAIL_INDEX])
     return payload
 
 

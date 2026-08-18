@@ -9,6 +9,7 @@ import UserAvatar from '../components/UserAvatar.vue'
 import { useUserStore } from '../stores/user'
 import { clubLink } from '../utils/username'
 import { safeDisplayName } from '../utils/safeDisplayName'
+import { setReadingPublic } from '../utils/uploadReading'
 
 const route = useRoute()
 const user = useUserStore()
@@ -23,8 +24,10 @@ const commentsPage = ref(1)
 const replyTo = ref<any | null>(null)
 const posting = ref(false)
 const liking = ref(false)
+const visibilityBusy = ref(false)
 const removingId = ref<number | null>(null)
 const error = ref('')
+const isOwner = computed(() => Boolean(item.value?.isOwner || item.value?.username === user.username))
 
 async function load() {
   loading.value = true
@@ -46,7 +49,7 @@ async function loadComments() {
 }
 
 async function toggleLike() {
-  if (!item.value || user.isGuest || liking.value) return
+  if (!item.value || user.isGuest || liking.value || !item.value.isPublic) return
   liking.value = true
   try {
     const res = item.value.liked
@@ -56,6 +59,20 @@ async function toggleLike() {
     item.value.likeCount = res.likeCount ?? item.value.likeCount
   } finally {
     liking.value = false
+  }
+}
+
+async function toggleVisibility() {
+  if (!item.value || !isOwner.value || visibilityBusy.value) return
+  visibilityBusy.value = true
+  error.value = ''
+  try {
+    const res = await setReadingPublic(item.value.id, !item.value.isPublic)
+    item.value.isPublic = Boolean(res.isPublic)
+  } catch (e: any) {
+    error.value = e?.message || '更新公开状态失败'
+  } finally {
+    visibilityBusy.value = false
   }
 }
 
@@ -145,7 +162,7 @@ onMounted(load)
                 </p>
               </div>
               <button
-                v-if="!user.isGuest"
+                v-if="!user.isGuest && item.isPublic"
                 type="button"
                 class="shrink-0 rounded-full px-3 py-1.5 text-sm font-bold disabled:opacity-50"
                 :class="item.liked ? 'bg-candy text-white' : 'bg-candy/10 text-candy'"
@@ -157,6 +174,19 @@ onMounted(load)
               <span v-else class="shrink-0 rounded-full bg-candy/10 px-3 py-1.5 text-sm font-bold text-candy">
                 ♥ {{ item.likeCount || 0 }}
               </span>
+            </div>
+            <div v-if="isOwner" class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full px-3 py-1 text-xs font-extrabold" :class="item.isPublic ? 'bg-mint/20 text-mint' : 'bg-brand-100 text-brand-600'">
+                {{ item.isPublic ? '已公开到广场' : '仅自己可见' }}
+              </span>
+              <button
+                class="btn-ghost px-3 py-1.5 text-sm"
+                type="button"
+                :disabled="visibilityBusy"
+                @click="toggleVisibility"
+              >
+                {{ visibilityBusy ? '…' : item.isPublic ? '不公开' : '公开' }}
+              </button>
             </div>
             <router-link
               class="flex items-center gap-2 text-left"
@@ -180,7 +210,7 @@ onMounted(load)
           回复 {{ safeDisplayName(replyTo.authorName, replyTo.username) }}
           <button type="button" class="ml-2 text-candy" @click="replyTo = null">取消</button>
         </p>
-        <div v-if="!user.isGuest" class="flex gap-2">
+        <div v-if="!user.isGuest && item.isPublic" class="flex gap-2">
           <input
             v-model="comment"
             class="min-w-0 flex-1 rounded-2xl border-2 border-brand-200 px-3 py-2 text-sm outline-none focus:border-brand-400"

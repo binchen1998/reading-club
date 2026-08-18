@@ -24,7 +24,7 @@ import { waitJobResult } from '../utils/jobSse'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
 import { sound } from '../utils/sound'
-import { saveReadingLocal, setReadingPublic, uploadReadingCloud } from '../utils/uploadReading'
+import { saveReadingLocal, uploadReadingCloud } from '../utils/uploadReading'
 
 type Item = { en: string; zh: string }
 type Choice = { key: string; text: string; ok: boolean }
@@ -79,10 +79,11 @@ const mergeTitle = ref('正在合成视频')
 const mergeHint = ref('')
 const mergePercent = ref(0)
 const mergeFailed = ref(false)
-const mergePhase = ref<'working' | 'ask-upload' | 'uploading' | 'ask-public' | 'failed'>('working')
+const mergePhase = ref<'working' | 'ask-upload' | 'ask-discard' | 'uploading' | 'failed'>('working')
+const sharePublic = ref(false)
 const pageClips = ref<PageClip[]>([])
 let flushingPage = false
-let mergeChoice: ((value: 'skip' | 'upload' | 'private' | 'public') => void) | null = null
+let mergeChoice: ((value: 'skip' | 'upload') => void) | null = null
 let pageRecorder: { stop: () => Promise<PageClip> } | null = null
 let quizTimer: number | null = null
 let passTimer: number | null = null
@@ -707,19 +708,35 @@ async function scoreBlob(clip: PageClip) {
 }
 
 function waitMergeChoice() {
-  return new Promise<'skip' | 'upload' | 'private' | 'public'>((resolve) => {
+  return new Promise<'skip' | 'upload'>((resolve) => {
     mergeChoice = resolve
   })
 }
 
-function pickMerge(value: 'skip' | 'upload' | 'private' | 'public') {
+function pickMerge(value: 'skip' | 'upload') {
   const resolve = mergeChoice
   mergeChoice = null
   resolve?.(value)
 }
 
+function showAskUpload() {
+  mergePhase.value = 'ask-upload'
+  mergeTitle.value = '本页朗读已保存在本地'
+  mergeHint.value = '要上传到云端吗？勾选后会同时公开到广场，之后也可在视频详情页更改。'
+}
+
+function askDiscardVideo() {
+  mergePhase.value = 'ask-discard'
+  mergeTitle.value = '确定舍弃这段视频？'
+  mergeHint.value = '舍弃后不会上传到云端，本页朗读进度仍会保留。'
+}
+
 function closeMergeDialog() {
-  if (mergeChoice) pickMerge(mergePhase.value === 'ask-public' ? 'private' : 'skip')
+  if (mergePhase.value === 'ask-discard') {
+    showAskUpload()
+    return
+  }
+  if (mergeChoice) pickMerge('skip')
   mergeOpen.value = false
   mergeFailed.value = false
   mergePhase.value = 'working'
@@ -775,9 +792,8 @@ async function flushPageRecording() {
       await sleep(400)
       return
     }
-    mergePhase.value = 'ask-upload'
-    mergeTitle.value = '本页朗读已保存在本地'
-    mergeHint.value = '要上传到云端吗？上传后可以再决定是否公开到广场。'
+    sharePublic.value = false
+    showAskUpload()
     const uploadPick = await waitMergeChoice()
     if (uploadPick !== 'upload') {
       uploadHint.value = '本页朗读已保存在本地'
@@ -786,9 +802,10 @@ async function flushPageRecording() {
     mergePhase.value = 'uploading'
     mergeTitle.value = '正在上传'
     mergeHint.value = '正在上传到云端…'
-    await uploadReadingCloud({
+    const uploaded = await uploadReadingCloud({
       id: saved.id,
       clip: merged,
+      isPublic: sharePublic.value,
       onProgress: (text) => {
         uploadHint.value = text
         mergeTitle.value = '正在上传'
@@ -798,17 +815,7 @@ async function flushPageRecording() {
       },
     })
     mergePercent.value = 100
-    mergePhase.value = 'ask-public'
-    mergeTitle.value = '上传完成'
-    mergeHint.value = '要公开到广场吗？不公开的话只有自己能看。'
-    const publicPick = await waitMergeChoice()
-    if (publicPick === 'public') {
-      await setReadingPublic(saved.id, true)
-      uploadHint.value = '已公开到广场'
-    } else {
-      await setReadingPublic(saved.id, false)
-      uploadHint.value = '已上传，仅自己可见'
-    }
+    uploadHint.value = uploaded.isPublic ? '已公开到广场' : '已上传，仅自己可见'
   } catch (err) {
     sound.fail()
     const msg = err instanceof Error ? err.message : '保存失败'
@@ -1362,7 +1369,7 @@ onUnmounted(() => {
         class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
       >
         <div class="card w-full max-w-md px-6 py-6 shadow-pop" role="dialog" aria-modal="true" aria-live="polite">
-          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-public' ? '📣' : mergePhase === 'ask-upload' ? '☁️' : '🎬' }}</p>
+          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-discard' ? '🗑️' : mergePhase === 'ask-upload' ? '☁️' : '🎬' }}</p>
           <h2 class="mt-3 text-center text-xl font-extrabold text-brand-700">{{ mergeTitle }}</h2>
           <p class="mt-2 text-center text-sm font-bold text-brand-700/70">{{ mergeHint }}</p>
           <div v-if="mergePhase === 'working' || mergePhase === 'uploading' || mergeFailed" class="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
@@ -1387,12 +1394,16 @@ onUnmounted(() => {
             知道了
           </button>
           <div v-else-if="mergePhase === 'ask-upload'" class="mt-5 flex flex-col gap-2">
+            <label class="flex items-center gap-2 rounded-2xl bg-brand-50 px-3 py-2 text-sm font-bold text-brand-700">
+              <input v-model="sharePublic" class="h-4 w-4 accent-brand-500" type="checkbox" />
+              上传后公开到广场
+            </label>
             <button class="btn-primary w-full" type="button" @click="pickMerge('upload')">上传到云端</button>
-            <button class="btn-ghost w-full" type="button" @click="pickMerge('skip')">先不上传</button>
+            <button class="btn-ghost w-full" type="button" @click="askDiscardVideo">舍弃视频</button>
           </div>
-          <div v-else-if="mergePhase === 'ask-public'" class="mt-5 flex flex-col gap-2">
-            <button class="btn-primary w-full" type="button" @click="pickMerge('public')">公开到广场</button>
-            <button class="btn-ghost w-full" type="button" @click="pickMerge('private')">仅自己可见</button>
+          <div v-else-if="mergePhase === 'ask-discard'" class="mt-5 flex flex-col gap-2">
+            <button class="btn-candy w-full" type="button" @click="pickMerge('skip')">确定舍弃</button>
+            <button class="btn-ghost w-full" type="button" @click="showAskUpload">再想想</button>
           </div>
         </div>
       </div>

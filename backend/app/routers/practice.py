@@ -39,6 +39,7 @@ class CompleteIn(BaseModel):
 class CloudIn(BaseModel):
     video_key: str
     thumb_key: str = ""
+    is_public: bool = False
 
 
 class VisibilityIn(BaseModel):
@@ -211,6 +212,7 @@ def attach_cloud(
     rec.thumb_key = thumb_key
     rec.video_url = qiniu_upload.cdn_url(video_key)
     rec.thumb_url = qiniu_upload.cdn_url(thumb_key) if thumb_key else ""
+    rec.is_public = bool(payload.is_public)
     db.commit()
     db.refresh(rec)
     invalidate_on_publish(user.username, rec.id)
