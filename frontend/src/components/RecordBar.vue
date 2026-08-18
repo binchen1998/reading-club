@@ -40,9 +40,6 @@ const emit = defineEmits<{
         <span class="chip shrink-0 bg-brand-100/90 px-3 py-1.5 text-sm text-brand-700 sm:text-base">
           第 {{ segIndex + 1 }} / {{ segCount }} 段
         </span>
-        <p class="hidden min-w-0 flex-1 text-sm font-bold leading-6 text-brand-700 sm:block sm:text-base">
-          书上黄框就是要读的 · 每词最多 3 秒 · 读完可点停
-        </p>
         <div v-if="recording" class="flex min-w-0 flex-1 items-center gap-3">
           <span
             class="w-10 shrink-0 text-center text-2xl font-black tabular-nums sm:text-3xl"

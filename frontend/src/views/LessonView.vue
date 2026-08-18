@@ -71,7 +71,13 @@ const SEC_PER_WORD = 3
 const recordLeft = ref(0)
 const recordTotal = ref(0)
 const uploadHint = ref('')
+const mergeOpen = ref(false)
+const mergeTitle = ref('正在合成视频')
+const mergeHint = ref('')
+const mergePercent = ref(0)
+const mergeFailed = ref(false)
 const pageClips = ref<PageClip[]>([])
+let flushingPage = false
 let pageRecorder: { stop: () => Promise<PageClip> } | null = null
 let quizTimer: number | null = null
 let passTimer: number | null = null
@@ -648,11 +654,26 @@ async function scoreBlob(clip: PageClip) {
   }
 }
 
+function closeMergeDialog() {
+  mergeOpen.value = false
+  mergeFailed.value = false
+}
+
 async function flushPageRecording() {
-  if (!pageClips.value.length || !beat.value) return
+  if (!pageClips.value.length || !beat.value || flushingPage) return
+  flushingPage = true
+  mergeFailed.value = false
+  mergeOpen.value = true
+  mergeTitle.value = '正在合成视频'
+  mergeHint.value = '多段朗读合成成片需要一点时间，请稍候'
+  mergePercent.value = 0
   try {
     uploadHint.value = '正在合并本页朗读…'
-    const merged = await concatClips(pageClips.value)
+    const merged = await concatClips(pageClips.value, ({ percent, text }) => {
+      mergeTitle.value = '正在合成视频'
+      mergeHint.value = text
+      mergePercent.value = percent
+    })
     merged.score = Math.round(pageClips.value.reduce((sum, item) => sum + item.score, 0) / pageClips.value.length)
     await uploadReading({
       clip: merged,
@@ -663,14 +684,28 @@ async function flushPageRecording() {
       page: beat.value.page,
       onProgress: (text) => {
         uploadHint.value = text
+        mergeTitle.value = '正在上传'
+        mergeHint.value = text
+        const m = text.match(/(\d+)\s*%/)
+        mergePercent.value = m ? Number(m[1]) : Math.max(mergePercent.value, 92)
       },
     })
     uploadHint.value = '本页朗读已上传'
+    mergeHint.value = '本页朗读已上传'
+    mergePercent.value = 100
     pageClips.value = []
     recordDone.value = true
+    await sleep(400)
   } catch (err) {
     sound.fail()
-    uploadHint.value = err instanceof Error ? err.message : '上传失败'
+    const msg = err instanceof Error ? err.message : '上传失败'
+    uploadHint.value = msg
+    mergeTitle.value = '合成失败'
+    mergeHint.value = msg
+    mergeFailed.value = true
+  } finally {
+    flushingPage = false
+    if (!mergeFailed.value) mergeOpen.value = false
   }
 }
 
@@ -1046,6 +1081,35 @@ onUnmounted(() => {
           </div>
         </div>
       </transition>
+    </Teleport>
+
+    <Teleport to="body">
+      <div
+        v-if="mergeOpen"
+        class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
+      >
+        <div class="card w-full max-w-md px-6 py-6 shadow-pop" role="dialog" aria-modal="true" aria-live="polite">
+          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : '🎬' }}</p>
+          <h2 class="mt-3 text-center text-xl font-extrabold text-brand-700">{{ mergeTitle }}</h2>
+          <p class="mt-2 text-center text-sm font-bold text-brand-700/70">{{ mergeHint }}</p>
+          <div class="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
+            <div
+              class="h-full rounded-full transition-all duration-300"
+              :class="mergeFailed ? 'bg-candy' : 'bg-sunny'"
+              :style="{ width: `${mergePercent}%` }"
+            />
+          </div>
+          <p class="mt-2 text-center text-lg font-black tabular-nums text-brand-700">{{ mergePercent }}%</p>
+          <button
+            v-if="mergeFailed"
+            class="btn-primary mt-5 w-full"
+            type="button"
+            @click="closeMergeDialog"
+          >
+            知道了
+          </button>
+        </div>
+      </div>
     </Teleport>
 
     <RecordBar

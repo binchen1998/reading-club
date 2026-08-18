@@ -33,10 +33,19 @@ function waitClipEnd(video: HTMLVideoElement, timeoutMs: number) {
   })
 }
 
-export async function concatClips(clips: PageClip[]): Promise<PageClip> {
+export async function concatClips(
+  clips: PageClip[],
+  onProgress?: (info: { percent: number; text: string }) => void,
+): Promise<PageClip> {
   const usable = clips.filter((c) => c.blob.size > 1000)
   if (!usable.length) throw new Error('没有可合并的录音')
-  if (usable.length === 1) return usable[0]
+  const report = (percent: number, text: string) => {
+    onProgress?.({ percent: Math.max(0, Math.min(100, Math.round(percent))), text })
+  }
+  if (usable.length === 1) {
+    report(100, '本页只有一段，无需合并')
+    return usable[0]
+  }
 
   const canvas = document.createElement('canvas')
   canvas.width = 1280
@@ -55,12 +64,20 @@ export async function concatClips(clips: PageClip[]): Promise<PageClip> {
   }
   recorder.start(250)
   const started = Date.now()
-  for (const clip of usable) {
+  for (let i = 0; i < usable.length; i += 1) {
+    const clip = usable[i]
+    report((i / usable.length) * 90, `正在合并第 ${i + 1} / ${usable.length} 段`)
     const video = document.createElement('video')
     video.playsInline = true
     video.preload = 'auto'
     video.src = URL.createObjectURL(clip.blob)
     video.muted = true
+    const onTime = () => {
+      const dur = video.duration || clip.durationSec || 1
+      const t = Math.min(1, (video.currentTime || 0) / Math.max(0.1, dur))
+      report(((i + t) / usable.length) * 90, `正在合并第 ${i + 1} / ${usable.length} 段`)
+    }
+    video.addEventListener('timeupdate', onTime)
     try {
       await video.play()
     } catch {
@@ -84,11 +101,13 @@ export async function concatClips(clips: PageClip[]): Promise<PageClip> {
     }
     draw()
     await waitClipEnd(video, maxMs)
+    video.removeEventListener('timeupdate', onTime)
     source.disconnect()
     URL.revokeObjectURL(video.src)
     video.removeAttribute('src')
     video.load()
   }
+  report(95, '正在收尾…')
   await new Promise<void>((resolve) => {
     const timer = window.setTimeout(resolve, 4000)
     recorder.addEventListener(
@@ -110,6 +129,7 @@ export async function concatClips(clips: PageClip[]): Promise<PageClip> {
   canvasStream.getTracks().forEach((track) => track.stop())
   await audioCtx.close().catch(() => undefined)
   if (!chunks.length) throw new Error('合并录音失败')
+  report(100, '合并完成')
   return {
     blob: new Blob(chunks, { type: recorder.mimeType || 'video/mp4' }),
     durationSec: Math.max(1, Math.round((Date.now() - started) / 1000)),
