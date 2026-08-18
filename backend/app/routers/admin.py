@@ -4,9 +4,12 @@ from sqlalchemy import desc, func, or_, select
 from sqlalchemy.orm import Session
 
 from ..auth import check_admin_credentials, create_admin_token, require_admin
-from ..cache_invalidate import invalidate_square_detail
+from ..avatar import display_avatar
+from ..cache_invalidate import invalidate_profile_wall, invalidate_square_comments, invalidate_square_detail
 from ..db import get_db
-from ..models import GeneratedAsset, Recording, User, WrongItem
+from ..display_name import leaderboard_display_name
+from ..models import GeneratedAsset, Recording, User, UserMessage, WrongItem
+from ..notifications import create_notification
 from ..timeutil import shanghai_today
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -137,6 +140,8 @@ def admin_users(
             {
                 "username": u.username,
                 "nickname": u.nickname,
+                "displayName": leaderboard_display_name(u),
+                "avatar": display_avatar(u),
                 "bio": u.bio or "",
                 "isMuted": bool(getattr(u, "is_muted", False)),
                 "is_muted": bool(getattr(u, "is_muted", False)),
@@ -217,6 +222,7 @@ def admin_unpublish_practice(
     db.commit()
     db.refresh(rec)
     invalidate_square_detail(rec.id)
+    invalidate_square_comments(rec.id)
     return serialize_recording(rec)
 
 
@@ -320,3 +326,124 @@ def admin_assets(
             for row in rows
         ],
     }
+
+
+def _wall_message_payload(row: UserMessage, author: User | None, owner: User | None) -> dict:
+    return {
+        "id": row.id,
+        "wallUsername": row.wall_username,
+        "wallName": leaderboard_display_name(owner, row.wall_username),
+        "authorUsername": row.author_username,
+        "authorName": leaderboard_display_name(author, row.author_username),
+        "authorAvatar": display_avatar(author),
+        "content": row.content,
+        "parentId": row.parent_id,
+        "status": row.status,
+        "createdAt": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
+@router.get("/wall-messages")
+def admin_wall_messages(
+    status: str = Query("pending", pattern="^(pending|approved|rejected|all)$"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    filters = []
+    if status != "all":
+        filters.append(UserMessage.status == status)
+    total_stmt = select(func.count()).select_from(UserMessage)
+    if filters:
+        total_stmt = total_stmt.where(*filters)
+    total = db.execute(total_stmt).scalar() or 0
+    stmt = select(UserMessage).order_by(desc(UserMessage.id)).offset((page - 1) * page_size).limit(page_size)
+    if filters:
+        stmt = stmt.where(*filters)
+    rows = list(db.execute(stmt).scalars().all())
+    usernames = {r.author_username for r in rows} | {r.wall_username for r in rows}
+    users = {
+        u.username: u
+        for u in db.execute(select(User).where(User.username.in_(list(usernames) or [""]))).scalars().all()
+    } if usernames else {}
+    return {
+        "total": int(total),
+        "page": page,
+        "pageSize": page_size,
+        "items": [
+            _wall_message_payload(row, users.get(row.author_username), users.get(row.wall_username))
+            for row in rows
+        ],
+    }
+
+
+@router.post("/wall-messages/{message_id}/approve")
+def approve_wall_message(
+    message_id: int,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    row = db.get(UserMessage, message_id)
+    if row is None or row.status == "rejected":
+        raise HTTPException(status_code=404, detail="留言不存在")
+    was_pending = row.status != "approved"
+    row.status = "approved"
+    if was_pending:
+        create_notification(
+            db,
+            username=row.wall_username,
+            type="wall_message",
+            actor_username=row.author_username,
+            ref_id=row.id,
+        )
+    db.commit()
+    invalidate_profile_wall(row.wall_username)
+    return {"ok": True, "status": "approved"}
+
+
+@router.post("/wall-messages/{message_id}/reject")
+def reject_wall_message(
+    message_id: int,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    row = db.get(UserMessage, message_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="留言不存在")
+    wall_user = row.wall_username
+    row.status = "rejected"
+    db.commit()
+    invalidate_profile_wall(wall_user)
+    return {"ok": True, "status": "rejected"}
+
+
+@router.get("/wall")
+def admin_wall_alias(
+    status: str = Query("pending", pattern="^(pending|approved|rejected|all)$"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    limit: int | None = Query(None),
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    size = min(limit, 100) if limit else page_size
+    return admin_wall_messages(status=status, page=page, page_size=size, _=True, db=db)
+
+
+@router.put("/wall/{message_id}/approve")
+def approve_wall_alias(
+    message_id: int,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    return approve_wall_message(message_id=message_id, _=True, db=db)
+
+
+@router.put("/wall/{message_id}/reject")
+def reject_wall_alias(
+    message_id: int,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    return reject_wall_message(message_id=message_id, _=True, db=db)

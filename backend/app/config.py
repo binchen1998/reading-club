@@ -38,6 +38,7 @@ QINIU_UPLOAD_HOST = (os.getenv("QINIU_UPLOAD_HOST") or "").strip()
 QINIU_PRACTICE_PREFIX = os.getenv("QINIU_PRACTICE_PREFIX") or "reading-club/practices"
 QINIU_ASSET_PREFIX = os.getenv("QINIU_ASSET_PREFIX") or "reading-club/assets"
 QINIU_FRONTEND_PREFIX = (os.getenv("QINIU_FRONTEND_PREFIX") or os.getenv("QINIU_DEPLOY_PREFIX") or "reading-club").strip().strip("/")
+QINIU_AVATAR_PREFIX = os.getenv("QINIU_AVATAR_PREFIX") or "reading-club/avatars"
 HOST = os.getenv("HOST") or "0.0.0.0"
 PORT = int(os.getenv("PORT") or "8001")
 DB_TYPE = (os.getenv("DB_TYPE") or "sqlite").strip().lower()
@@ -59,3 +60,4 @@ def sync_db_url() -> str:
 JWT_SECRET = os.getenv("JWT_SECRET") or "reading_club_jwt_secret_2026"
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME") or "admin"
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD") or "coding61"
+QWEN_API_KEY = (os.getenv("QWEN_API_KEY") or "").strip()

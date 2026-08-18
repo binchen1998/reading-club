@@ -14,7 +14,15 @@ export async function api(path: string, init: RequestInit = {}) {
   const res = await fetch(path, { ...init, headers })
   if (!res.ok) {
     const text = await res.text()
-    throw new Error(text || res.statusText)
+    let message = text || res.statusText
+    try {
+      const data = JSON.parse(text)
+      const detail = data.detail ?? data.message
+      message = Array.isArray(detail) ? detail.map((item: any) => item.msg || item).join('；') : String(detail || message)
+    } catch {
+      /* keep text */
+    }
+    throw new Error(message)
   }
   const type = res.headers.get('content-type') || ''
   if (type.includes('application/json')) return res.json()
@@ -24,6 +32,7 @@ export async function api(path: string, init: RequestInit = {}) {
 export const apiGet = (path: string) => api(path)
 export const apiPost = (path: string, body?: unknown) =>
   api(path, { method: 'POST', body: body == null ? undefined : JSON.stringify(body) })
+export const apiDelete = (path: string) => api(path, { method: 'DELETE' })
 
 export const ADMIN_TOKEN_KEY = 'club_admin_token'
 

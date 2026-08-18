@@ -1,3 +1,5 @@
+import { getStoredRealname } from '../auth/resolveToken'
+
 export const USERNAME_KEY = 'club-username'
 
 export function readUsername(): string {
@@ -26,10 +28,11 @@ export function syncUsernameFromUrl(search = window.location.search): string {
 }
 
 export function clubLink(path: string, username = readUsername()): string {
-  if (!username) return path
   const [base, hash = ''] = path.split('#')
   const url = new URL(base, 'http://local.test')
-  url.searchParams.set('username', username)
+  if (username) url.searchParams.set('username', username)
+  const realname = getStoredRealname()
+  if (realname) url.searchParams.set('realname', realname)
   return `${url.pathname}${url.search}${hash ? `#${hash}` : ''}`
 }
 

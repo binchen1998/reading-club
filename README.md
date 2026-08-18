@@ -18,7 +18,7 @@ cd D:\git\reading-club\backend
 python -m migrations.run
 ```
 
-也可分步：`python -m migrations.0001_init`，再 `python -m migrations.0002_user_muted_asset_preview`。
+也可分步：`python -m migrations.0001_init`，再按序号跑 `0002` / `0003` / `0004_social`（关注、作品评论、留言板、通知）。
 
 本地仍可用 SQLite：`DB_TYPE=sqlite`（默认），同样要先跑一次迁移。
 
@@ -43,7 +43,18 @@ npm run dev
 
 打开 http://localhost:5174
 
-管理后台：`/admin`，默认账号 `admin` / 密码 `coding61`。
+管理后台：`/admin`，默认账号 `admin` / 密码 `coding61`。留言审核在「留言」页。
+
+广场列表快照由 **独立 worker 进程** 定时覆盖（上传完成不会立刻失效快照）。必须另开一个终端启动：
+
+```powershell
+cd D:\git\reading-club
+$env:PYTHONPATH = "D:\git\reading-club"
+cd backend
+python run_background_workers.py
+```
+
+启动后会立刻刷一次广场快照，之后默认每 60 秒覆盖（`SQUARE_SNAPSHOT_REFRESH_INTERVAL_SECONDS`）。锁文件 `backend/.background-workers.lock`，同一台机器只跑一份。Redis 开着时快照会同时写入 Redis。
 
 本机预览 FastAPI 托管的页面（资源走本地 `/assets`，不要当生产流程）：
 

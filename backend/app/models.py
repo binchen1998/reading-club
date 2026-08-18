@@ -11,10 +11,12 @@ class User(Base):
 
     username: Mapped[str] = mapped_column(String(50), primary_key=True)
     nickname: Mapped[str] = mapped_column(String(50), default="")
-    avatar: Mapped[str] = mapped_column(String(500), default="")
+    avatar: Mapped[str] = mapped_column(String(500), default="📖")
+    avatar_url: Mapped[str] = mapped_column(String(600), default="")
     bio: Mapped[str] = mapped_column(String(200), default="")
     is_muted: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class PageProgress(Base):
@@ -122,4 +124,55 @@ class GeneratedAsset(Base):
     label: Mapped[str] = mapped_column(String(80), default="")
     preview: Mapped[str] = mapped_column(String(200), default="")
     source: Mapped[str] = mapped_column(String(20), default="generated")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class Follow(Base):
+    __tablename__ = "follows"
+    __table_args__ = (UniqueConstraint("follower", "following", name="uq_follow"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    follower: Mapped[str] = mapped_column(String(50), index=True)
+    following: Mapped[str] = mapped_column(String(50), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class RecordingComment(Base):
+    __tablename__ = "recording_comments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    recording_id: Mapped[int] = mapped_column(Integer, ForeignKey("recordings.id"), index=True)
+    username: Mapped[str] = mapped_column(String(50), index=True)
+    content: Mapped[str] = mapped_column(Text, default="")
+    parent_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("recording_comments.id"), nullable=True, index=True
+    )
+    moderated: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class UserMessage(Base):
+    __tablename__ = "user_messages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    wall_username: Mapped[str] = mapped_column(String(50), index=True)
+    author_username: Mapped[str] = mapped_column(String(50), index=True)
+    content: Mapped[str] = mapped_column(Text, default="")
+    parent_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("user_messages.id"), nullable=True, index=True
+    )
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(50), index=True)
+    type: Mapped[str] = mapped_column(String(40), index=True)
+    actor_username: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    message: Mapped[str] = mapped_column(String(500), default="")
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

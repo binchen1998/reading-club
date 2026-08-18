@@ -14,6 +14,8 @@ from sqlalchemy import desc, select
 from .cache_keys import SQUARE_SNAPSHOT
 from .config import DATA_DIR
 from .db import SessionLocal
+from .avatar import display_avatar
+from .display_name import leaderboard_display_name
 from .models import Recording, User
 from .redis_client import get_redis
 from .timeutil import shanghai_today
@@ -53,11 +55,12 @@ def get_sort_items(snapshot: dict[str, Any], sort: str) -> list[dict[str, Any]]:
     return []
 
 
-def _serialize(row: Recording, nickname: str) -> dict[str, Any]:
+def _serialize(row: Recording, nickname: str, avatar: str = "") -> dict[str, Any]:
     return {
         "id": row.id,
         "username": row.username,
         "nickname": nickname or row.username,
+        "avatar": avatar,
         "bookTitle": row.book_title,
         "page": row.page,
         "lessonDate": row.lesson_date.isoformat() if row.lesson_date else None,
@@ -108,12 +111,16 @@ def refresh_square_snapshot() -> dict[str, Any]:
             .scalars()
             .all()
         )
-        names = {
-            u.username: u.nickname or u.username
-            for u in db.execute(select(User)).scalars().all()
-        }
+        owners = {u.username: u for u in db.execute(select(User)).scalars().all()}
         today = shanghai_today()
-        latest = [_serialize(row, names.get(row.username, "")) for row in rows]
+        latest = [
+            _serialize(
+                row,
+                leaderboard_display_name(owners.get(row.username), row.username),
+                display_avatar(owners.get(row.username)),
+            )
+            for row in rows
+        ]
         likes = sorted(latest, key=lambda item: (-int(item.get("likeCount") or 0), -(item.get("id") or 0)))
         today_count = sum(1 for row in rows if row.lesson_date == today)
         payload = {

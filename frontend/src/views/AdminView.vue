@@ -11,6 +11,7 @@ const TABS = [
   { key: 'overview', label: '概览' },
   { key: 'users', label: '用户' },
   { key: 'practices', label: '朗读' },
+  { key: 'wall', label: '留言' },
   { key: 'wrongs', label: '错题' },
   { key: 'assets', label: '资源' },
 ] as const
@@ -26,6 +27,8 @@ const users = ref<any[]>([])
 const practices = ref<any[]>([])
 const wrongs = ref<any[]>([])
 const assets = ref<any[]>([])
+const wallItems = ref<any[]>([])
+const wallStatus = ref('pending')
 const userQuery = ref('')
 const muting = ref('')
 const assetKind = ref('all')
@@ -83,6 +86,10 @@ async function loadTab() {
       const res = await adminApi(`/api/admin/assets?kind=${encodeURIComponent(assetKind.value)}`)
       assets.value = res.items || []
     }
+    if (tab.value === 'wall') {
+      const res = await adminApi(`/api/admin/wall?status=${encodeURIComponent(wallStatus.value)}&limit=100`)
+      wallItems.value = res.items || res || []
+    }
   } catch (e: any) {
     error.value = e?.message || '加载失败'
     if (String(e?.message || '').includes('令牌') || String(e?.message || '').includes('权限')) {
@@ -122,6 +129,15 @@ async function setMute(u: any, muted: boolean) {
 async function unpublishPractice(id: number) {
   try {
     await adminApi(`/api/admin/practices/${id}/unpublish`, { method: 'PUT', body: '{}' })
+    await loadTab()
+  } catch (e: any) {
+    error.value = e?.message || '操作失败'
+  }
+}
+
+async function reviewWall(id: number, approved: boolean) {
+  try {
+    await adminApi(`/api/admin/wall/${id}/${approved ? 'approve' : 'reject'}`, { method: 'PUT', body: '{}' })
     await loadTab()
   } catch (e: any) {
     error.value = e?.message || '操作失败'
@@ -325,6 +341,35 @@ onMounted(loadTab)
           </tbody>
         </table>
         <div v-if="!practices.length" class="p-6 text-center text-sm text-brand-600/50">暂无朗读</div>
+      </div>
+
+      <div v-if="tab === 'wall'" class="space-y-3">
+        <div class="flex gap-2">
+          <button
+            v-for="s in ['pending', 'approved', 'rejected', 'all']"
+            :key="s"
+            type="button"
+            class="px-4 py-2 text-sm"
+            :class="wallStatus === s ? 'btn-primary' : 'btn-ghost'"
+            @click="wallStatus = s; loadTab()"
+          >
+            {{ s === 'pending' ? '待审' : s === 'approved' ? '已通过' : s === 'rejected' ? '已拒绝' : '全部' }}
+          </button>
+        </div>
+        <div v-if="!wallItems.length" class="card py-8 text-center text-sm font-bold text-brand-600/50">
+          没有留言
+        </div>
+        <div v-for="msg in wallItems" :key="msg.id" class="card space-y-2">
+          <p class="text-sm font-bold text-brand-700">
+            {{ msg.authorName || msg.authorUsername }} → {{ msg.wallName || msg.wallUsername }}
+          </p>
+          <p class="text-sm text-brand-600">{{ msg.content }}</p>
+          <p class="text-xs font-bold text-brand-600/50">{{ msg.status }} · {{ msg.createdAt || '' }}</p>
+          <div v-if="msg.status === 'pending'" class="flex gap-2">
+            <button type="button" class="btn-primary px-3 py-1 text-xs" @click="reviewWall(msg.id, true)">通过</button>
+            <button type="button" class="btn-ghost px-3 py-1 text-xs" @click="reviewWall(msg.id, false)">拒绝</button>
+          </div>
+        </div>
       </div>
 
       <div v-if="tab === 'wrongs'" class="space-y-3">

@@ -9,6 +9,7 @@ from datetime import datetime
 from .config import (
     QINIU_ACCESS_KEY,
     QINIU_ASSET_PREFIX,
+    QINIU_AVATAR_PREFIX,
     QINIU_BUCKET,
     QINIU_CDN_DOMAIN,
     QINIU_PRACTICE_PREFIX,
@@ -40,6 +41,16 @@ def upload_host() -> str:
 
 def safe_username(username: str) -> str:
     return "".join(c if c.isalnum() or c in "-_@" else "_" for c in username)
+
+
+def build_avatar_key(username: str) -> str:
+    ts = int(datetime.utcnow().timestamp())
+    return f"{QINIU_AVATAR_PREFIX}/{safe_username(username)}/{ts}-{uuid.uuid4().hex}.jpg"
+
+
+def avatar_key_belongs_to_user(key: str, username: str) -> bool:
+    prefix = f"{QINIU_AVATAR_PREFIX}/{safe_username(username)}/"
+    return bool(key) and key.startswith(prefix)
 
 
 def practice_key_prefix(username: str, practice_id: int) -> str:

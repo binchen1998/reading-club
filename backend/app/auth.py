@@ -9,6 +9,7 @@ from fastapi import Depends, Header, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from .avatar import DEFAULT_AVATAR
 from .config import ADMIN_PASSWORD, ADMIN_USERNAME, JWT_SECRET
 from .db import get_db
 from .models import User
@@ -26,7 +27,10 @@ def get_or_create_user(db: Session, username: str) -> User:
     user = db.get(User, username)
     if user is not None:
         return user
-    user = User(username=username, nickname=username)
+    from .nickname import allocate_default_nickname
+
+    nick = allocate_default_nickname(db, exclude_username=username)
+    user = User(username=username, nickname=nick, avatar=DEFAULT_AVATAR)
     db.add(user)
     try:
         db.commit()

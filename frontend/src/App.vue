@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 
+import { api } from './api'
 import GenerateBusy from './components/GenerateBusy.vue'
 import { clubLink } from './utils/username'
 import { useUserStore } from './stores/user'
 
 const route = useRoute()
 const user = useUserStore()
+const unreadCount = ref(0)
+let unreadTimer: number | undefined
 const reading = computed(() => route.path.startsWith('/read/'))
 const adminPage = computed(() => route.path.startsWith('/admin'))
+const onMessages = computed(() => route.path === '/messages')
 const backNav = computed(() => {
   const seriesId = String(route.params.seriesId || '')
   const bookSlug = String(route.params.bookSlug || '')
@@ -18,9 +22,35 @@ const backNav = computed(() => {
   return null
 })
 
+async function loadUnread() {
+  if (!user.username || user.isGuest) {
+    unreadCount.value = 0
+    return
+  }
+  try {
+    const res = await api('/api/users/notifications/unread-count')
+    unreadCount.value = Number(res.count ?? res.unreadCount ?? 0)
+  } catch {
+    /* ignore */
+  }
+}
+
+function onReadAll(event: Event) {
+  const detail = (event as CustomEvent).detail
+  unreadCount.value = Number(detail?.unread_count ?? 0)
+}
+
 onMounted(() => {
   user.hydrate()
   if (user.username) user.loadMe()
+  loadUnread()
+  window.addEventListener('notifications-read-all', onReadAll)
+  unreadTimer = window.setInterval(loadUnread, 60_000)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('notifications-read-all', onReadAll)
+  if (unreadTimer) window.clearInterval(unreadTimer)
 })
 </script>
 
@@ -48,6 +78,18 @@ onMounted(() => {
             <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/books')">书架</RouterLink>
             <RouterLink class="rounded-full bg-sunny/80 px-3 py-1 text-brand-700" :to="clubLink('/wrong-book')">错题本</RouterLink>
             <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/square')">广场</RouterLink>
+            <RouterLink
+              class="relative rounded-full px-3 py-1 text-brand-700 hover:bg-white"
+              :to="clubLink('/messages')"
+            >
+              消息
+              <span
+                v-if="unreadCount && !onMessages"
+                class="absolute -right-1 -top-1 grid min-w-4 place-items-center rounded-full bg-candy px-1 text-[10px] font-black text-white"
+              >
+                {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </span>
+            </RouterLink>
             <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/me')">我的</RouterLink>
           </nav>
         </div>
