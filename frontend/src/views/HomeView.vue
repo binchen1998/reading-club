@@ -6,6 +6,7 @@ import { api } from '../api'
 import MonthCalendar from '../components/MonthCalendar.vue'
 import StudyRecordLine from '../components/StudyRecordLine.vue'
 import { clubLink } from '../utils/username'
+import { scheduleHomeActiveReport } from '../utils/plausible'
 import { useUserStore } from '../stores/user'
 import { serverTodayIso, syncServerTime } from '../utils/serverTime'
 
@@ -30,6 +31,7 @@ async function loadDay(date: string) {
 onMounted(async () => {
   user.hydrate()
   await user.loadMe()
+  scheduleHomeActiveReport(user.username)
   await loadStats()
   await loadDay(selectedDate.value)
 })
