@@ -51,7 +51,6 @@ const phraseDone = ref(false)
 const recordDone = ref(false)
 const vocabRetries = ref(0)
 const phraseRetries = ref(0)
-const readPromptOpen = ref(false)
 const explainBusy = ref(false)
 const explainBusyError = ref('')
 const wrongKeys = ref<Record<number, string[]>>({})
@@ -364,9 +363,6 @@ async function playExplain(from = 0) {
   if (gen === playGen) {
     explainPlaying.value = false
     explainPaused.value = false
-    if ((needVocab.value && !vocabDone.value) || (needPhrase.value && !phraseDone.value)) {
-      readPromptOpen.value = true
-    }
   }
 }
 
@@ -470,7 +466,6 @@ function startActivity(next: 'vocab' | 'phrase' | 'record') {
   if (next === 'phrase' && (!phraseQs.value.length || phraseLocked.value)) return
   if (next === 'record' && recordLocked.value) return
   stopAudio()
-  readPromptOpen.value = false
   step.value = next
   startStep()
 }
@@ -934,7 +929,6 @@ async function prepareOpenedPage() {
 function goToBeat(index: number) {
   const max = (lesson.value?.beats?.length || 1) - 1
   if (index < 0 || index > max || index === beatIndex.value) return
-  readPromptOpen.value = false
   clearQuizTimer()
   clearPassTimer()
   if (recording.value) stopRecord()
@@ -1373,18 +1367,6 @@ onUnmounted(() => {
       @close="pauseFlow"
       @toggle-camera="toggleCamera"
     />
-
-    <ClubDialog :open="readPromptOpen" title="先自己读一遍" emoji="📖" @close="readPromptOpen = false">
-      <p class="font-bold leading-7 text-brand-700">
-        讲解听完了。请先自己把这一页读一遍，然后复习单词和短语。
-      </p>
-      <p class="mt-3 text-sm font-bold text-brand-600/70">
-        单词过了才能复习短语，短语过了才能自主朗读。
-      </p>
-      <div class="mt-5 flex flex-col gap-2">
-        <button class="btn-ghost w-full" type="button" @click="readPromptOpen = false">知道了</button>
-      </div>
-    </ClubDialog>
 
     <ClubDialog :open="!!focusItem" :title="focusItem?.en || ''" emoji="⭐" @close="focusItem = null">
       <p class="text-2xl font-extrabold text-brand-700">{{ focusItem?.zh }}</p>
