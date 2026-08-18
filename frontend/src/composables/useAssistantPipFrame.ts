@@ -2,14 +2,14 @@ import { computed, ref } from 'vue'
 
 import { computePipSize } from '../utils/pipLayout'
 
-const STORAGE_KEY = 'club-assistant-pip-frame'
-const MIN_W = 88
-const MIN_H = 110
+const STORAGE_KEY = 'club-assistant-pip-frame-v2'
+const MIN_W = 64
+const MIN_H = 80
 /** 助教正下方提问按钮预留高度（按钮 + 间距） */
 export const ASSISTANT_ASK_STACK = 40
 
-const pipW = ref(126)
-const pipH = ref(168)
+const pipW = ref(90)
+const pipH = ref(120)
 const margin = ref(12)
 const left = ref(0)
 const top = ref(0)
