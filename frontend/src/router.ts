@@ -35,22 +35,14 @@ const router = createRouter({
   ],
 })
 
-function queryString(query: LocationQuery, key: string): string {
-  const raw = query[key]
+function queryUsername(query: LocationQuery): string {
+  const raw = query.username
   const value = Array.isArray(raw) ? raw[0] : raw
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function queryUsername(query: LocationQuery): string {
-  return queryString(query, 'username')
-}
-
 router.beforeEach((to) => {
   if (to.path.startsWith('/admin')) return true
-  if (to.path === '/home' && !queryUsername(to.query) && !queryString(to.query, 'token')) {
-    window.alert('链接里必须带 username，无法打开首页')
-    return false
-  }
   const fromUrl = syncUsernameFromUrl(to.fullPath.includes('?') ? to.fullPath.slice(to.fullPath.indexOf('?')) : window.location.search)
   const qUser = queryUsername(to.query)
   if (qUser) writeUsername(qUser)
