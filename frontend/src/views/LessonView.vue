@@ -756,7 +756,7 @@ watch(gapSec, (value) => localStorage.setItem('club-tts-gap', String(value)))
 watch(beatIndex, () => closeTextPopup())
 
 watch(recordBarOpen, (open) => {
-  setAssistantExtraBottom(open ? 56 : 0)
+  setAssistantExtraBottom(open ? 96 : 0)
   if (open) void camera.start()
 })
 
@@ -796,7 +796,7 @@ onUnmounted(() => {
   <div
     v-if="lesson && beat"
     class="flex h-full min-h-0 flex-col overflow-hidden"
-    :class="recordBarOpen ? 'pb-14' : 'pb-[env(safe-area-inset-bottom)]'"
+    :class="recordBarOpen ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'"
   >
     <div class="fixed left-1/2 top-1.5 z-[90] flex -translate-x-1/2 items-center gap-1.5 lg:top-2 lg:gap-2">
       <button
