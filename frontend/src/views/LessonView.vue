@@ -7,8 +7,10 @@ import AiAskListenFab from '../components/AiAskListenFab.vue'
 import AssistantLive2dPip from '../components/AssistantLive2dPip.vue'
 import BookStage from '../components/BookStage.vue'
 import ClubDialog from '../components/ClubDialog.vue'
+import RecordBar from '../components/RecordBar.vue'
 import TextPopup from '../components/TextPopup.vue'
 import UserCameraPip from '../components/UserCameraPip.vue'
+import { setAssistantExtraBottom } from '../composables/useAssistantPipFrame'
 import { useUserCamera } from '../composables/useUserCamera'
 import { useUserStore } from '../stores/user'
 import { recognizeAudio } from '../utils/asr'
@@ -112,7 +114,14 @@ const recordWords = computed(() => (currentSeg.value.match(/[A-Za-z']+/g) || [])
 const lastSegment = computed(() => segIndex.value >= (pageSegments.value.length || 1) - 1)
 const dialogOpen = computed(() => step.value !== 'explain' && !flowPaused.value)
 const quizDialogOpen = computed(() => dialogOpen.value && (step.value === 'vocab' || step.value === 'phrase'))
-const recordDialogOpen = computed(() => dialogOpen.value && step.value === 'record')
+const recordBarOpen = computed(() => dialogOpen.value && step.value === 'record')
+const recordPassText = computed(() => {
+  if (lastScore.value == null) return ''
+  if (!passed.value) return '还没到 60 分，再读一次'
+  if (lastSegment.value && lastBeat.value && pageTasksReady.value) return '第一章先到这里'
+  if (lastSegment.value && pageTasksReady.value) return '过了，可以翻页'
+  return '过了'
+})
 const segmentMode = computed(() => step.value === 'record' && karaokeWords.value.length > 0)
 const displayBoxes = computed(() => {
   const raw = segmentMode.value
@@ -722,7 +731,8 @@ watch(gapSec, (value) => localStorage.setItem('club-tts-gap', String(value)))
 
 watch(beatIndex, () => closeTextPopup())
 
-watch(recordDialogOpen, (open) => {
+watch(recordBarOpen, (open) => {
+  setAssistantExtraBottom(open ? 56 : 0)
   if (open) void camera.start()
 })
 
@@ -752,13 +762,14 @@ onUnmounted(() => {
   clearRecordTimer()
   if (recording.value) stopRecord()
   camera.stop()
+  setAssistantExtraBottom(0)
   stopAskStream()
   stopAudio()
 })
 </script>
 
 <template>
-  <div v-if="lesson && beat" class="flex h-full min-h-0 flex-col">
+  <div v-if="lesson && beat" class="flex h-full min-h-0 flex-col" :class="recordBarOpen ? 'pb-14' : ''">
     <div class="fixed left-1/2 top-2 z-[90] flex -translate-x-1/2 items-center gap-2">
       <button
         class="rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-brand-700 shadow-pop"
@@ -957,71 +968,30 @@ onUnmounted(() => {
       </transition>
     </Teleport>
 
-    <ClubDialog :open="recordDialogOpen" title="读这一段" emoji="📖" draggable @close="pauseFlow">
-      <p class="mb-2 chip bg-brand-100 text-brand-700">第 {{ segIndex + 1 }} / {{ pageSegments.length }} 段</p>
-      <p class="mb-3 font-bold text-brand-600">书上黄框就是要读的。每个词最多 3 秒，读完可点停，时间到会自动停。</p>
-      <div class="mb-3 flex items-center justify-between gap-2">
-        <button
-          class="chip bg-brand-100 text-brand-700 disabled:opacity-50"
-          type="button"
-          :disabled="camera.starting"
-          @click="toggleCamera"
-        >
-          {{ camera.enabled ? '📷 关闭摄像头' : '📷 打开摄像头' }}
-        </button>
-        <span class="text-xs font-bold text-brand-600/70">
-          {{ camera.enabled ? '成片右上角叠你的脸' : '成片右上角用头像' }}
-        </span>
-      </div>
-      <p v-if="camera.error && !camera.enabled" class="mb-2 text-xs font-bold text-candy">{{ camera.error }}</p>
-      <div v-if="recording" class="mb-3 text-center">
-        <p class="text-5xl font-extrabold tabular-nums" :class="recordLeft <= 3 ? 'text-candy' : 'text-brand-700'">
-          {{ Math.ceil(recordLeft) }}
-        </p>
-        <p class="mt-1 text-sm font-bold text-brand-600/70">
-          秒后自动停 · {{ recordWords }} 词 × 3 秒
-        </p>
-        <div class="mx-auto mt-2 h-2 max-w-xs overflow-hidden rounded-full bg-brand-100">
-          <div
-            class="h-full rounded-full"
-            :class="recordLeft <= 3 ? 'bg-candy' : 'bg-sunny'"
-            :style="{ width: recordTotal ? `${(recordLeft / recordTotal) * 100}%` : '0%' }"
-          />
-        </div>
-      </div>
-      <div data-camera-pip-anchor class="flex flex-wrap gap-2">
-        <button v-if="!recording && !busy" class="btn-candy flex-1" type="button" @click="startRecord">
-          {{ lastScore != null && !passed ? '再读一次' : '开始录音' }}
-        </button>
-        <button v-else-if="recording" class="btn-ghost flex-1" type="button" @click="stopRecord">停</button>
-      </div>
-      <p v-if="uploadHint" class="mt-3 font-bold text-brand-600">{{ uploadHint }}</p>
-      <p v-if="busy" class="mt-3 font-bold text-brand-600/70">正在评分…</p>
-      <p v-else-if="scoreError" class="mt-3 font-bold text-candy">{{ scoreError }}</p>
-      <div v-else-if="lastScore != null" class="mt-3 text-center">
-        <p class="text-3xl font-extrabold" :class="passed ? 'text-mint' : 'text-candy'">{{ lastScore }} 分</p>
-        <p class="mt-1 font-extrabold" :class="passed ? 'text-mint' : 'text-candy'">
-          {{
-            passed
-              ? lastSegment && lastBeat && pageTasksReady
-                ? '第一章先到这里。'
-                : lastSegment && pageTasksReady
-                  ? '过了，可以翻页'
-                  : '过了！'
-              : '还没到 60 分，再读一次'
-          }}
-        </p>
-        <p v-if="lastHeard" class="mt-2 text-xs font-bold text-brand-600/60">听到了：{{ lastHeard }}</p>
-      </div>
-      <button
-        v-if="!recording && !busy && !passed"
-        class="mt-3 w-full text-center text-lg font-extrabold text-brand-600/70"
-        type="button"
-        @click="advanceSegment"
-      >
-        先跳过这句（不计入完成度）
-      </button>
-    </ClubDialog>
+    <RecordBar
+      :open="recordBarOpen"
+      :recording="recording"
+      :busy="busy"
+      :passed="passed"
+      :last-score="lastScore"
+      :last-heard="lastHeard"
+      :score-error="scoreError"
+      :upload-hint="uploadHint"
+      :record-left="recordLeft"
+      :record-total="recordTotal"
+      :record-words="recordWords"
+      :seg-index="segIndex"
+      :seg-count="pageSegments.length"
+      :camera-enabled="camera.enabled"
+      :camera-starting="camera.starting"
+      :camera-error="camera.error"
+      :pass-text="recordPassText"
+      @start="startRecord"
+      @stop="stopRecord"
+      @skip="advanceSegment"
+      @close="pauseFlow"
+      @toggle-camera="toggleCamera"
+    />
 
     <ClubDialog :open="pageGateOpen" title="还不能翻页" emoji="🔒" @close="pageGateOpen = false">
       <p class="font-bold text-brand-700">本页任务还没做完，先完成这些：</p>

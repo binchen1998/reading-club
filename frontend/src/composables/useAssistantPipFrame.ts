@@ -15,6 +15,11 @@ const left = ref(0)
 const top = ref(0)
 const userMoved = ref(false)
 const userSized = ref(false)
+const extraBottom = ref(0)
+
+function bottomReserve() {
+  return ASSISTANT_ASK_STACK + extraBottom.value
+}
 
 export type AssistantResizeCorner = 'nw' | 'ne' | 'sw' | 'se'
 
@@ -80,7 +85,7 @@ export function useAssistantPipFrame(options: {
     const maxL = Math.max(margin.value, window.innerWidth - w - margin.value)
     const maxT = Math.max(
       margin.value,
-      window.innerHeight - h - margin.value - ASSISTANT_ASK_STACK,
+      window.innerHeight - h - margin.value - bottomReserve(),
     )
     return {
       left: Math.min(maxL, Math.max(margin.value, l)),
@@ -112,7 +117,7 @@ export function useAssistantPipFrame(options: {
 
   function placeDefault() {
     const leftPad = Math.max(16, margin.value)
-    const bottomPad = Math.max(16, margin.value) + ASSISTANT_ASK_STACK
+    const bottomPad = Math.max(16, margin.value) + bottomReserve()
     const next = clampPos(leftPad, window.innerHeight - pipH.value - bottomPad)
     left.value = next.left
     top.value = next.top
@@ -255,4 +260,22 @@ export function useAssistantPipFrame(options: {
 /** 提问按钮跟助教共用同一套坐标 */
 export function useAssistantPipRect() {
   return { left, top, pipW, pipH }
+}
+
+/** 底部出现录音条时抬高助教，避免挡住 */
+export function setAssistantExtraBottom(px: number) {
+  extraBottom.value = Math.max(0, Math.round(px))
+  const pad = Math.max(16, margin.value) + bottomReserve()
+  if (!userMoved.value) {
+    const nextLeft = Math.max(16, margin.value)
+    const maxL = Math.max(margin.value, window.innerWidth - pipW.value - margin.value)
+    const maxT = Math.max(margin.value, window.innerHeight - pipH.value - pad)
+    left.value = Math.min(maxL, nextLeft)
+    top.value = Math.min(maxT, Math.max(margin.value, window.innerHeight - pipH.value - pad))
+    return
+  }
+  const maxL = Math.max(margin.value, window.innerWidth - pipW.value - margin.value)
+  const maxT = Math.max(margin.value, window.innerHeight - pipH.value - pad)
+  left.value = Math.min(maxL, Math.max(margin.value, left.value))
+  top.value = Math.min(maxT, Math.max(margin.value, top.value))
 }
