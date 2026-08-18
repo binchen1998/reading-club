@@ -14,6 +14,25 @@ let unreadTimer: number | undefined
 const reading = computed(() => route.path.startsWith('/read/'))
 const adminPage = computed(() => route.path.startsWith('/admin'))
 const onMessages = computed(() => route.path === '/messages')
+const navItems = [
+  { path: '/home', label: '首页', match: ['/home', '/day'] },
+  { path: '/books', label: '书架', match: ['/books', '/series'] },
+  { path: '/wrong-book', label: '错题本', match: ['/wrong-book'] },
+  { path: '/square', label: '广场', match: ['/square'] },
+  { path: '/messages', label: '消息', match: ['/messages'] },
+  { path: '/me', label: '我的', match: ['/me', '/user'] },
+] as const
+
+function navActive(match: readonly string[]) {
+  return match.some((prefix) => route.path === prefix || route.path.startsWith(`${prefix}/`))
+}
+
+function navClass(active: boolean) {
+  return active
+    ? 'relative rounded-full bg-sunny/80 px-3 py-1 text-brand-700'
+    : 'relative rounded-full px-3 py-1 text-brand-700 hover:bg-white'
+}
+
 const backNav = computed(() => {
   const seriesId = String(route.params.seriesId || '')
   const bookSlug = String(route.params.bookSlug || '')
@@ -74,23 +93,20 @@ onUnmounted(() => {
             {{ backNav.label }}
           </RouterLink>
           <nav class="flex flex-wrap items-center justify-end gap-2 text-sm font-extrabold">
-            <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/home')">首页</RouterLink>
-            <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/books')">书架</RouterLink>
-            <RouterLink class="rounded-full bg-sunny/80 px-3 py-1 text-brand-700" :to="clubLink('/wrong-book')">错题本</RouterLink>
-            <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/square')">广场</RouterLink>
             <RouterLink
-              class="relative rounded-full px-3 py-1 text-brand-700 hover:bg-white"
-              :to="clubLink('/messages')"
+              v-for="item in navItems"
+              :key="item.path"
+              :class="navClass(navActive(item.match))"
+              :to="clubLink(item.path)"
             >
-              消息
+              {{ item.label }}
               <span
-                v-if="unreadCount && !onMessages"
+                v-if="item.path === '/messages' && unreadCount && !onMessages"
                 class="absolute -right-1 -top-1 grid min-w-4 place-items-center rounded-full bg-candy px-1 text-[10px] font-black text-white"
               >
                 {{ unreadCount > 99 ? '99+' : unreadCount }}
               </span>
             </RouterLink>
-            <RouterLink class="rounded-full px-3 py-1 text-brand-700 hover:bg-white" :to="clubLink('/me')">我的</RouterLink>
           </nav>
         </div>
       </header>

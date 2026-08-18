@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import { api } from '../api'
 import ModeratingBusy from '../components/ModeratingBusy.vue'
 import Pagination from '../components/Pagination.vue'
+import ProfileEditDialog from '../components/ProfileEditDialog.vue'
 import UserAvatar from '../components/UserAvatar.vue'
 import { useUserStore } from '../stores/user'
 import { clubLink } from '../utils/username'
@@ -30,22 +31,14 @@ const modal = ref<'followers' | 'following' | ''>('')
 const people = ref<any[]>([])
 const peopleTotal = ref(0)
 const peoplePage = ref(1)
-const nickInput = ref('')
-const nickError = ref('')
-const savingNick = ref(false)
-const bioInput = ref('')
-const bioError = ref('')
-const savingBio = ref(false)
+const profileOpen = ref(false)
 const activeTab = ref<'works' | 'wall'>('works')
 
 const owner = computed(() => data.value?.user || data.value || {})
 const isSelf = computed(() => Boolean(data.value?.isSelf || owner.value.username === user.username))
-const moderatingText = computed(() => {
-  if (savingNick.value) return '正在用 AI 审核昵称，请稍等。'
-  if (savingBio.value) return '正在用 AI 审核个人介绍，请稍等。'
-  if (wallPosting.value) return '正在用 AI 审核留言，请稍等。'
-  return '正在用 AI 审核，请稍等。'
-})
+const moderatingText = computed(() =>
+  wallPosting.value ? '正在用 AI 审核留言，请稍等。' : '正在用 AI 审核，请稍等。',
+)
 
 async function load() {
   if (!userKey.value) return
@@ -55,8 +48,6 @@ async function load() {
     data.value = await api(
       `/api/profile/${encodeURIComponent(userKey.value)}?page=${worksPage.value}&page_size=12`,
     )
-    nickInput.value = user.profile?.hasCustomNickname ? user.profile.nickname : ''
-    bioInput.value = owner.value.bio || ''
     await loadWall()
   } catch (e: any) {
     error.value = e?.message || '加载失败'
@@ -139,38 +130,13 @@ async function loadPeople() {
   peopleTotal.value = res.total || 0
 }
 
-async function saveNickname() {
-  const value = nickInput.value.trim()
-  if (!value) {
-    nickError.value = '请填写昵称'
-    return
-  }
-  savingNick.value = true
-  nickError.value = ''
-  try {
-    await user.setNickname(value)
-    data.value = { ...data.value, user: { ...data.value.user, ...user.profile } }
-  } catch (e: any) {
-    nickError.value = e?.message || '昵称未通过审核或已被使用'
-  } finally {
-    savingNick.value = false
-  }
-}
-
-async function saveBio() {
-  savingBio.value = true
-  bioError.value = ''
-  try {
-    await user.setBio(bioInput.value.trim())
-    data.value = {
-      ...data.value,
-      bio: user.profile?.bio || '',
-      user: { ...data.value.user, ...user.profile },
-    }
-  } catch (e: any) {
-    bioError.value = e?.message || '个人介绍未通过审核'
-  } finally {
-    savingBio.value = false
+function onProfileSaved() {
+  if (!data.value) return
+  data.value = {
+    ...data.value,
+    bio: user.profile?.bio || '',
+    nickname: user.profile?.nickname,
+    user: { ...data.value.user, ...user.profile },
   }
 }
 
@@ -210,6 +176,14 @@ onMounted(async () => {
             >
               {{ toggling ? '…' : data.isFollowing ? '已关注' : '关注' }}
             </button>
+            <button
+              v-else-if="isSelf"
+              type="button"
+              class="btn-ghost px-3 py-1 text-xs"
+              @click="profileOpen = true"
+            >
+              编辑资料
+            </button>
           </div>
           <p class="mt-1 text-xs font-bold text-brand-600/60">
             <button type="button" @click="openPeople('followers')">粉丝 {{ data.followers ?? 0 }}</button>
@@ -221,39 +195,6 @@ onMounted(async () => {
           </p>
         </div>
       </section>
-
-      <div v-if="isSelf" class="card space-y-4">
-        <div class="space-y-2">
-          <label class="text-xs font-bold text-brand-600">公开昵称（必须唯一，提交后由 AI 审核）</label>
-          <div class="flex gap-2">
-            <input
-              v-model="nickInput"
-              maxlength="50"
-              class="min-w-0 flex-1 rounded-2xl border-2 border-brand-200 px-3 py-2 text-sm font-bold outline-none focus:border-brand-400"
-              placeholder="给自己起一个独一无二的昵称"
-            />
-            <button class="btn-primary px-4 text-sm" type="button" :disabled="savingNick" @click="saveNickname">
-              {{ savingNick ? '审核中…' : '保存' }}
-            </button>
-          </div>
-          <p v-if="nickError" class="text-sm font-bold text-candy">{{ nickError }}</p>
-        </div>
-        <div class="space-y-2">
-          <label class="text-xs font-bold text-brand-600">个人介绍（提交后由 AI 审核）</label>
-          <div class="flex gap-2">
-            <input
-              v-model="bioInput"
-              maxlength="200"
-              class="min-w-0 flex-1 rounded-2xl border-2 border-brand-200 px-3 py-2 text-sm font-bold outline-none focus:border-brand-400"
-              placeholder="介绍一下自己"
-            />
-            <button class="btn-primary px-4 text-sm" type="button" :disabled="savingBio" @click="saveBio">
-              {{ savingBio ? '审核中…' : '保存' }}
-            </button>
-          </div>
-          <p v-if="bioError" class="text-sm font-bold text-candy">{{ bioError }}</p>
-        </div>
-      </div>
 
       <div class="flex gap-1 overflow-x-auto rounded-2xl bg-white/80 p-1 shadow-sm">
         <button
@@ -403,7 +344,8 @@ onMounted(async () => {
       </div>
     </template>
 
-    <ModeratingBusy :open="user.moderating || wallPosting" :text="moderatingText" />
+    <ProfileEditDialog :open="profileOpen" @close="profileOpen = false" @saved="onProfileSaved" />
+    <ModeratingBusy :open="wallPosting" :text="moderatingText" />
 
     <div
       v-if="modal"
