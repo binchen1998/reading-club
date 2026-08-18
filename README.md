@@ -1,4 +1,4 @@
-# 袋鼠英语阅读
+# 袋鼠英语-阅读俱乐部
 
 读 coding61 章节书（Fly Guy / Nate the Great / 神奇树屋等）。目前只开放 **Nate the Great · Hungry Book Club · 第一章** 做实验。
 

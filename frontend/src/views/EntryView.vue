@@ -27,7 +27,7 @@ if (readUsername()) {
   <div class="flex min-h-[70vh] flex-col items-center justify-center">
     <div class="mb-6 text-center">
       <div class="animate-float text-7xl">📖</div>
-      <h1 class="mt-2 text-3xl font-extrabold text-brand-700">袋鼠英语阅读</h1>
+      <h1 class="mt-2 text-3xl font-extrabold text-brand-700">袋鼠英语-阅读俱乐部</h1>
       <p class="mt-1 font-bold text-brand-600/80">通过 ?username= 进入，不用注册</p>
     </div>
     <section class="card w-full max-w-md animate-pop-in space-y-4">
