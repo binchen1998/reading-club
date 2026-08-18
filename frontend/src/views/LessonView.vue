@@ -112,10 +112,6 @@ const pageTasksReady = computed(() => {
   if (needRecord.value && !recordDone.value) return false
   return true
 })
-const phraseLocked = computed(() => needVocab.value && !vocabDone.value)
-const recordLocked = computed(
-  () => (needVocab.value && !vocabDone.value) || (needPhrase.value && !phraseDone.value),
-)
 const currentQuiz = computed(() => (step.value === 'vocab' ? vocabQs.value : phraseQs.value))
 const currentQuestion = computed(() => currentQuiz.value[quizCursor.value])
 const pageSegments = computed(() => mergeShortSegments(beat.value?.segments || []))
@@ -463,8 +459,8 @@ function startStep() {
 
 function startActivity(next: 'vocab' | 'phrase' | 'record') {
   if (next === 'vocab' && !vocabQs.value.length) return
-  if (next === 'phrase' && (!phraseQs.value.length || phraseLocked.value)) return
-  if (next === 'record' && recordLocked.value) return
+  if (next === 'phrase' && !phraseQs.value.length) return
+  if (next === 'record' && !needRecord.value) return
   stopAudio()
   step.value = next
   startStep()
@@ -1189,8 +1185,7 @@ onUnmounted(() => {
             <button
               class="btn-primary w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs disabled:cursor-not-allowed"
               type="button"
-              :disabled="!phraseQs.length || phraseLocked"
-              :title="phraseLocked ? '请先完成单词复习' : ''"
+              :disabled="!phraseQs.length"
               @click="startActivity('phrase')"
             >
               {{ phraseDone ? '短语已过 ✓' : '复习短语' }}
@@ -1198,8 +1193,7 @@ onUnmounted(() => {
             <button
               class="btn-candy w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs disabled:cursor-not-allowed"
               type="button"
-              :disabled="recordLocked"
-              :title="recordLocked ? (phraseLocked ? '请先完成单词复习' : '请先完成短语复习') : ''"
+              :disabled="!needRecord"
               @click="startActivity('record')"
             >
               {{ recordDone ? '朗读已录 ✓' : '自主朗读' }}
