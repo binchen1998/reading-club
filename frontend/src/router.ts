@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type LocationQuery } from 'vue-router'
 
 import AdminView from './views/AdminView.vue'
 import BookView from './views/BookView.vue'
@@ -35,10 +35,20 @@ const router = createRouter({
   ],
 })
 
+function queryUsername(query: LocationQuery): string {
+  const raw = query.username
+  const value = Array.isArray(raw) ? raw[0] : raw
+  return typeof value === 'string' ? value.trim() : ''
+}
+
 router.beforeEach((to) => {
   if (to.path.startsWith('/admin')) return true
+  if (to.path === '/home' && !queryUsername(to.query)) {
+    window.alert('链接里必须带 username，无法打开首页')
+    return false
+  }
   const fromUrl = syncUsernameFromUrl(to.fullPath.includes('?') ? to.fullPath.slice(to.fullPath.indexOf('?')) : window.location.search)
-  const qUser = typeof to.query.username === 'string' ? to.query.username : ''
+  const qUser = queryUsername(to.query)
   if (qUser) writeUsername(qUser)
   const user = qUser || fromUrl || readUsername()
   if (to.meta.auth && !user) {
