@@ -76,12 +76,11 @@ const emit = defineEmits<{
 
         <div data-camera-pip-anchor class="relative z-20 ml-auto flex shrink-0 items-center gap-2">
           <button
-            class="chip shrink-0 bg-white/80 px-3 py-1.5 text-sm text-brand-700 disabled:opacity-50 sm:text-base"
+            class="chip shrink-0 bg-white/80 px-3 py-1.5 text-sm text-brand-700 sm:text-base"
             type="button"
-            :disabled="cameraStarting"
             @click="emit('toggleCamera')"
           >
-            {{ cameraEnabled ? '📷 关摄像头' : '📷 开摄像头' }}
+            {{ cameraStarting ? '📷 打开中…' : cameraEnabled ? '📷 关摄像头' : '📷 开摄像头' }}
           </button>
           <button
             v-if="!recording && !busy"

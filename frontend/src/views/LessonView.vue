@@ -118,6 +118,9 @@ const lastSegment = computed(() => segIndex.value >= (pageSegments.value.length 
 const dialogOpen = computed(() => step.value !== 'explain' && !flowPaused.value)
 const quizDialogOpen = computed(() => dialogOpen.value && (step.value === 'vocab' || step.value === 'phrase'))
 const recordBarOpen = computed(() => dialogOpen.value && step.value === 'record')
+const cameraEnabled = computed(() => !!camera.enabled.value)
+const cameraStarting = computed(() => !!camera.starting.value)
+const cameraErrorText = computed(() => camera.error.value || '')
 const recordPassText = computed(() => {
   if (lastScore.value == null) return ''
   if (!passed.value) return '还没到 60 分，再读一次'
@@ -763,7 +766,7 @@ function pauseFlow() {
 }
 
 async function toggleCamera() {
-  if (camera.enabled.value) {
+  if (camera.enabled.value || camera.starting.value) {
     camera.close()
     return
   }
@@ -788,6 +791,7 @@ watch(beatIndex, () => closeTextPopup())
 watch(recordBarOpen, (open) => {
   setAssistantExtraBottom(open ? 96 : 0)
   if (open) void camera.start()
+  else camera.stop()
 })
 
 watch(
@@ -1058,9 +1062,9 @@ onUnmounted(() => {
       :record-words="recordWords"
       :seg-index="segIndex"
       :seg-count="pageSegments.length"
-      :camera-enabled="camera.enabled"
-      :camera-starting="camera.starting"
-      :camera-error="camera.error"
+      :camera-enabled="cameraEnabled"
+      :camera-starting="cameraStarting"
+      :camera-error="cameraErrorText"
       :pass-text="recordPassText"
       @start="startRecord"
       @stop="stopRecord"
