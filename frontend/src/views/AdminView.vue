@@ -14,6 +14,7 @@ const TABS = [
   { key: 'wall', label: '留言' },
   { key: 'wrongs', label: '错题' },
   { key: 'assets', label: '资源' },
+  { key: 'lessons', label: '课稿' },
 ] as const
 
 const tab = ref((route.params.tab as string) || 'overview')
@@ -33,6 +34,11 @@ const userQuery = ref('')
 const muting = ref('')
 const assetKind = ref('all')
 const wrongStatus = ref('open')
+const contentTree = ref<any[]>([])
+const openSeries = ref<Record<string, boolean>>({})
+const openBooks = ref<Record<string, boolean>>({})
+const clearing = ref('')
+const clearHint = ref('')
 
 async function login() {
   if (loggingIn.value) return
@@ -85,6 +91,10 @@ async function loadTab() {
     if (tab.value === 'assets') {
       const res = await adminApi(`/api/admin/assets?kind=${encodeURIComponent(assetKind.value)}`)
       assets.value = res.items || []
+    }
+    if (tab.value === 'lessons') {
+      const res = await adminApi('/api/admin/content')
+      contentTree.value = res.series || []
     }
     if (tab.value === 'wall') {
       const res = await adminApi(`/api/admin/wall?status=${encodeURIComponent(wallStatus.value)}&limit=100`)
@@ -141,6 +151,36 @@ async function reviewWall(id: number, approved: boolean) {
     await loadTab()
   } catch (e: any) {
     error.value = e?.message || '操作失败'
+  }
+}
+
+function bookKey(seriesId: string, slug: string) {
+  return `${seriesId}/${slug}`
+}
+
+function confirmClear(label: string) {
+  return window.confirm(`确定清除${label}的课稿和词框？清除后会在后台重新生成。`)
+}
+
+async function clearContent(seriesId: string, bookSlug = '', chapter?: number, label = '') {
+  if (!confirmClear(label || seriesId) || clearing.value) return
+  clearing.value = `${seriesId}/${bookSlug || ''}/${chapter || ''}`
+  clearHint.value = ''
+  try {
+    const res = await adminApi('/api/admin/content/clear', {
+      method: 'POST',
+      body: JSON.stringify({
+        series_id: seriesId,
+        book_slug: bookSlug,
+        chapter: chapter || null,
+      }),
+    })
+    clearHint.value = `已清除课稿 ${res.lessons || 0}、词框 ${res.ocrFiles || 0}，正在重新生成 ${res.queued || 0} 项`
+    await loadTab()
+  } catch (e: any) {
+    error.value = e?.message || '清除失败'
+  } finally {
+    clearing.value = ''
   }
 }
 
@@ -454,6 +494,87 @@ onMounted(loadTab)
             </tbody>
           </table>
           <div v-if="!assets.length" class="p-6 text-center text-sm text-brand-600/50">还没有按需生成的资源</div>
+        </div>
+      </div>
+
+      <div v-if="tab === 'lessons'" class="space-y-3">
+        <p class="text-sm font-bold text-brand-600/70">
+          可按套书、单本或单章清除课稿和词框。生成有问题时用这个重来，不会删用户朗读或进度。
+        </p>
+        <p v-if="clearHint" class="text-sm font-bold text-mint">{{ clearHint }}</p>
+        <div v-if="!contentTree.length" class="card py-8 text-center text-sm font-bold text-brand-600/50">
+          还没有系列
+        </div>
+        <div v-for="series in contentTree" :key="series.id" class="card space-y-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              class="min-w-0 flex-1 text-left text-lg font-extrabold text-brand-700"
+              @click="openSeries[series.id] = !openSeries[series.id]"
+            >
+              {{ openSeries[series.id] ? '▼' : '▶' }} {{ series.title }}
+            </button>
+            <button
+              type="button"
+              class="btn-ghost px-3 py-1 text-xs"
+              :disabled="!!clearing"
+              @click="clearContent(series.id, '', undefined, series.title)"
+            >
+              {{ clearing.startsWith(`${series.id}//`) ? '清除中…' : '清除本套' }}
+            </button>
+          </div>
+          <div v-if="openSeries[series.id]" class="space-y-2">
+            <div v-for="book in series.books" :key="book.slug" class="rounded-2xl bg-brand-50 p-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  class="min-w-0 flex-1 text-left font-extrabold text-brand-700"
+                  :disabled="!book.ready"
+                  @click="openBooks[bookKey(series.id, book.slug)] = !openBooks[bookKey(series.id, book.slug)]"
+                >
+                  {{ book.ready ? (openBooks[bookKey(series.id, book.slug)] ? '▼' : '▶') : '·' }}
+                  {{ book.title }}
+                  <span class="ml-2 text-xs font-bold text-brand-600/50">
+                    {{ book.ready ? `课稿 ${book.generated}/${book.chapterCount}` : '仅书目' }}
+                  </span>
+                </button>
+                <button
+                  v-if="book.ready"
+                  type="button"
+                  class="btn-ghost px-3 py-1 text-xs"
+                  :disabled="!!clearing"
+                  @click="clearContent(series.id, book.slug, undefined, book.title)"
+                >
+                  {{ clearing === `${series.id}/${book.slug}/` ? '清除中…' : '清除本书' }}
+                </button>
+              </div>
+              <div v-if="openBooks[bookKey(series.id, book.slug)]" class="mt-2 space-y-1">
+                <div
+                  v-for="ch in book.chapters"
+                  :key="ch.id"
+                  class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"
+                >
+                  <p class="min-w-0 flex-1 text-sm font-bold text-brand-700">
+                    {{ ch.title }}
+                    <span class="ml-2 text-xs text-brand-600/50">
+                      {{ ch.generating ? '生成中' : ch.generated ? '已生成' : '未生成' }}
+                    </span>
+                  </p>
+                  <button
+                    type="button"
+                    class="text-xs font-bold text-candy"
+                    :disabled="!!clearing"
+                    @click="clearContent(series.id, book.slug, ch.chapter, ch.title)"
+                  >
+                    {{ clearing === `${series.id}/${book.slug}/${ch.chapter}` ? '清除中…' : '清除这章' }}
+                  </button>
+                </div>
+                <p v-if="!book.chapters.length" class="px-3 py-2 text-xs font-bold text-brand-600/40">
+                  还没有切出章节
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </template>

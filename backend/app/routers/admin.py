@@ -4,6 +4,7 @@ from sqlalchemy import desc, func, or_, select
 from sqlalchemy.orm import Session
 
 from ..auth import check_admin_credentials, create_admin_token, require_admin
+from ..content_reset import clear_generated, content_tree
 from ..avatar import display_avatar
 from ..cache_invalidate import invalidate_profile_wall, invalidate_square_comments, invalidate_square_detail
 from ..db import get_db
@@ -18,6 +19,12 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 class AdminLoginIn(BaseModel):
     username: str
     password: str
+
+
+class ContentClearIn(BaseModel):
+    series_id: str
+    book_slug: str = ""
+    chapter: int | None = None
 
 
 class MuteIn(BaseModel):
@@ -283,6 +290,29 @@ def admin_wrongs(
             for row in rows
         ],
     }
+
+
+@router.get("/content")
+def admin_content(_: bool = Depends(require_admin)):
+    return {"series": content_tree()}
+
+
+@router.post("/content/clear")
+def admin_content_clear(
+    payload: ContentClearIn,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        result = clear_generated(
+            db,
+            series_id=payload.series_id,
+            book_slug=payload.book_slug,
+            chapter=payload.chapter,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"ok": True, **result}
 
 
 @router.get("/assets")

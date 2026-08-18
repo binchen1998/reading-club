@@ -158,7 +158,7 @@
       "id": "FrogAndToad",
       "level_name": "files",
       "title": "Frog and Toad 青蛙与蟾蜍",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/files/files.json",
       "book_count": 10,
       "books": [
@@ -258,7 +258,7 @@
       "id": "FancyNancy",
       "level_name": "Nancy",
       "title": "Fancy Nancy 漂亮的南希",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/Nancy/files/Nancy.json",
       "book_count": 5,
       "books": [
@@ -313,7 +313,7 @@
       "id": "WinnieAndWilbur",
       "level_name": "WinnieAndWilbur",
       "title": "Winnie And Wilbur 女巫温妮",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/WinnieAndWilbur/files/WinnieAndWilbur.json",
       "book_count": 12,
       "books": [
@@ -431,7 +431,7 @@
       "id": "MagicTreeHouse",
       "level_name": "MagicTreeHouse",
       "title": "Magic Tree House 神奇树屋",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/MagicTreeHouse/files/MagicTreeHouse.json",
       "book_count": 4,
       "books": [
@@ -477,7 +477,7 @@
       "id": "CuriousGeorge",
       "level_name": "CuriousGeorge",
       "title": "Curious George 好奇的乔治",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/CuriousGeorge/files/CuriousGeorge.json",
       "book_count": 6,
       "books": [
@@ -821,7 +821,7 @@
       "id": "AToZ",
       "level_name": "AToZ",
       "title": "A to Z Mysteries 神秘案件",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/AToZ/files/AToZ.json",
       "book_count": 26,
       "books": [
@@ -1065,7 +1065,7 @@
       "id": "CatAndMouse",
       "level_name": "CatAndMouse",
       "title": "老鼠记者",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/CatAndMouse/files/CatAndMouse.json",
       "book_count": 10,
       "books": [
@@ -1165,7 +1165,7 @@
       "id": "DragonMasters",
       "level_name": "DraonMasters",
       "title": "Dragon Masters 驯龙大师",
-      "readable": false,
+      "readable": true,
       "catalog_url": "https://static1.cxy61.com/bridge-books/DraonMasters/files/DraonMasters.json",
       "book_count": 27,
       "books": [

@@ -76,14 +76,30 @@ def enqueue_all_local() -> None:
         enqueue_book(book_path.parents[1].name, book_path.parent.name)
 
 
-def _put(series_id: str, book_slug: str, chapter: int) -> None:
+def forget_chapter(series_id: str, book_slug: str, chapter: int) -> None:
+    key = _key(series_id, book_slug, chapter)
+    with _guard:
+        _done.discard(key)
+        _failed_at.pop(key, None)
+
+
+def enqueue_chapter(series_id: str, book_slug: str, chapter: int, force: bool = False) -> None:
+    start_lesson_worker()
+    if force:
+        forget_chapter(series_id, book_slug, chapter)
+    _put(series_id, book_slug, chapter, force=force)
+
+
+def _put(series_id: str, book_slug: str, chapter: int, force: bool = False) -> None:
     key = _key(series_id, book_slug, chapter)
     now = time.time()
     with _guard:
-        if key in _queued or key in _active or key in _done:
+        if key in _queued or key in _active:
+            return
+        if not force and key in _done:
             return
         last_fail = _failed_at.get(key) or 0
-        if last_fail and now - last_fail < RETRY_AFTER_SEC:
+        if not force and last_fail and now - last_fail < RETRY_AFTER_SEC:
             return
         _queued.add(key)
     _queue.put((series_id, book_slug, chapter, key))

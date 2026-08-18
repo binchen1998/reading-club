@@ -123,6 +123,18 @@ def ocr_key(series_id: str, book_slug: str, page: int, digest: str) -> str:
     return f"{QINIU_ASSET_PREFIX}/ocr/{series_id}/{book_slug}/{page:03d}-{digest}.json"
 
 
+def qiniu_delete(key: str) -> None:
+    if not qiniu_enabled() or not key:
+        return
+    from qiniu import Auth, BucketManager
+
+    auth = Auth(QINIU_ACCESS_KEY, QINIU_SECRET_KEY)
+    _ret, info = BucketManager(auth).delete(QINIU_BUCKET, key)
+    status = getattr(info, "status_code", 0)
+    if status not in (200, 612):
+        raise RuntimeError(f"七牛删除失败: {getattr(info, 'text_body', info)}")
+
+
 def qiniu_exists(key: str) -> bool:
     if not qiniu_enabled() or not key:
         return False
