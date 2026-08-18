@@ -19,6 +19,7 @@ from .gen_jobs import mark_done, mark_error, mark_running, next_interactive_job
 from .lesson_gen import generate_lesson, lesson_exists
 from .ocr import ocr_cache_digest
 from .tts import audio_id
+from .worker_log import attach_worker_logging
 
 logger = logging.getLogger("lesson_worker")
 WORD_RE = re.compile(r"[A-Za-z']+")
@@ -51,6 +52,7 @@ def start_lesson_worker() -> None:
         if _started:
             return
         _started = True
+    attach_worker_logging()
     threading.Thread(target=_loop, daemon=True, name="lesson-worker").start()
     for i in range(INTERACTIVE_WORKERS):
         threading.Thread(target=_interactive_loop, daemon=True, name=f"gen-worker-{i}").start()
@@ -108,6 +110,17 @@ def _put(series_id: str, book_slug: str, chapter: int, force: bool = False) -> N
             return
         _queued.add(key)
     _queue.put((series_id, book_slug, chapter, key))
+    logger.info("排队章节 %s", key)
+
+
+def background_status() -> dict:
+    with _guard:
+        return {
+            "queued": sorted(_queued),
+            "active": sorted(_active),
+            "queued_count": len(_queued),
+            "active_count": len(_active),
+        }
 
 
 def _loop() -> None:
@@ -117,6 +130,7 @@ def _loop() -> None:
         with _guard:
             _queued.discard(key)
             _active.add(key)
+        logger.info("开始后台生成 %s", key)
         try:
             _generate_one(series_id, book_slug, chapter, key)
             with _guard:
@@ -173,11 +187,20 @@ def _fill_tts(lesson: dict, label: str) -> None:
         return
     logger.info("background tts %s count=%s", label, len(texts))
 
+    done = 0
+    lock = threading.Lock()
+
     def one(text: str) -> None:
+        nonlocal done
+        preview = (text or "")[:50]
         try:
+            logger.info("TTS %s %s", label, preview)
             ensure_tts(text, purpose="后台预生成")
+            with lock:
+                done += 1
+                logger.info("TTS 完成 %s %s/%s %s", label, done, len(texts), preview)
         except Exception:
-            logger.exception("background tts failed %s %s", label, text[:40])
+            logger.exception("background tts failed %s %s", label, preview)
 
     workers = min(TTS_WORKERS, max(2, len(texts)))
     with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -197,11 +220,13 @@ def _fill_ocr(series_id: str, book_slug: str, lesson: dict, label: str) -> None:
     if not items:
         return
     logger.info("background ocr %s count=%s", label, len(items))
-    for page, text in items:
+    for index, (page, text) in enumerate(items, start=1):
+        preview = (text or "")[:50]
         try:
+            logger.info("OCR %s %s/%s p%s %s", label, index, len(items), page, preview)
             ensure_ocr(series_id, book_slug, page, text, purpose="后台预生成")
         except Exception:
-            logger.exception("background ocr failed %s p%s %s", label, page, text[:40])
+            logger.exception("background ocr failed %s p%s %s", label, page, preview)
 
 
 def enqueue_lesson_job(series_id: str, book_slug: str, chapter: int):
@@ -251,9 +276,11 @@ def _interactive_loop() -> None:
         if job is None:
             continue
         mark_running(job.id)
+        logger.info("即时任务开始 %s %s", job.kind, job.key)
         try:
             result = _run_interactive(job.kind, job.payload)
             mark_done(job.id, result)
+            logger.info("即时任务完成 %s %s", job.kind, job.key)
         except Exception as exc:
             logger.exception("interactive generate failed %s", job.key)
             mark_error(job.id, str(exc) or "生成失败")
@@ -261,15 +288,29 @@ def _interactive_loop() -> None:
 
 def _run_interactive(kind: str, payload: dict) -> dict:
     if kind == "lesson":
+        logger.info(
+            "生成课稿 %s/%s/ch%02d",
+            payload.get("series_id"),
+            payload.get("book_slug"),
+            int(payload.get("chapter") or 0),
+        )
         generate_lesson(payload["series_id"], payload["book_slug"], int(payload["chapter"]))
         return {"exists": True}
     if kind == "tts":
         from .assets import ensure_tts
 
+        logger.info("生成 TTS %s", (payload.get("text") or "")[:80])
         return ensure_tts(payload["text"], payload.get("purpose") or "讲解音频")
     if kind == "ocr":
         from .assets import ensure_ocr
 
+        logger.info(
+            "生成 OCR %s/%s p%s %s",
+            payload.get("series_id"),
+            payload.get("book_slug"),
+            payload.get("page"),
+            (payload.get("text") or "")[:50],
+        )
         return ensure_ocr(
             payload["series_id"],
             payload["book_slug"],
@@ -281,6 +322,8 @@ def _run_interactive(kind: str, payload: dict) -> dict:
         from fastapi import HTTPException
 
         from .teaching import chat_reply
+
+        logger.info("助教回复 %s", (payload.get("student_text") or "")[:80])
 
         try:
             reply = chat_reply(

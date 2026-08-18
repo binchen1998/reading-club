@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import desc, func, or_, select
 from sqlalchemy.orm import Session
 
 from ..auth import check_admin_credentials, create_admin_token, require_admin
 from ..content_reset import clear_generated, content_tree
+from ..worker_log import attach_worker_logging, iter_admin_worker_sse, recent, worker_status
 from ..avatar import display_avatar
 from ..cache_invalidate import invalidate_profile_wall, invalidate_square_comments, invalidate_square_detail
 from ..db import get_db
@@ -290,6 +292,25 @@ def admin_wrongs(
             for row in rows
         ],
     }
+
+
+@router.get("/worker")
+def admin_worker(_: bool = Depends(require_admin)):
+    attach_worker_logging()
+    return {**worker_status(), "logs": recent(200)}
+
+
+@router.get("/worker/events")
+def admin_worker_events(_: bool = Depends(require_admin)):
+    return StreamingResponse(
+        iter_admin_worker_sse(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get("/content")

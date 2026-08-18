@@ -106,6 +106,12 @@ def generate_chapter_lesson(chapter: dict) -> dict[str, Any]:
             for row in pages
         ],
     }
+    logger.info(
+        "开始生成课稿 chapter=%s pages=%s title=%s",
+        chapter.get("chapter"),
+        len(pages),
+        chapter.get("title") or "",
+    )
     client = _client()
     messages = [
         {"role": "system", "content": load_prompt()},
@@ -123,7 +129,13 @@ def generate_chapter_lesson(chapter: dict) -> dict[str, Any]:
         raw = (resp.choices[0].message.content or "").strip()
         try:
             lesson = extract_json(raw)
-            return sanitize_lesson(lesson, chapter)
+            cleaned = sanitize_lesson(lesson, chapter)
+            logger.info(
+                "课稿完成 chapter=%s beats=%s",
+                cleaned.get("chapter"),
+                len(cleaned.get("beats") or []),
+            )
+            return cleaned
         except Exception as exc:
             last_err = exc
             logger.warning("课稿第 %s 次无效: %s | %s", attempt, exc, raw[:180].replace("\n", " "))
@@ -200,6 +212,7 @@ def generate_chapter_lesson_full(chapter: dict) -> dict[str, Any]:
         {**chapter, "pages": pages[start : start + 10]}
         for start in range(0, len(pages), 10)
     ]
+    logger.info("课稿分段 chapter=%s chunks=%s pages=%s", num, len(chunks), len(pages))
     parts: list[dict] = [{}] * len(chunks)
     with ThreadPoolExecutor(max_workers=min(4, len(chunks))) as pool:
         futs = {pool.submit(generate_chapter_lesson, chunk): i for i, chunk in enumerate(chunks)}

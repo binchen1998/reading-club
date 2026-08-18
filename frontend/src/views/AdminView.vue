@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { ADMIN_TOKEN_KEY, adminApi } from '../api'
+import {
+  streamAdminWorkerLogs,
+  type WorkerLogLine,
+  type WorkerStatus,
+} from '../utils/adminWorkerSse'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,6 +20,7 @@ const TABS = [
   { key: 'wrongs', label: '错题' },
   { key: 'assets', label: '资源' },
   { key: 'lessons', label: '课稿' },
+  { key: 'worker', label: 'Worker' },
 ] as const
 
 const tab = ref((route.params.tab as string) || 'overview')
@@ -39,6 +45,75 @@ const openSeries = ref<Record<string, boolean>>({})
 const openBooks = ref<Record<string, boolean>>({})
 const clearing = ref('')
 const clearHint = ref('')
+const workerStatus = ref<WorkerStatus>({})
+const workerLogs = ref<WorkerLogLine[]>([])
+const workerFollow = ref(true)
+const workerLive = ref(false)
+const logBox = ref<HTMLElement | null>(null)
+let workerAbort: AbortController | null = null
+
+function kindLabel(kind?: string) {
+  if (kind === 'lesson') return '课稿'
+  if (kind === 'tts') return 'TTS'
+  if (kind === 'ocr') return '词框'
+  if (kind === 'chat') return '助教'
+  return kind || '任务'
+}
+
+function logTone(level?: string) {
+  const value = (level || '').toUpperCase()
+  if (value === 'ERROR' || value === 'CRITICAL') return 'text-red-300'
+  if (value === 'WARNING') return 'text-amber-300'
+  return 'text-emerald-200'
+}
+
+function logTime(iso?: string) {
+  if (!iso) return ''
+  return iso.includes('T') ? iso.slice(11, 19) : iso
+}
+
+function scrollLogs() {
+  const el = logBox.value
+  if (el) el.scrollTop = el.scrollHeight
+}
+
+function applyWorkerEvent(event: { status?: WorkerStatus; logs?: WorkerLogLine[]; line?: WorkerLogLine }) {
+  if (event.status) workerStatus.value = event.status
+  if (event.logs) {
+    workerLogs.value = event.logs
+    if (workerFollow.value) nextTick(scrollLogs)
+  }
+  if (event.line) {
+    workerLogs.value = [...workerLogs.value, event.line].slice(-400)
+    if (workerFollow.value) nextTick(scrollLogs)
+  }
+}
+
+function stopWorkerStream() {
+  workerLive.value = false
+  workerAbort?.abort()
+  workerAbort = null
+}
+
+async function startWorkerStream() {
+  stopWorkerStream()
+  const ac = new AbortController()
+  workerAbort = ac
+  workerLive.value = true
+  try {
+    await streamAdminWorkerLogs((event) => applyWorkerEvent(event), ac.signal)
+    if (!ac.signal.aborted && tab.value === 'worker' && loggedIn.value) {
+      workerLive.value = false
+      window.setTimeout(() => {
+        if (tab.value === 'worker' && loggedIn.value) void startWorkerStream()
+      }, 1200)
+    }
+  } catch (e: any) {
+    if (ac.signal.aborted) return
+    workerLive.value = false
+    error.value = e?.message || 'worker 日志断开'
+  }
+}
 
 async function login() {
   if (loggingIn.value) return
@@ -63,6 +138,7 @@ async function login() {
 }
 
 function logout() {
+  stopWorkerStream()
   localStorage.removeItem(ADMIN_TOKEN_KEY)
   loggedIn.value = false
 }
@@ -95,6 +171,11 @@ async function loadTab() {
     if (tab.value === 'lessons') {
       const res = await adminApi('/api/admin/content')
       contentTree.value = res.series || []
+    }
+    if (tab.value === 'worker') {
+      void startWorkerStream()
+    } else {
+      stopWorkerStream()
     }
     if (tab.value === 'wall') {
       const res = await adminApi(`/api/admin/wall?status=${encodeURIComponent(wallStatus.value)}&limit=100`)
@@ -201,6 +282,7 @@ watch(
 )
 
 onMounted(loadTab)
+onUnmounted(stopWorkerStream)
 </script>
 
 <template>
@@ -494,6 +576,87 @@ onMounted(loadTab)
             </tbody>
           </table>
           <div v-if="!assets.length" class="p-6 text-center text-sm text-brand-600/50">还没有按需生成的资源</div>
+        </div>
+      </div>
+
+      <div v-if="tab === 'worker'" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div class="card">
+            <div class="text-xs font-bold text-brand-600/50">后台进行中</div>
+            <div class="mt-1 text-2xl font-extrabold text-brand-700">
+              {{ workerStatus.background?.active_count ?? 0 }}
+            </div>
+          </div>
+          <div class="card">
+            <div class="text-xs font-bold text-brand-600/50">后台排队</div>
+            <div class="mt-1 text-2xl font-extrabold text-brand-700">
+              {{ workerStatus.background?.queued_count ?? 0 }}
+            </div>
+          </div>
+          <div class="card">
+            <div class="text-xs font-bold text-brand-600/50">即时任务</div>
+            <div class="mt-1 text-2xl font-extrabold text-brand-700">
+              {{ workerStatus.interactive?.length ?? 0 }}
+            </div>
+          </div>
+          <div class="card">
+            <div class="text-xs font-bold text-brand-600/50">日志流</div>
+            <div class="mt-1 text-lg font-extrabold" :class="workerLive ? 'text-mint' : 'text-candy'">
+              {{ workerLive ? '已连接' : '未连接' }}
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="(workerStatus.background?.active || []).length || (workerStatus.interactive || []).length"
+          class="card space-y-2"
+        >
+          <p class="text-sm font-extrabold text-brand-700">正在生成</p>
+          <p
+            v-for="item in workerStatus.background?.active || []"
+            :key="`bg-${item}`"
+            class="rounded-2xl bg-brand-50 px-3 py-2 text-sm font-bold text-brand-700"
+          >
+            后台章节 · {{ item }}
+          </p>
+          <p
+            v-for="job in workerStatus.interactive || []"
+            :key="job.job_id || job.key"
+            class="rounded-2xl bg-brand-50 px-3 py-2 text-sm font-bold text-brand-700"
+          >
+            {{ kindLabel(job.kind) }} · {{ job.status === 'running' ? '进行中' : '排队' }}
+            <span class="ml-2 font-medium text-brand-600/70">{{ job.preview || job.key }}</span>
+          </p>
+        </div>
+        <div
+          v-if="(workerStatus.background?.queued || []).length"
+          class="card space-y-2"
+        >
+          <p class="text-sm font-extrabold text-brand-700">排队中</p>
+          <p
+            v-for="item in workerStatus.background?.queued || []"
+            :key="`q-${item}`"
+            class="text-sm font-bold text-brand-600/70"
+          >
+            {{ item }}
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex items-center gap-2 text-sm font-bold text-brand-700">
+            <input v-model="workerFollow" type="checkbox" />
+            跟随滚动
+          </label>
+          <button type="button" class="btn-ghost px-3 py-1 text-xs" @click="workerLogs = []">清空显示</button>
+        </div>
+        <div
+          ref="logBox"
+          class="h-[28rem] overflow-auto rounded-3xl bg-slate-950 px-4 py-3 font-mono text-xs leading-6 shadow-pop"
+        >
+          <p v-if="!workerLogs.length" class="text-slate-500">还没有 worker 日志。打开阅读页生成后会实时出现在这里。</p>
+          <p v-for="(line, index) in workerLogs" :key="line.id || index" :class="logTone(line.level)">
+            <span class="text-slate-500">{{ logTime(line.iso) }}</span>
+            <span class="ml-2 text-slate-400">{{ line.level }}</span>
+            <span class="ml-2">{{ line.message }}</span>
+          </p>
         </div>
       </div>
 

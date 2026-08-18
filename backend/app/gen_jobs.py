@@ -63,6 +63,37 @@ def get_job(job_id: str) -> Job | None:
         return _jobs.get(job_id)
 
 
+def _job_preview(job: Job) -> str:
+    payload = job.payload or {}
+    if job.kind == "lesson":
+        chapter = int(payload.get("chapter") or 0)
+        return f"{payload.get('series_id')}/{payload.get('book_slug')}/ch{chapter:02d}"
+    if job.kind == "tts":
+        return (payload.get("text") or "")[:80]
+    if job.kind == "ocr":
+        text = (payload.get("text") or "")[:50]
+        return f"{payload.get('series_id')}/{payload.get('book_slug')} p{payload.get('page')} {text}"
+    if job.kind == "chat":
+        return (payload.get("student_text") or payload.get("book_title") or "")[:80]
+    return job.key
+
+
+def list_open_jobs() -> list[dict]:
+    with _guard:
+        jobs = [job for job in _jobs.values() if job.status in ("queued", "running")]
+    jobs.sort(key=lambda job: (0 if job.status == "running" else 1, job.updated_at))
+    return [
+        {
+            "job_id": job.id,
+            "kind": job.kind,
+            "key": job.key,
+            "status": job.status,
+            "preview": _job_preview(job),
+        }
+        for job in jobs
+    ]
+
+
 def subscribe(job_id: str) -> queue.Queue:
     q: queue.Queue = queue.Queue()
     with _guard:
