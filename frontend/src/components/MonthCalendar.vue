@@ -53,21 +53,21 @@ onMounted(load)
 </script>
 
 <template>
-  <section class="card">
-    <div class="mb-3 flex items-center justify-between">
+  <section class="card !p-2.5 lg:!p-5">
+    <div class="mb-2 flex items-center justify-between lg:mb-3">
       <button class="font-extrabold text-brand-600" type="button" @click="prevMonth">‹</button>
-      <p class="font-extrabold text-brand-700">{{ monthTitle }}</p>
+      <p class="text-sm font-extrabold text-brand-700 lg:text-base">{{ monthTitle }}</p>
       <button class="font-extrabold text-brand-600" type="button" @click="nextMonth">›</button>
     </div>
-    <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-brand-500">
+    <div class="grid grid-cols-7 gap-0.5 text-center text-[10px] font-bold text-brand-500 lg:gap-1 lg:text-xs">
       <span v-for="w in weekdayLabels" :key="w">{{ w }}</span>
     </div>
-    <div class="mt-1 grid grid-cols-7 gap-1">
+    <div class="mt-1 grid grid-cols-7 gap-0.5 lg:gap-1">
       <button
         v-for="(day, i) in gridCells"
         :key="i"
         type="button"
-        class="aspect-square rounded-xl text-sm font-extrabold"
+        class="aspect-square rounded-lg text-[11px] font-extrabold lg:rounded-xl lg:text-sm"
         :class="!day
           ? 'invisible'
           : day.is_future
@@ -81,6 +81,6 @@ onMounted(load)
         {{ day?.day || '' }}
       </button>
     </div>
-    <p class="mt-3 text-xs font-bold text-brand-500">绿底表示那天有学习。点日期看每页完成情况。</p>
+    <p class="mt-2 text-[10px] font-bold leading-snug text-brand-500 lg:mt-3 lg:text-xs">绿底表示那天有学习。点日期看每页完成情况。</p>
   </section>
 </template>

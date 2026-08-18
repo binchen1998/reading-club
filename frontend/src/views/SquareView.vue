@@ -46,11 +46,11 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="grid grid-cols-[minmax(0,1fr)_300px] items-start gap-3">
+  <div class="grid grid-cols-[minmax(0,1fr)_minmax(7.5rem,min(18.75rem,30vw))] items-start gap-2 lg:gap-3">
     <section class="min-w-0 space-y-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
-          <h1 class="text-2xl font-extrabold text-brand-700 lg:text-3xl">朗读广场</h1>
+          <h1 class="text-xl font-extrabold text-brand-700 lg:text-3xl">朗读广场</h1>
           <div class="flex gap-1">
             <button
               class="rounded-full px-2.5 py-1 text-xs font-extrabold"
@@ -87,7 +87,7 @@ onMounted(load)
       <p v-else-if="!items.length" class="card font-bold text-brand-600/60">
         广场还没有作品，读完一页并选择公开就会出现。
       </p>
-      <div v-else class="grid grid-cols-4 gap-2">
+      <div v-else class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         <router-link
           v-for="item in items"
           :key="item.id"
@@ -153,7 +153,13 @@ onMounted(load)
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  padding: 0 18px;
+  padding: 0 10px;
+}
+
+@media (min-width: 1024px) {
+  .square-stat-item {
+    padding: 0 18px;
+  }
 }
 
 .square-stat-num {

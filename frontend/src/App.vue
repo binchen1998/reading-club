@@ -33,8 +33,8 @@ function navActive(match: readonly string[]) {
 
 function navClass(active: boolean) {
   return active
-    ? 'relative rounded-full bg-sunny/80 px-3 py-1 text-brand-700'
-    : 'relative rounded-full px-3 py-1 text-brand-700 hover:bg-white'
+    ? 'relative whitespace-nowrap rounded-full bg-sunny/80 px-2 py-1 text-brand-700 lg:px-3'
+    : 'relative whitespace-nowrap rounded-full px-2 py-1 text-brand-700 hover:bg-white lg:px-3'
 }
 
 function goBack() {
@@ -80,12 +80,12 @@ onUnmounted(() => {
         v-if="!hideBanner"
         class="sticky top-0 z-30 border-b border-brand-200/50 bg-white/55 backdrop-blur"
       >
-        <div class="relative mx-auto flex min-h-[3.5rem] max-w-[1400px] items-center justify-between gap-3 px-4 py-3 lg:px-6">
+        <div class="relative mx-auto flex min-h-[3.5rem] max-w-[1400px] items-center justify-between gap-2 px-2 py-2 lg:gap-3 lg:px-6 lg:py-3">
           <RouterLink :to="clubLink('/home')" class="flex items-center gap-2 text-lg font-extrabold text-brand-700">
             <span class="animate-float">📖</span>
             <span class="max-md:hidden">袋鼠英语-阅读俱乐部</span>
           </RouterLink>
-          <nav class="flex flex-wrap items-center justify-end gap-2 text-sm font-extrabold">
+          <nav class="flex flex-nowrap items-center justify-end gap-1 text-xs font-extrabold lg:gap-2 lg:text-sm">
             <RouterLink
               v-for="item in navItems"
               :key="item.path"
@@ -121,8 +121,8 @@ onUnmounted(() => {
           reading
             ? 'h-[100dvh] overflow-hidden px-2 pb-2 pt-12 lg:pt-14'
             : showShellBack
-              ? 'max-w-[1400px] px-4 pb-16 pt-14 lg:px-6'
-              : 'max-w-[1400px] px-4 pb-16 pt-4 lg:px-6'
+              ? 'max-w-[1400px] px-2 pb-16 pt-14 lg:px-6'
+              : 'max-w-[1400px] px-2 pb-16 pt-4 lg:px-6'
         "
       >
         <RouterView v-slot="{ Component, route: r }">

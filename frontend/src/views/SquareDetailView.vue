@@ -136,51 +136,51 @@ onMounted(load)
     <div v-else-if="error && !item" class="card py-10 text-center font-bold text-candy">{{ error }}</div>
     <template v-else-if="item">
       <div class="card overflow-hidden !p-0">
-        <div class="flex flex-col lg:flex-row">
-          <div class="relative max-h-[50vh] w-full bg-black lg:w-1/2">
+        <div class="flex flex-row">
+          <div class="relative min-w-0 w-1/2 bg-black">
             <video
-              class="max-h-[50vh] w-full object-contain"
+              class="max-h-[min(70vh,28rem)] w-full object-contain"
               :src="item.videoUrl"
               controls
               playsinline
             />
             <div
               v-if="item.overallScore > 0"
-              class="absolute left-2 top-2 grid h-10 w-10 place-items-center rounded-xl bg-brand-500 text-sm font-black text-white shadow-pop"
+              class="absolute left-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-xs font-black text-white shadow-pop lg:left-2 lg:top-2 lg:h-10 lg:w-10 lg:rounded-xl lg:text-sm"
             >
               {{ item.overallScore }}
             </div>
           </div>
-          <div class="flex min-w-0 flex-1 flex-col gap-3 p-4">
+          <div class="flex min-w-0 w-1/2 flex-col gap-2 p-3 lg:gap-3 lg:p-4">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0">
-                <h2 class="truncate text-lg font-extrabold text-brand-700">
+                <h2 class="text-sm font-extrabold leading-snug text-brand-700 lg:truncate lg:text-lg">
                   {{ item.bookTitle }} · 第 {{ item.page }} 页
                 </h2>
-                <p v-if="item.lessonDate" class="mt-0.5 text-xs font-bold text-brand-600/60">
+                <p v-if="item.lessonDate" class="mt-0.5 text-[11px] font-bold text-brand-600/60 lg:text-xs">
                   课次日期：{{ item.lessonDate }}
                 </p>
               </div>
               <button
                 v-if="!user.isGuest && item.isPublic"
                 type="button"
-                class="shrink-0 rounded-full px-3 py-1.5 text-sm font-bold disabled:opacity-50"
+                class="shrink-0 rounded-full px-2 py-1 text-xs font-bold disabled:opacity-50 lg:px-3 lg:py-1.5 lg:text-sm"
                 :class="item.liked ? 'bg-candy text-white' : 'bg-candy/10 text-candy'"
                 :disabled="liking"
                 @click="toggleLike"
               >
                 {{ liking ? '…' : '♥' }} {{ item.likeCount || 0 }}
               </button>
-              <span v-else class="shrink-0 rounded-full bg-candy/10 px-3 py-1.5 text-sm font-bold text-candy">
+              <span v-else class="shrink-0 rounded-full bg-candy/10 px-2 py-1 text-xs font-bold text-candy lg:px-3 lg:py-1.5 lg:text-sm">
                 ♥ {{ item.likeCount || 0 }}
               </span>
             </div>
-            <div v-if="isOwner" class="flex flex-wrap items-center gap-2">
-              <span class="rounded-full px-3 py-1 text-xs font-extrabold" :class="item.isPublic ? 'bg-mint/20 text-mint' : 'bg-brand-100 text-brand-600'">
+            <div v-if="isOwner" class="flex flex-wrap items-center gap-1.5 lg:gap-2">
+              <span class="rounded-full px-2 py-0.5 text-[10px] font-extrabold lg:px-3 lg:py-1 lg:text-xs" :class="item.isPublic ? 'bg-mint/20 text-mint' : 'bg-brand-100 text-brand-600'">
                 {{ item.isPublic ? '已公开到广场' : '仅自己可见' }}
               </span>
               <button
-                class="btn-ghost px-3 py-1.5 text-sm"
+                class="btn-ghost px-2 py-1 text-xs lg:px-3 lg:py-1.5 lg:text-sm"
                 type="button"
                 :disabled="visibilityBusy"
                 @click="toggleVisibility"
@@ -194,17 +194,17 @@ onMounted(load)
             >
               <UserAvatar :avatar="item.avatar" size="sm" rounded="xl" />
               <div class="min-w-0">
-                <div class="truncate font-extrabold text-brand-700">
+                <div class="truncate text-sm font-extrabold text-brand-700 lg:text-base">
                   {{ safeDisplayName(item.nickname, item.username) }}
                 </div>
-                <div class="text-xs text-brand-600/50">点击查看主页</div>
+                <div class="text-[11px] text-brand-600/50 lg:text-xs">点击查看主页</div>
               </div>
             </router-link>
           </div>
         </div>
       </div>
 
-      <section class="card space-y-3">
+      <section class="card space-y-3 !p-3 lg:!p-5">
         <h3 class="font-extrabold text-brand-700">评论</h3>
         <p v-if="replyTo" class="text-xs font-bold text-brand-600">
           回复 {{ safeDisplayName(replyTo.authorName, replyTo.username) }}
