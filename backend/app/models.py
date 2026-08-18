@@ -50,6 +50,19 @@ class PageProgress(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class BookCursor(Base):
+    __tablename__ = "book_cursors"
+    __table_args__ = (UniqueConstraint("username", "series_id", "book_slug", name="uq_book_cursor"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(50), index=True)
+    series_id: Mapped[str] = mapped_column(String(80), default="")
+    book_slug: Mapped[str] = mapped_column(String(120), default="")
+    chapter_id: Mapped[str] = mapped_column(String(40), default="")
+    page: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class Recording(Base):
     __tablename__ = "recordings"
 

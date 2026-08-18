@@ -565,6 +565,24 @@ function saveProgress(extra: Record<string, unknown>) {
   apiPost('/api/progress', { ...pageMeta(), ...extra }).catch(() => undefined)
 }
 
+function saveCursor() {
+  const meta = pageMeta()
+  if (!meta.page || !meta.chapter_id) return
+  apiPost('/api/progress/cursor', {
+    series_id: meta.series_id,
+    book_slug: meta.book_slug,
+    chapter_id: meta.chapter_id,
+    page: meta.page,
+  }).catch(() => undefined)
+}
+
+function applyResumePage() {
+  const page = Number(route.query.page || 0)
+  if (!page || !lesson.value?.beats?.length) return
+  const idx = lesson.value.beats.findIndex((item: { page?: number }) => Number(item.page) === page)
+  if (idx >= 0) beatIndex.value = idx
+}
+
 function nextAfterQuiz() {
   const isPhrase = step.value === 'phrase'
   const alreadyDone = isPhrase ? phraseDone.value : vocabDone.value
@@ -833,6 +851,7 @@ function goToBeat(index: number, force = false) {
   step.value = 'explain'
   startStep()
   void loadPageProgress()
+  saveCursor()
 }
 
 async function loadPageProgress() {
@@ -959,8 +978,10 @@ onMounted(async () => {
   } finally {
     endGenerate()
   }
+  applyResumePage()
   await loadPageProgress()
   startStep()
+  saveCursor()
 })
 
 onUnmounted(() => {

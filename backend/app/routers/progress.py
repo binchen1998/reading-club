@@ -8,10 +8,17 @@ from sqlalchemy.orm import Session
 from ..auth import get_current_user
 from ..cache_invalidate import invalidate_reports
 from ..db import get_db
-from ..models import PageProgress, User
+from ..models import BookCursor, PageProgress, User
 from ..timeutil import shanghai_today
 
 router = APIRouter(prefix="/api/progress", tags=["progress"])
+
+
+class CursorIn(BaseModel):
+    series_id: str
+    book_slug: str
+    chapter_id: str
+    page: int
 
 
 class ProgressIn(BaseModel):
@@ -116,3 +123,57 @@ def page_progress(
         )
     ).scalar_one_or_none()
     return serialize_progress(row) if row else None
+
+
+def serialize_cursor(row: BookCursor, last_page: int = 0) -> dict:
+    page = int(row.page or 0)
+    return {
+        "seriesId": row.series_id,
+        "bookSlug": row.book_slug,
+        "chapterId": row.chapter_id,
+        "page": page,
+        "finished": bool(last_page and page >= last_page),
+    }
+
+
+def upsert_book_cursor(db: Session, username: str, payload: CursorIn) -> BookCursor:
+    page = max(0, int(payload.page or 0))
+    chapter_id = (payload.chapter_id or "").strip()
+    row = db.execute(
+        select(BookCursor).where(
+            BookCursor.username == username,
+            BookCursor.series_id == payload.series_id,
+            BookCursor.book_slug == payload.book_slug,
+        )
+    ).scalar_one_or_none()
+    if row is None:
+        row = BookCursor(
+            username=username,
+            series_id=payload.series_id,
+            book_slug=payload.book_slug,
+            chapter_id=chapter_id,
+            page=page,
+        )
+        db.add(row)
+    else:
+        row.chapter_id = chapter_id
+        row.page = page
+    row.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def book_cursors_for_series(db: Session, username: str, series_id: str) -> dict[str, BookCursor]:
+    rows = db.execute(
+        select(BookCursor).where(BookCursor.username == username, BookCursor.series_id == series_id)
+    ).scalars().all()
+    return {row.book_slug: row for row in rows}
+
+
+@router.post("/cursor")
+def save_cursor(payload: CursorIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not payload.series_id or not payload.book_slug or not payload.chapter_id or payload.page <= 0:
+        return {"page": 0, "chapterId": "", "finished": False}
+    row = upsert_book_cursor(db, user.username, payload)
+    return serialize_cursor(row)
