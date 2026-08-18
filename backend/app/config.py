@@ -9,6 +9,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / "backend" / ".env")
+BASE_DIR = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
 CATALOG = CONTENT / "catalog.json"
 BOOKS = CONTENT / "books"
@@ -42,6 +43,13 @@ QINIU_PRACTICE_PREFIX = os.getenv("QINIU_PRACTICE_PREFIX") or "reading-club/prac
 QINIU_ASSET_PREFIX = os.getenv("QINIU_ASSET_PREFIX") or "reading-club/assets"
 QINIU_FRONTEND_PREFIX = (os.getenv("QINIU_FRONTEND_PREFIX") or os.getenv("QINIU_DEPLOY_PREFIX") or "reading-club").strip().strip("/")
 QINIU_AVATAR_PREFIX = os.getenv("QINIU_AVATAR_PREFIX") or "reading-club/avatars"
+QINIU_BACKUP_PREFIX = (os.getenv("QINIU_BACKUP_PREFIX") or "reading-club-backup").strip()
+QINIU_BACKUP_SLOTS = max(1, int(os.getenv("QINIU_BACKUP_SLOTS") or "5"))
+DB_BACKUP_SCHEDULE_HOUR = int(os.getenv("DB_BACKUP_SCHEDULE_HOUR") or "2")
+DB_BACKUP_SCHEDULE_MINUTE = int(os.getenv("DB_BACKUP_SCHEDULE_MINUTE") or "0")
+DB_BACKUP_RETRY_DELAY_SECONDS = max(60, int(os.getenv("DB_BACKUP_RETRY_DELAY_SECONDS") or "1800"))
+DB_BACKUP_OUTPUT_DIR = os.getenv("DB_BACKUP_OUTPUT_DIR") or str(STORAGE / "backups")
+DB_BACKUP_KEEP_LOCAL = (os.getenv("DB_BACKUP_KEEP_LOCAL") or "0").strip().lower() in ("1", "true", "yes")
 HOST = os.getenv("HOST") or "0.0.0.0"
 PORT = int(os.getenv("PORT") or "8001")
 DB_TYPE = (os.getenv("DB_TYPE") or "sqlite").strip().lower()

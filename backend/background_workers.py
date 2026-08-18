@@ -4,6 +4,8 @@ import signal
 import threading
 from pathlib import Path
 
+from app.backup_database import backup_storage_enabled, log_backup_storage_status
+from app.database_backup_worker import run_database_backup_loop
 from app.square_snapshot_worker import run_square_snapshot_loop
 
 logger = logging.getLogger(__name__)
@@ -69,9 +71,24 @@ def main() -> None:
 
     signal.signal(signal.SIGINT, handle_stop)
     signal.signal(signal.SIGTERM, handle_stop)
+    log_backup_storage_status(logger.info)
+    if backup_storage_enabled():
+        logger.info("database backup worker enabled")
+    else:
+        logger.info("database backup worker will idle (qiniu backup storage not ready)")
+    backup_thread = threading.Thread(
+        target=run_database_backup_loop,
+        args=(stop,),
+        name="db-backup-worker",
+        daemon=True,
+    )
+    backup_thread.start()
+    logger.info("started workers: backup, square-snapshot")
     try:
         run_square_snapshot_loop(stop)
     finally:
+        stop.set()
+        backup_thread.join(timeout=8)
         lock.release()
 
 

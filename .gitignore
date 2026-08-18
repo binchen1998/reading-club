@@ -29,6 +29,8 @@ storage/club.sqlite
 storage/*.sqlite
 storage/*.sqlite-journal
 backend/.background-workers.lock
+backend/.database-backup-state.json
+storage/backups/
 
 # os / editor
 .DS_Store
