@@ -51,6 +51,7 @@ const recordDone = ref(false)
 const vocabRetries = ref(0)
 const phraseRetries = ref(0)
 const pageGateOpen = ref(false)
+const pageGateConfirm = ref(false)
 const wrongKeys = ref<Record<number, string[]>>({})
 const flowPaused = ref(false)
 const focusItem = ref<Item | null>(null)
@@ -384,6 +385,7 @@ function startActivity(next: 'vocab' | 'phrase' | 'record') {
   if (next === 'phrase' && !phraseQs.value.length) return
   stopAudio()
   pageGateOpen.value = false
+  pageGateConfirm.value = false
   step.value = next
   startStep()
 }
@@ -628,14 +630,16 @@ function goBack() {
   router.back()
 }
 
-function goToBeat(index: number) {
+function goToBeat(index: number, force = false) {
   const max = (lesson.value?.beats?.length || 1) - 1
   if (index < 0 || index > max || index === beatIndex.value) return
-  if (index > beatIndex.value && !pageTasksReady.value) {
+  if (index > beatIndex.value && !pageTasksReady.value && !force) {
     pageGateOpen.value = true
+    pageGateConfirm.value = false
     return
   }
   pageGateOpen.value = false
+  pageGateConfirm.value = false
   clearQuizTimer()
   clearPassTimer()
   if (recording.value) stopRecord()
@@ -688,6 +692,19 @@ function prevPage() {
 
 function nextPage() {
   goToBeat(beatIndex.value + 1)
+}
+
+function closePageGate() {
+  pageGateOpen.value = false
+  pageGateConfirm.value = false
+}
+
+function confirmForceNextPage() {
+  if (!pageGateConfirm.value) {
+    pageGateConfirm.value = true
+    return
+  }
+  goToBeat(beatIndex.value + 1, true)
 }
 
 function clickSentence(i: number) {
@@ -1004,14 +1021,27 @@ onUnmounted(() => {
       @toggle-camera="toggleCamera"
     />
 
-    <ClubDialog :open="pageGateOpen" title="还不能翻页" emoji="🔒" @close="pageGateOpen = false">
+    <ClubDialog :open="pageGateOpen" title="还不能翻页" emoji="🔒" @close="closePageGate">
       <p class="font-bold text-brand-700">本页任务还没做完，先完成这些：</p>
       <ul class="mt-3 space-y-2">
         <li v-for="item in missingTasks" :key="item" class="rounded-2xl bg-brand-50 px-3 py-2 font-extrabold text-candy">
           {{ item }}
         </li>
       </ul>
-      <button class="btn-primary mt-5 w-full" type="button" @click="pageGateOpen = false">知道了</button>
+      <p v-if="pageGateConfirm" class="mt-4 text-center text-sm font-extrabold text-candy">
+        确定不完成任务，强制去下一页？
+      </p>
+      <div class="mt-5 flex flex-col gap-2">
+        <button class="btn-primary w-full" type="button" @click="closePageGate">知道了</button>
+        <button
+          class="w-full rounded-2xl px-4 py-3 text-sm font-extrabold"
+          :class="pageGateConfirm ? 'btn-candy' : 'btn-ghost'"
+          type="button"
+          @click="confirmForceNextPage"
+        >
+          {{ pageGateConfirm ? '确认强制下一页' : '强制下一页' }}
+        </button>
+      </div>
     </ClubDialog>
 
     <ClubDialog :open="!!focusItem" :title="focusItem?.en || ''" emoji="⭐" @close="focusItem = null">
