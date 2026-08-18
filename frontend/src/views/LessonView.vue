@@ -24,7 +24,7 @@ import { ensureOcr, ensureTts } from '../utils/ensureAsset'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
 import { sound } from '../utils/sound'
-import { uploadReading } from '../utils/uploadReading'
+import { saveReadingLocal, setReadingPublic, uploadReadingCloud } from '../utils/uploadReading'
 
 type Item = { en: string; zh: string }
 type Choice = { key: string; text: string; ok: boolean }
@@ -78,8 +78,10 @@ const mergeTitle = ref('正在合成视频')
 const mergeHint = ref('')
 const mergePercent = ref(0)
 const mergeFailed = ref(false)
+const mergePhase = ref<'working' | 'ask-upload' | 'uploading' | 'ask-public' | 'failed'>('working')
 const pageClips = ref<PageClip[]>([])
 let flushingPage = false
+let mergeChoice: ((value: 'skip' | 'upload' | 'private' | 'public') => void) | null = null
 let pageRecorder: { stop: () => Promise<PageClip> } | null = null
 let quizTimer: number | null = null
 let passTimer: number | null = null
@@ -665,15 +667,30 @@ async function scoreBlob(clip: PageClip) {
   }
 }
 
+function waitMergeChoice() {
+  return new Promise<'skip' | 'upload' | 'private' | 'public'>((resolve) => {
+    mergeChoice = resolve
+  })
+}
+
+function pickMerge(value: 'skip' | 'upload' | 'private' | 'public') {
+  const resolve = mergeChoice
+  mergeChoice = null
+  resolve?.(value)
+}
+
 function closeMergeDialog() {
+  if (mergeChoice) pickMerge(mergePhase.value === 'ask-public' ? 'private' : 'skip')
   mergeOpen.value = false
   mergeFailed.value = false
+  mergePhase.value = 'working'
 }
 
 async function flushPageRecording() {
   if (!pageClips.value.length || !beat.value || flushingPage) return
   flushingPage = true
   mergeFailed.value = false
+  mergePhase.value = 'working'
   mergeOpen.value = true
   mergeTitle.value = '正在合成视频'
   mergeHint.value = '多段朗读合成成片需要一点时间，请稍候'
@@ -686,7 +703,18 @@ async function flushPageRecording() {
       mergePercent.value = percent
     })
     merged.score = Math.round(pageClips.value.reduce((sum, item) => sum + item.score, 0) / pageClips.value.length)
-    await uploadReading({
+    pageClips.value = []
+    recordDone.value = true
+    saveProgress({ record_done: true, record_score: merged.score })
+    if (user.isGuest) {
+      uploadHint.value = '本页朗读已保存在本地'
+      mergeTitle.value = '合成完成'
+      mergeHint.value = '本页朗读已保存在本地'
+      mergePercent.value = 100
+      await sleep(400)
+      return
+    }
+    const saved = await saveReadingLocal({
       clip: merged,
       seriesId: String(route.params.seriesId),
       bookSlug: String(route.params.bookSlug),
@@ -695,28 +723,67 @@ async function flushPageRecording() {
       page: beat.value.page,
       onProgress: (text) => {
         uploadHint.value = text
+        mergeTitle.value = '正在保存'
+        mergeHint.value = text
+        mergePercent.value = Math.max(mergePercent.value, 92)
+      },
+    })
+    uploadHint.value = '本页朗读已保存在本地'
+    mergePercent.value = 100
+    if (!saved.canCloud) {
+      mergeTitle.value = '合成完成'
+      mergeHint.value = '本页朗读已保存在本地'
+      await sleep(400)
+      return
+    }
+    mergePhase.value = 'ask-upload'
+    mergeTitle.value = '本页朗读已保存在本地'
+    mergeHint.value = '要上传到云端吗？上传后可以再决定是否公开到广场。'
+    const uploadPick = await waitMergeChoice()
+    if (uploadPick !== 'upload') {
+      uploadHint.value = '本页朗读已保存在本地'
+      return
+    }
+    mergePhase.value = 'uploading'
+    mergeTitle.value = '正在上传'
+    mergeHint.value = '正在上传到云端…'
+    await uploadReadingCloud({
+      id: saved.id,
+      clip: merged,
+      onProgress: (text) => {
+        uploadHint.value = text
         mergeTitle.value = '正在上传'
         mergeHint.value = text
         const m = text.match(/(\d+)\s*%/)
         mergePercent.value = m ? Number(m[1]) : Math.max(mergePercent.value, 92)
       },
     })
-    uploadHint.value = '本页朗读已上传'
-    mergeHint.value = '本页朗读已上传'
     mergePercent.value = 100
-    pageClips.value = []
-    recordDone.value = true
-    await sleep(400)
+    mergePhase.value = 'ask-public'
+    mergeTitle.value = '上传完成'
+    mergeHint.value = '要公开到广场吗？不公开的话只有自己能看。'
+    const publicPick = await waitMergeChoice()
+    if (publicPick === 'public') {
+      await setReadingPublic(saved.id, true)
+      uploadHint.value = '已公开到广场'
+    } else {
+      await setReadingPublic(saved.id, false)
+      uploadHint.value = '已上传，仅自己可见'
+    }
   } catch (err) {
     sound.fail()
-    const msg = err instanceof Error ? err.message : '上传失败'
+    const msg = err instanceof Error ? err.message : '保存失败'
     uploadHint.value = msg
-    mergeTitle.value = '合成失败'
+    mergeTitle.value = mergePhase.value === 'uploading' ? '上传失败' : '合成失败'
     mergeHint.value = msg
     mergeFailed.value = true
+    mergePhase.value = 'failed'
   } finally {
     flushingPage = false
-    if (!mergeFailed.value) mergeOpen.value = false
+    if (!mergeFailed.value) {
+      mergeOpen.value = false
+      mergePhase.value = 'working'
+    }
   }
 }
 
@@ -873,6 +940,7 @@ onUnmounted(() => {
   clearPassTimer()
   clearRecordTimer()
   if (recording.value) stopRecord()
+  if (mergeChoice) pickMerge('skip')
   camera.stop()
   setAssistantExtraBottom(0)
   stopAskStream()
@@ -1115,17 +1183,22 @@ onUnmounted(() => {
         class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
       >
         <div class="card w-full max-w-md px-6 py-6 shadow-pop" role="dialog" aria-modal="true" aria-live="polite">
-          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : '🎬' }}</p>
+          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-public' ? '📣' : mergePhase === 'ask-upload' ? '☁️' : '🎬' }}</p>
           <h2 class="mt-3 text-center text-xl font-extrabold text-brand-700">{{ mergeTitle }}</h2>
           <p class="mt-2 text-center text-sm font-bold text-brand-700/70">{{ mergeHint }}</p>
-          <div class="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
+          <div v-if="mergePhase === 'working' || mergePhase === 'uploading' || mergeFailed" class="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
             <div
               class="h-full rounded-full transition-all duration-300"
               :class="mergeFailed ? 'bg-candy' : 'bg-sunny'"
               :style="{ width: `${mergePercent}%` }"
             />
           </div>
-          <p class="mt-2 text-center text-lg font-black tabular-nums text-brand-700">{{ mergePercent }}%</p>
+          <p
+            v-if="mergePhase === 'working' || mergePhase === 'uploading' || mergeFailed"
+            class="mt-2 text-center text-lg font-black tabular-nums text-brand-700"
+          >
+            {{ mergePercent }}%
+          </p>
           <button
             v-if="mergeFailed"
             class="btn-primary mt-5 w-full"
@@ -1134,6 +1207,14 @@ onUnmounted(() => {
           >
             知道了
           </button>
+          <div v-else-if="mergePhase === 'ask-upload'" class="mt-5 flex flex-col gap-2">
+            <button class="btn-primary w-full" type="button" @click="pickMerge('upload')">上传到云端</button>
+            <button class="btn-ghost w-full" type="button" @click="pickMerge('skip')">先不上传</button>
+          </div>
+          <div v-else-if="mergePhase === 'ask-public'" class="mt-5 flex flex-col gap-2">
+            <button class="btn-primary w-full" type="button" @click="pickMerge('public')">公开到广场</button>
+            <button class="btn-ghost w-full" type="button" @click="pickMerge('private')">仅自己可见</button>
+          </div>
         </div>
       </div>
     </Teleport>

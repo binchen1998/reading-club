@@ -1,7 +1,6 @@
 from datetime import datetime
-from uuid import uuid4
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -25,7 +24,8 @@ class PrepareIn(BaseModel):
     page: int
     duration_sec: int = 0
     mime_type: str = "video/mp4"
-    is_public: bool = True
+    is_public: bool = False
+    storage: str = "local"
 
 
 class CompleteIn(BaseModel):
@@ -33,7 +33,16 @@ class CompleteIn(BaseModel):
     duration_sec: int = 0
     overall_score: int | None = None
     thumb_key: str = ""
-    is_public: bool = True
+    is_public: bool = False
+
+
+class CloudIn(BaseModel):
+    video_key: str
+    thumb_key: str = ""
+
+
+class VisibilityIn(BaseModel):
+    is_public: bool
 
 
 def serialize_recording(row: Recording) -> dict:
@@ -55,13 +64,38 @@ def serialize_recording(row: Recording) -> dict:
         "isPublic": row.is_public,
         "likeCount": row.like_count,
         "completedAt": row.completed_at.isoformat() if row.completed_at else None,
+        "canCloud": qiniu_upload.qiniu_enabled(),
     }
+
+
+def _own_recording(db: Session, practice_id: int, user: User) -> Recording:
+    rec = db.get(Recording, practice_id)
+    if rec is None or rec.username != user.username:
+        raise HTTPException(status_code=404, detail="录音不存在")
+    return rec
+
+
+def _mark_progress(db: Session, rec: Recording) -> None:
+    upsert_progress(
+        db,
+        rec.username,
+        ProgressIn(
+            series_id=rec.series_id,
+            book_slug=rec.book_slug,
+            book_title=rec.book_title,
+            chapter_id=rec.chapter_id,
+            page=rec.page,
+            record_done=True,
+            record_score=rec.overall_score,
+            recording_id=rec.id,
+        ),
+    )
 
 
 @router.post("/prepare")
 def prepare(payload: PrepareIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if is_guest(user.username):
-        raise HTTPException(status_code=403, detail="游客不能上传朗读")
+        raise HTTPException(status_code=403, detail="游客不能保存朗读")
     assert_user_not_muted(user)
     rec = Recording(
         username=user.username,
@@ -73,14 +107,12 @@ def prepare(payload: PrepareIn, user: User = Depends(get_current_user), db: Sess
         page=payload.page,
         lesson_date=shanghai_today(),
         duration_sec=max(0, payload.duration_sec),
-        is_public=payload.is_public,
+        is_public=False,
     )
     db.add(rec)
     db.flush()
-    ext = qiniu_upload.resolve_video_ext("mp4", payload.mime_type)
-    if ext != "mp4":
-        ext = "mp4"
-    if qiniu_upload.qiniu_enabled():
+    use_qiniu = (payload.storage or "local").strip().lower() == "qiniu" and qiniu_upload.qiniu_enabled()
+    if use_qiniu:
         video_key = qiniu_upload.build_practice_key(user.username, rec.id, "mp4")
         thumb_key = qiniu_upload.build_thumb_key(user.username, rec.id, "jpg")
         db.commit()
@@ -108,12 +140,11 @@ def prepare(payload: PrepareIn, user: User = Depends(get_current_user), db: Sess
 async def local_upload(
     practice_id: int,
     file: UploadFile = File(...),
+    overall_score: int = Form(0),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    rec = db.get(Recording, practice_id)
-    if rec is None or rec.username != user.username:
-        raise HTTPException(status_code=404, detail="录音不存在")
+    rec = _own_recording(db, practice_id, user)
     assert_user_not_muted(user)
     if rec.status == "completed":
         raise HTTPException(status_code=400, detail="练习已完成，请勿重复提交")
@@ -123,24 +154,85 @@ async def local_upload(
     dest.write_bytes(await file.read())
     rec.video_key = name
     rec.video_url = f"/media/recordings/{name}"
+    rec.overall_score = max(0, min(100, int(overall_score or 0)))
+    rec.is_public = False
     rec.status = "completed"
     rec.completed_at = datetime.utcnow()
     db.commit()
     db.refresh(rec)
-    upsert_progress(
-        db,
-        user.username,
-        ProgressIn(
-            series_id=rec.series_id,
-            book_slug=rec.book_slug,
-            book_title=rec.book_title,
-            chapter_id=rec.chapter_id,
-            page=rec.page,
-            record_done=True,
-            record_score=rec.overall_score,
-            recording_id=rec.id,
-        ),
-    )
+    _mark_progress(db, rec)
+    invalidate_on_publish(user.username, rec.id)
+    return serialize_recording(rec)
+
+
+@router.post("/{practice_id}/cloud-token")
+def cloud_token(practice_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if is_guest(user.username):
+        raise HTTPException(status_code=403, detail="游客不能上传朗读")
+    assert_user_not_muted(user)
+    rec = _own_recording(db, practice_id, user)
+    if rec.status != "completed":
+        raise HTTPException(status_code=400, detail="请先完成本地保存")
+    if not qiniu_upload.qiniu_enabled():
+        raise HTTPException(status_code=503, detail="未配置七牛，无法上传")
+    video_key = qiniu_upload.build_practice_key(user.username, rec.id, "mp4")
+    thumb_key = qiniu_upload.build_thumb_key(user.username, rec.id, "jpg")
+    return {
+        **serialize_recording(rec),
+        "mode": "qiniu",
+        "upload_host": qiniu_upload.upload_host(),
+        "video_key": video_key,
+        "video": qiniu_upload.create_upload_token(video_key),
+        "thumb_key": thumb_key,
+        "thumb": qiniu_upload.create_upload_token(thumb_key),
+    }
+
+
+@router.post("/{practice_id}/cloud")
+def attach_cloud(
+    practice_id: int,
+    payload: CloudIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if is_guest(user.username):
+        raise HTTPException(status_code=403, detail="游客不能上传朗读")
+    assert_user_not_muted(user)
+    rec = _own_recording(db, practice_id, user)
+    if rec.status != "completed":
+        raise HTTPException(status_code=400, detail="请先完成本地保存")
+    video_key = (payload.video_key or "").strip()
+    if not video_key or not qiniu_upload.practice_key_belongs_to_user(video_key, user.username, practice_id):
+        raise HTTPException(status_code=400, detail="无效的视频 key")
+    thumb_key = (payload.thumb_key or "").strip()
+    if thumb_key and not qiniu_upload.practice_key_belongs_to_user(thumb_key, user.username, practice_id):
+        raise HTTPException(status_code=400, detail="无效的封面 key")
+    rec.video_key = video_key
+    rec.thumb_key = thumb_key
+    rec.video_url = qiniu_upload.cdn_url(video_key)
+    rec.thumb_url = qiniu_upload.cdn_url(thumb_key) if thumb_key else ""
+    db.commit()
+    db.refresh(rec)
+    invalidate_on_publish(user.username, rec.id)
+    return serialize_recording(rec)
+
+
+@router.patch("/{practice_id}/visibility")
+def set_visibility(
+    practice_id: int,
+    payload: VisibilityIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if is_guest(user.username):
+        raise HTTPException(status_code=403, detail="游客不能公开朗读")
+    assert_user_not_muted(user)
+    rec = _own_recording(db, practice_id, user)
+    if rec.status != "completed":
+        raise HTTPException(status_code=400, detail="朗读还没保存完成")
+    rec.is_public = bool(payload.is_public)
+    db.commit()
+    db.refresh(rec)
     invalidate_on_publish(user.username, rec.id)
     return serialize_recording(rec)
 
@@ -155,9 +247,7 @@ def complete(
     if is_guest(user.username):
         raise HTTPException(status_code=403, detail="游客不能上传朗读")
     assert_user_not_muted(user)
-    rec = db.get(Recording, practice_id)
-    if rec is None or rec.username != user.username:
-        raise HTTPException(status_code=404, detail="录音不存在")
+    rec = _own_recording(db, practice_id, user)
     if rec.status == "completed":
         raise HTTPException(status_code=400, detail="练习已完成，请勿重复提交")
     video_key = (payload.video_key or "").strip()
@@ -173,24 +263,11 @@ def complete(
     rec.duration_sec = max(0, int(payload.duration_sec or 0))
     if payload.overall_score is not None:
         rec.overall_score = max(0, min(100, int(payload.overall_score)))
-    rec.is_public = payload.is_public
+    rec.is_public = bool(payload.is_public)
     rec.status = "completed"
     rec.completed_at = datetime.utcnow()
     db.commit()
     db.refresh(rec)
-    upsert_progress(
-        db,
-        user.username,
-        ProgressIn(
-            series_id=rec.series_id,
-            book_slug=rec.book_slug,
-            book_title=rec.book_title,
-            chapter_id=rec.chapter_id,
-            page=rec.page,
-            record_done=True,
-            record_score=rec.overall_score,
-            recording_id=rec.id,
-        ),
-    )
+    _mark_progress(db, rec)
     invalidate_on_publish(user.username, rec.id)
     return serialize_recording(rec)
