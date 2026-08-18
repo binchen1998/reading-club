@@ -17,6 +17,7 @@ LOGGERS = (
     "lesson_gen",
     "prebuild_content",
     "content_reset",
+    "remote_book",
 )
 
 _guard = threading.Lock()
@@ -84,16 +85,20 @@ class WorkerLogHandler(logging.Handler):
 
 def attach_worker_logging() -> None:
     global _attached
-    if _attached:
-        return
-    _attached = True
-    handler = WorkerLogHandler()
-    handler.setLevel(logging.INFO)
+    handler = next(
+        (item for item in logging.getLogger("lesson_worker").handlers if isinstance(item, WorkerLogHandler)),
+        None,
+    )
+    if handler is None:
+        handler = WorkerLogHandler()
+        handler.setLevel(logging.INFO)
     for name in LOGGERS:
         log = logging.getLogger(name)
-        log.addHandler(handler)
+        if not any(isinstance(item, WorkerLogHandler) for item in log.handlers):
+            log.addHandler(handler)
         if log.level == logging.NOTSET or log.level > logging.INFO:
             log.setLevel(logging.INFO)
+    _attached = True
 
 
 def worker_status() -> dict:

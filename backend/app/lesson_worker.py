@@ -230,10 +230,18 @@ def _fill_ocr(series_id: str, book_slug: str, lesson: dict, label: str) -> None:
             logger.exception("background ocr failed %s p%s %s", label, page, preview)
 
 
-def enqueue_lesson_job(series_id: str, book_slug: str, chapter: int):
+def enqueue_lesson_job(series_id: str, book_slug: str, chapter: int, page: int | None = None):
     from .gen_jobs import submit_job
 
     start_lesson_worker()
+    if page is not None:
+        num = int(page)
+        return submit_job(
+            "lesson",
+            f"lesson:{series_id}/{book_slug}/p{num:03d}",
+            {"series_id": series_id, "book_slug": book_slug, "chapter": chapter, "page": num},
+            priority=0,
+        )
     return submit_job(
         "lesson",
         f"lesson:{series_id}/{book_slug}/ch{chapter:02d}",
@@ -289,6 +297,17 @@ def _interactive_loop() -> None:
 
 def _run_interactive(kind: str, payload: dict) -> dict:
     if kind == "lesson":
+        if payload.get("page") is not None:
+            from .lesson_gen import generate_page_lesson
+
+            logger.info(
+                "生成单页课稿 %s/%s p%s",
+                payload.get("series_id"),
+                payload.get("book_slug"),
+                payload.get("page"),
+            )
+            generate_page_lesson(payload["series_id"], payload["book_slug"], int(payload["page"]))
+            return {"exists": True, "page": int(payload["page"])}
         logger.info(
             "生成课稿 %s/%s/ch%02d",
             payload.get("series_id"),

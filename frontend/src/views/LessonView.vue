@@ -88,6 +88,7 @@ let quizTimer: number | null = null
 let passTimer: number | null = null
 let recordTimer: number | null = null
 let playGen = 0
+let pagePrepGen = 0
 const explainPlaying = ref(false)
 const explainPaused = ref(false)
 
@@ -828,6 +829,110 @@ function goBack() {
   router.back()
 }
 
+function lessonApiPath() {
+  return `/api/lessons/${route.params.seriesId}/${route.params.bookSlug}/${route.params.chapterId}`
+}
+
+function cdnPageImage(page: number) {
+  return `/media/cdn/${route.params.seriesId}/${route.params.bookSlug}/${page}.jpg`
+}
+
+function emptyBeat(page: number) {
+  return {
+    page,
+    image: cdnPageImage(page),
+    english: '',
+    translate: '',
+    explain: '',
+    generated: false,
+    words: [],
+    phrases: [],
+    segments: [],
+    word_items: [],
+    phrase_items: [],
+    ocr: [],
+  }
+}
+
+function showStubPage(page: number) {
+  data.value = {
+    lesson: {
+      chapter: 1,
+      title: '',
+      title_zh: '',
+      beats: [emptyBeat(page)],
+      word_bank: [],
+      phrase_bank: [],
+    },
+  }
+  beatIndex.value = 0
+}
+
+function beatNeedsLesson(row: { english?: string; generated?: boolean; explain?: string } | null | undefined) {
+  if (!row) return false
+  if (!String(row.english || '').trim()) return false
+  if (row.generated) return false
+  if (String(row.explain || '').trim()) return false
+  return true
+}
+
+async function requestPageLesson(page: number, withDialog: boolean) {
+  const path = lessonApiPath()
+  if (withDialog) {
+    beginGenerate('讲解')
+    await waitGenerateShown()
+  }
+  try {
+    const job = (await apiPost(`${path}/generate?page=${page}`)) as { exists?: boolean; job_id?: string }
+    if (job?.job_id && !job.exists) await waitJobResult(job.job_id)
+  } finally {
+    if (withDialog) endGenerate()
+  }
+}
+
+async function refreshLesson() {
+  const page = Number(beat.value?.page ?? route.query.page)
+  data.value = await api(lessonApiPath())
+  if (Number.isFinite(page)) {
+    const idx = (data.value?.lesson?.beats || []).findIndex(
+      (item: { page?: number }) => Number(item.page) === page,
+    )
+    if (idx >= 0) beatIndex.value = idx
+  }
+}
+
+async function requestNextPageLesson() {
+  const next = lesson.value?.beats?.[beatIndex.value + 1]
+  if (!next || !beatNeedsLesson(next)) return
+  const page = Number(next.page)
+  if (!Number.isFinite(page)) return
+  try {
+    await apiPost(`${lessonApiPath()}/generate?page=${page}`)
+  } catch {
+    /* 下一页预生成失败不影响本页 */
+  }
+}
+
+async function prepareOpenedPage() {
+  const gen = ++pagePrepGen
+  await nextTick()
+  await waitGenerateShown()
+  if (gen !== pagePrepGen) return
+  const current = beat.value
+  if (!current) return
+  if (beatNeedsLesson(current)) {
+    await requestPageLesson(Number(current.page), true)
+    if (gen !== pagePrepGen) return
+    await refreshLesson()
+    if (gen !== pagePrepGen) return
+  }
+  await loadPageProgress()
+  if (gen !== pagePrepGen) return
+  startStep()
+  saveCursor()
+  void requestNextPageLesson()
+}
+
 function goToBeat(index: number, force = false) {
   const max = (lesson.value?.beats?.length || 1) - 1
   if (index < 0 || index > max || index === beatIndex.value) return
@@ -849,9 +954,7 @@ function goToBeat(index: number, force = false) {
   focusItem.value = null
   beatIndex.value = index
   step.value = 'explain'
-  startStep()
-  void loadPageProgress()
-  saveCursor()
+  void prepareOpenedPage()
 }
 
 async function loadPageProgress() {
@@ -961,28 +1064,12 @@ watch(
 )
 
 onMounted(async () => {
-  const path = `/api/lessons/${route.params.seriesId}/${route.params.bookSlug}/${route.params.chapterId}`
-  const check = (await api(`${path}?check=1`)) as { exists?: boolean }
-  if (!check?.exists) {
-    beginGenerate('讲解')
-    await waitGenerateShown()
-    try {
-      const job = (await apiPost(`${path}/generate`)) as { exists?: boolean; job_id?: string }
-      if (job?.job_id && !job.exists) await waitJobResult(job.job_id)
-    } catch (err) {
-      endGenerate()
-      throw err
-    }
-  }
-  try {
-    data.value = await api(path)
-  } finally {
-    endGenerate()
-  }
+  const initialPage = Number(route.query.page || 1) || 1
+  showStubPage(initialPage)
+  await nextTick()
+  data.value = await api(lessonApiPath())
   applyResumePage()
-  await loadPageProgress()
-  startStep()
-  saveCursor()
+  await prepareOpenedPage()
 })
 
 onUnmounted(() => {

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import threading
 import urllib.error
 import urllib.parse
@@ -11,6 +12,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import lru_cache
 
 from .config import CATALOG, STORAGE
+
+logger = logging.getLogger("remote_book")
 
 CDN_UA = "reading-club/1.0"
 MAX_PAGES = 200
@@ -112,6 +115,25 @@ def page_paddle(series_id: str, book_slug: str, page: int):
     return fetch_json(page_urls(series_id, book_slug, page)["paddle"])
 
 
+def load_one_page(series_id: str, book_slug: str, page: int) -> dict | None:
+    if not book_exists(series_id, book_slug):
+        return None
+    n = int(page)
+    payload = fetch_json(page_urls(series_id, book_slug, n)["json"])
+    if payload is None:
+        return None
+    english = (payload.get("学习内容") or "").strip()
+    return {
+        "page": n,
+        "image": page_urls(series_id, book_slug, n)["image"],
+        "json": page_urls(series_id, book_slug, n)["json"],
+        "guide": (payload.get("导读") or "").strip(),
+        "english": english,
+        "translate": (payload.get("翻译") or "").strip(),
+        "has_text": bool(english),
+    }
+
+
 def _cache_path(series_id: str, book_slug: str):
     return META_DIR / series_id / f"{book_slug}.json"
 
@@ -158,6 +180,7 @@ def _fetch_book(series_id: str, book_slug: str) -> dict:
     if not book:
         raise FileNotFoundError(f"书目里没有 {series_id}/{book_slug}")
     base = pages_base_url(series_id, book.get("name") or "")
+    logger.info("开始拉原站书页 %s/%s %s", series_id, book_slug, base)
     found: dict[int, dict] = {}
     stop_at = MAX_PAGES
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -172,6 +195,7 @@ def _fetch_book(series_id: str, book_slug: str) -> dict:
                 else:
                     missing = True
                     stop_at = min(stop_at, idx)
+            logger.info("原站书页 %s/%s 已取 %s 页", series_id, book_slug, len(found))
             if missing:
                 if n == 0 and stop_at == 0:
                     stop_at = MAX_PAGES
@@ -180,6 +204,7 @@ def _fetch_book(series_id: str, book_slug: str) -> dict:
                 break
             n += 8
     pages = [found[i] for i in sorted(found) if i < stop_at]
+    logger.info("原站书页完成 %s/%s pages=%s", series_id, book_slug, len(pages))
     return {
         "series_id": series_id,
         "slug": book_slug,
@@ -194,6 +219,7 @@ def _fetch_book(series_id: str, book_slug: str) -> dict:
 def load_book(series_id: str, book_slug: str) -> dict:
     cached = peek_book(series_id, book_slug)
     if cached:
+        logger.info("使用缓存书页 %s/%s pages=%s", series_id, book_slug, len(cached.get("pages") or []))
         return cached
     data = _fetch_book(series_id, book_slug)
     key = f"{series_id}/{book_slug}"

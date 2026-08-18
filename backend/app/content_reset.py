@@ -240,6 +240,17 @@ def clear_generated(
             pages = pages | extra_pages
             path.unlink()
             lessons += 1
+        page_dir = LESSONS / sid / slug
+        if page_dir.exists():
+            for file in page_dir.glob("p*.json"):
+                try:
+                    page_no = int(file.stem[1:])
+                except ValueError:
+                    continue
+                if pages and page_no not in pages:
+                    continue
+                file.unlink(missing_ok=True)
+                lessons += 1
         forget_chapter(sid, slug, num)
         ocr_files += _delete_ocr(sid, slug, pages if chapter else None)
         grouped.setdefault((sid, slug), set()).update(pages)
