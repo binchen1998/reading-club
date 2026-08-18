@@ -22,3 +22,11 @@ export function recordReportIcon(done: boolean, score?: number) {
   const n = Number(score || 0)
   return n ? String(n) : '✓'
 }
+
+export function quizReportLabel(kind: string, done: boolean, retries?: number) {
+  return `${kind}：${quizReportText(done, retries)}`
+}
+
+export function recordReportLabel(done: boolean, score?: number) {
+  return `朗读：${recordReportText(done, score)}`
+}
