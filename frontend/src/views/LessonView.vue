@@ -487,14 +487,6 @@ function pickOption(key: string) {
     }
     return
   }
-  if (item) {
-    apiPost('/api/wrongbook/resolve', {
-      kind: step.value === 'phrase' ? 'phrase' : 'vocab',
-      en: item.en,
-      zh: item.zh,
-      ...pageMeta(),
-    }).catch(() => undefined)
-  }
   celebrating.value = true
   const lastItem = quizCursor.value >= currentQuiz.value.length - 1
   const alreadyDone = step.value === 'phrase' ? phraseDone.value : vocabDone.value

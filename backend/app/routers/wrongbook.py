@@ -26,6 +26,10 @@ class WrongIn(BaseModel):
     page: int = 0
 
 
+class ResolveIn(BaseModel):
+    id: int
+
+
 def serialize_wrong(row: WrongItem) -> dict:
     return {
         "id": row.id,
@@ -89,21 +93,11 @@ def add_wrong(payload: WrongIn, user: User = Depends(get_current_user), db: Sess
 
 
 @router.post("/resolve")
-def resolve_wrong(payload: WrongIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    kind = "phrase" if payload.kind == "phrase" else "vocab"
-    en = payload.en.strip()[:120]
-    row = db.execute(
-        select(WrongItem).where(
-            WrongItem.username == user.username,
-            WrongItem.kind == kind,
-            WrongItem.en == en,
-            WrongItem.series_id == payload.series_id,
-            WrongItem.book_slug == payload.book_slug,
-            WrongItem.chapter_id == payload.chapter_id,
-            WrongItem.page == payload.page,
-        )
-    ).scalar_one_or_none()
-    if row and row.resolved_at is None:
+def resolve_wrong(payload: ResolveIn, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    row = db.get(WrongItem, int(payload.id))
+    if row is None or row.username != user.username:
+        return {"ok": False}
+    if row.resolved_at is None:
         row.resolved_at = datetime.utcnow()
         db.commit()
         invalidate_wrong(user.username)

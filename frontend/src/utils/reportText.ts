@@ -10,3 +10,15 @@ export function recordReportText(done: boolean, score?: number) {
   const n = Number(score || 0)
   return n ? `已录 ${n}分` : '已录'
 }
+
+export function quizReportIcon(done: boolean, retries?: number) {
+  if (!done) return '○'
+  const n = Number(retries || 0)
+  return n <= 0 ? '✓' : `🔁${n}`
+}
+
+export function recordReportIcon(done: boolean, score?: number) {
+  if (!done) return '○'
+  const n = Number(score || 0)
+  return n ? String(n) : '✓'
+}
