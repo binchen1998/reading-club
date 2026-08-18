@@ -191,6 +191,11 @@ function startOcrJob(payload: OcrPayload): AssetJob<Array<Record<string, unknown
   return job
 }
 
+export function hasCachedTts(text: string): boolean {
+  const value = (text || '').trim()
+  return !!value && ttsCache.has(value)
+}
+
 export async function ensureTts(text: string, purpose: string, opts?: EnsureOpts): Promise<string> {
   const value = (text || '').trim()
   if (!value) return ''

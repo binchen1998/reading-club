@@ -19,7 +19,7 @@ import { concatClips } from '../utils/concatClips'
 import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
-import { ensureOcr, ensureTts, prefetchPageAssets } from '../utils/ensureAsset'
+import { ensureOcr, ensureTts, hasCachedTts, prefetchPageAssets } from '../utils/ensureAsset'
 import { waitJobResult } from '../utils/jobSse'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
@@ -53,6 +53,7 @@ const vocabRetries = ref(0)
 const phraseRetries = ref(0)
 const explainBusy = ref(false)
 const explainBusyError = ref('')
+const explainWaitingTts = ref(false)
 const wrongKeys = ref<Record<number, string[]>>({})
 const flowPaused = ref(false)
 const focusItem = ref<Item | null>(null)
@@ -263,6 +264,7 @@ function stopAudio() {
   playGen += 1
   explainPlaying.value = false
   explainPaused.value = false
+  explainWaitingTts.value = false
   stopSpeak()
   stopAssistantSpeak()
   if (live) {
@@ -313,7 +315,14 @@ async function playOne(text: string, purpose?: string): Promise<void> {
   const label =
     purpose ||
     (step.value === 'phrase' ? '短语发音' : step.value === 'vocab' ? '单词发音' : '讲解音频')
-  const url = await ensureTts(text, label, step.value === 'explain' ? { silent: true } : undefined)
+  const silent = step.value === 'explain'
+  if (silent && !hasCachedTts(text)) explainWaitingTts.value = true
+  let url = ''
+  try {
+    url = await ensureTts(text, label, silent ? { silent: true } : undefined)
+  } finally {
+    if (gen === playGen) explainWaitingTts.value = false
+  }
   if (!url || gen !== playGen) return
   await new Promise<void>((resolve) => {
     const audio = new Audio(url)
@@ -1144,6 +1153,9 @@ onUnmounted(() => {
               秒
             </label>
           </div>
+          <p v-if="explainWaitingTts" class="text-[11px] font-bold text-brand-600/70 lg:text-xs">
+            正在等待朗读...
+          </p>
           <div class="max-h-[28vh] space-y-2 overflow-y-auto pr-1 lg:max-h-[42vh]">
             <div
               v-if="explainBusy"
