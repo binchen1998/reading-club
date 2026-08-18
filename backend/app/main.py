@@ -18,6 +18,7 @@ from .routers import (
     reports,
     share,
     square,
+    teaching,
     users,
     wrongbook,
 )
@@ -53,6 +54,7 @@ app.include_router(practice.router)
 app.include_router(wrongbook.router)
 app.include_router(square.router)
 app.include_router(profile.router)
+app.include_router(teaching.router)
 app.get("/share/{rec_id}")(share_page)
 app.mount("/media/books", StaticFiles(directory=BOOKS), name="books")
 app.mount("/media/audio", StaticFiles(directory=AUDIO), name="audio")

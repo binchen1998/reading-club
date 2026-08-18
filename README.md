@@ -83,6 +83,22 @@ npm run deploy          # 生成本地 dist，并上传 JS/CSS 到七牛（HTML 
 
 生产只跑 uvicorn 即可（服务 `frontend/dist`，由服务器 `npm run deploy` 生成，不进 git）。
 
+## 预生成课稿 / TTS / OCR
+
+不要在对话里替你跑。书先下载到 `content/books`，再指定范围：
+
+```powershell
+cd D:\git\reading-club
+$env:PYTHONPATH = "D:\git\reading-club"
+python -m scripts.prebuild_content --all
+python -m scripts.prebuild_content --series NateTheGreat
+python -m scripts.prebuild_content --series NateTheGreat --book hungry-book-club
+python -m scripts.prebuild_content --series NateTheGreat --book "Hungry Book Club" --chapter 1
+python -m scripts.prebuild_content --series NateTheGreat --book hungry-book-club --only tts
+```
+
+`--only` 可以是 `all`（默认，课稿+TTS+OCR）、`lesson`、`tts`、`ocr`。已有 `ch01.json` 默认不覆盖，加 `--force` 才重生成。生成课稿时会看上一页没写完的半句和下一页开头，避免把跨页句子拆错。需要 `QWEN_API_KEY`。
+
 ## 下载更多书
 
 ```powershell

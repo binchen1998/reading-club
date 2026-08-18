@@ -6,6 +6,9 @@ const assetBase = process.env.VITE_ASSET_BASE || '/'
 export default defineConfig({
   plugins: [vue()],
   base: assetBase.endsWith('/') ? assetBase : `${assetBase}/`,
+  optimizeDeps: {
+    include: ['pixi.js', 'pixi-live2d-display'],
+  },
   server: {
     port: 5174,
     proxy: {

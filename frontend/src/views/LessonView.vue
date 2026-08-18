@@ -3,10 +3,13 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { api, apiPost } from '../api'
+import AiAskListenFab from '../components/AiAskListenFab.vue'
+import AssistantLive2dPip from '../components/AssistantLive2dPip.vue'
 import BookStage from '../components/BookStage.vue'
 import ClubDialog from '../components/ClubDialog.vue'
 import TextPopup from '../components/TextPopup.vue'
 import { recognizeAudio } from '../utils/asr'
+import { speakAssistantText, stopAssistantSpeak } from '../utils/assistantTts'
 import { concatClips } from '../utils/concatClips'
 import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
@@ -89,6 +92,13 @@ const dictBanks = computed<DictItem[]>(() => [
   ...(beat.value?.phrase_items || []),
 ])
 const textPopup = ref('')
+const askListening = ref(false)
+const askStream = ref<MediaStream | null>(null)
+const askBusy = ref(false)
+const askError = ref('')
+const chatHistory = ref<{ role: 'user' | 'assistant'; content: string }[]>([])
+let askRecorder: MediaRecorder | null = null
+let askChunks: Blob[] = []
 const stepLabel = computed(() => {
   const labels = {
     explain: '讲解',
@@ -130,9 +140,69 @@ function markSentence(text: string) {
   markNeedles(needlesOf(text, beat.value?.word_items || [], beat.value?.phrase_items || []))
 }
 
+function stopAskStream() {
+  askRecorder = null
+  askChunks = []
+  askStream.value?.getTracks().forEach((track) => track.stop())
+  askStream.value = null
+  askListening.value = false
+}
+
+async function startAsk() {
+  if (askBusy.value || askListening.value) return
+  stopAudio()
+  stopAssistantSpeak()
+  askError.value = ''
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+  askStream.value = stream
+  askChunks = []
+  const recorder = new MediaRecorder(stream)
+  askRecorder = recorder
+  recorder.ondataavailable = (ev) => {
+    if (ev.data.size) askChunks.push(ev.data)
+  }
+  recorder.start()
+  askListening.value = true
+}
+
+async function finishAsk() {
+  if (!askRecorder) return
+  askBusy.value = true
+  const recorder = askRecorder
+  const blob = await new Promise<Blob>((resolve) => {
+    recorder.onstop = () => resolve(new Blob(askChunks, { type: recorder.mimeType || 'audio/webm' }))
+    if (recorder.state !== 'inactive') recorder.stop()
+    else resolve(new Blob(askChunks, { type: 'audio/webm' }))
+  })
+  stopAskStream()
+  try {
+    const heard = await recognizeAudio(blob, 'zh')
+    if (!heard) throw new Error('没听清，再说一次')
+    const res = await apiPost('/api/teaching/chat', {
+      book_title: lesson.value?.title || '',
+      current_page_number: beat.value?.page,
+      current_english: beat.value?.english || '',
+      current_script: beat.value?.explain || '',
+      student_text: heard,
+      messages: chatHistory.value,
+    })
+    chatHistory.value = [
+      ...chatHistory.value,
+      { role: 'user', content: heard },
+      { role: 'assistant', content: res.reply },
+    ].slice(-20)
+    await speakAssistantText(res.reply)
+  } catch (e: any) {
+    askError.value = e?.message || '助教暂时没听清'
+  } finally {
+    askBusy.value = false
+  }
+}
+
 function stopAudio() {
   playGen += 1
   stopSpeak()
+  stopAssistantSpeak()
   if (live) {
     live.pause()
     live.src = ''
@@ -547,6 +617,7 @@ onUnmounted(() => {
   clearPassTimer()
   clearRecordTimer()
   if (recording.value) stopRecord()
+  stopAskStream()
   stopAudio()
 })
 </script>
@@ -801,5 +872,21 @@ onUnmounted(() => {
       :banks="dictBanks"
       @close="closeTextPopup"
     />
+
+    <AssistantLive2dPip :visible="true" />
+    <AiAskListenFab
+      :visible="true"
+      :listening="askListening"
+      :stream="askStream"
+      :disabled="askBusy || recording"
+      @ask="startAsk"
+      @finish="finishAsk"
+    />
+    <p
+      v-if="askError || askBusy"
+      class="pointer-events-none fixed bottom-24 left-1/2 z-[93] -translate-x-1/2 rounded-full bg-white/95 px-4 py-1.5 text-xs font-extrabold text-candy shadow-pop"
+    >
+      {{ askBusy ? '助教正在想…' : askError }}
+    </p>
   </div>
 </template>
