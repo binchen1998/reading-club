@@ -18,6 +18,7 @@ from backend.app.qiniu_upload import (
     qiniu_enabled,
     qiniu_put_bytes,
     series_cover_key,
+    with_cdn_timestamp,
 )
 from backend.app.remote_book import book_slug_of, catalog_series, page_image_bytes
 
@@ -81,7 +82,8 @@ def main() -> None:
         image = _cover_bytes(series_id, slug, page)
         key = series_cover_key(series_id, pick.get("version") or "")
         qiniu_put_bytes(key, image, mime_type="image/jpeg")
-        cover_url = cdn_url(key)
+        stamp = int(datetime.now(timezone.utc).timestamp())
+        cover_url = with_cdn_timestamp(cdn_url(key), stamp)
         items.append(
             {
                 "id": series_id,

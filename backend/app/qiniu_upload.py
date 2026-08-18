@@ -100,6 +100,13 @@ def cdn_url(key: str) -> str:
     return f"https://{domain}/{key}"
 
 
+def with_cdn_timestamp(url: str, ts: int | None = None) -> str:
+    if not url:
+        return ""
+    stamp = int(ts if ts is not None else time.time())
+    return f"{url.split('?', 1)[0]}?t={stamp}"
+
+
 def create_upload_token(key: str, expires: int = 3600) -> dict:
     if not qiniu_enabled():
         raise RuntimeError("七牛未配置，无法上传")
@@ -164,8 +171,10 @@ def qiniu_put_bytes(key: str, data: bytes, mime_type: str | None = None) -> None
         raise RuntimeError(f"七牛上传失败: {getattr(info, 'text_body', info)}")
 
 
-def qiniu_get_bytes(key: str) -> bytes | None:
+def qiniu_get_bytes(key: str, cache_bust: bool = False) -> bytes | None:
     url = cdn_url(key)
+    if cache_bust:
+        url = with_cdn_timestamp(url)
     if not url:
         return None
     import requests

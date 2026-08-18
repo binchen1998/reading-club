@@ -8,7 +8,7 @@ from ..book_pages import split_chapters
 from ..config import CATALOG
 from ..db import get_db
 from ..models import User
-from ..qiniu_upload import covers_json_key, qiniu_get_bytes
+from ..qiniu_upload import covers_json_key, qiniu_get_bytes, with_cdn_timestamp
 from ..remote_book import book_slug_of, page_image_url, peek_book
 from ..routers.progress import book_cursors_for_series, serialize_cursor
 
@@ -68,7 +68,7 @@ def series_detail(
 
 
 def _qiniu_covers() -> dict[str, str]:
-    raw = qiniu_get_bytes(covers_json_key())
+    raw = qiniu_get_bytes(covers_json_key(), cache_bust=True)
     if not raw:
         return {}
     try:
@@ -80,7 +80,7 @@ def _qiniu_covers() -> dict[str, str]:
         series_id = str(item.get("id") or "").strip()
         cover = str(item.get("cover") or "").strip()
         if series_id and cover:
-            covers[series_id] = cover
+            covers[series_id] = with_cdn_timestamp(cover)
     return covers
 
 
