@@ -37,6 +37,15 @@ const emit = defineEmits<{
       <div
         class="pointer-events-auto mx-auto flex min-h-[4.5rem] max-w-[1400px] flex-wrap items-center gap-3 rounded-3xl border border-white/50 bg-white/55 px-3 py-3 shadow-[0_10px_32px_rgba(15,23,42,0.16)] backdrop-blur-md sm:min-h-[5.25rem] sm:gap-4 sm:px-5 sm:py-4"
       >
+        <div data-camera-pip-anchor class="relative z-20 shrink-0">
+          <button
+            class="chip shrink-0 bg-white/80 px-3 py-1.5 text-sm text-brand-700 sm:text-base"
+            type="button"
+            @click="emit('toggleCamera')"
+          >
+            {{ cameraStarting ? '📷 打开中…' : cameraEnabled ? '📷 关摄像头' : '📷 开摄像头' }}
+          </button>
+        </div>
         <span class="chip shrink-0 bg-brand-100/90 px-3 py-1.5 text-sm text-brand-700 sm:text-base">
           第 {{ segIndex + 1 }} / {{ segCount }} 段
         </span>
@@ -71,14 +80,7 @@ const emit = defineEmits<{
           <span v-if="lastHeard" class="font-bold text-brand-700/50"> · 听到：{{ lastHeard }}</span>
         </p>
 
-        <div data-camera-pip-anchor class="relative z-20 ml-auto flex shrink-0 items-center gap-2">
-          <button
-            class="chip shrink-0 bg-white/80 px-3 py-1.5 text-sm text-brand-700 sm:text-base"
-            type="button"
-            @click="emit('toggleCamera')"
-          >
-            {{ cameraStarting ? '📷 打开中…' : cameraEnabled ? '📷 关摄像头' : '📷 开摄像头' }}
-          </button>
+        <div class="relative z-20 ml-auto flex shrink-0 items-center gap-2">
           <button
             v-if="!recording && !busy"
             class="btn-candy px-4 py-2 text-sm sm:px-5 sm:py-2.5 sm:text-base"
