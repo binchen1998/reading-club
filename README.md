@@ -6,6 +6,22 @@
 - **后端**：FastAPI 托管 `frontend/dist`（生产只跑 uvicorn）
 - **部署**：服务器 `npm run deploy` 构建并把 JS/CSS 传到七牛，HTML 仍由 FastAPI 提供
 
+## 数据库
+
+启动过程**不会**建库建表。请先手工建好 MySQL 库和用户，再单独跑迁移：
+
+```powershell
+cd D:\git\reading-club\backend
+# backend/.env 里设置：
+# DB_TYPE=mysql
+# MYSQL_URL=mysql+aiomysql://reading_club:你的密码@localhost/reading_club?charset=utf8mb4
+python -m migrations.run
+```
+
+也可分步：`python -m migrations.0001_init`，再 `python -m migrations.0002_user_muted_asset_preview`。
+
+本地仍可用 SQLite：`DB_TYPE=sqlite`（默认），同样要先跑一次迁移。
+
 ## 启动
 
 后端（conda 环境即可）：

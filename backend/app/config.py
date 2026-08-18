@@ -40,6 +40,22 @@ QINIU_ASSET_PREFIX = os.getenv("QINIU_ASSET_PREFIX") or "reading-club/assets"
 QINIU_FRONTEND_PREFIX = (os.getenv("QINIU_FRONTEND_PREFIX") or os.getenv("QINIU_DEPLOY_PREFIX") or "reading-club").strip().strip("/")
 HOST = os.getenv("HOST") or "0.0.0.0"
 PORT = int(os.getenv("PORT") or "8001")
+DB_TYPE = (os.getenv("DB_TYPE") or "sqlite").strip().lower()
+SQLITE_FILE = (os.getenv("SQLITE_FILE") or "").strip() or str(STORAGE / "club.sqlite")
+MYSQL_URL = (os.getenv("MYSQL_URL") or "").strip()
+
+
+def sync_db_url() -> str:
+    if DB_TYPE == "mysql":
+        if not MYSQL_URL:
+            raise RuntimeError("DB_TYPE=mysql 但未设置 MYSQL_URL")
+        return (
+            MYSQL_URL.replace("mysql+aiomysql://", "mysql+pymysql://", 1)
+            .replace("mysql+asyncmy://", "mysql+pymysql://", 1)
+        )
+    return f"sqlite:///{SQLITE_FILE}"
+
+
 JWT_SECRET = os.getenv("JWT_SECRET") or "reading_club_jwt_secret_2026"
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME") or "admin"
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD") or "coding61"

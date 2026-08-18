@@ -4,7 +4,6 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import AUDIO, BOOKS, HOST, PORT, RECORDINGS, ROOT
-from .db import init_db
 from .routers import (
     admin,
     assets,
@@ -38,7 +37,6 @@ app.add_middleware(
 
 AUDIO.mkdir(parents=True, exist_ok=True)
 RECORDINGS.mkdir(parents=True, exist_ok=True)
-init_db()
 
 app.include_router(catalog.router)
 app.include_router(lessons.router)
