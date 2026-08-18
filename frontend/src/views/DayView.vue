@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { api } from '../api'
+import { quizReportText, recordReportText } from '../utils/reportText'
 
 const route = useRoute()
 const date = String(route.query.date || '')
@@ -22,9 +23,9 @@ onMounted(async () => {
     <div v-for="item in items" :key="`${item.bookSlug}-${item.page}`" class="card">
       <p class="font-extrabold text-brand-700">{{ item.bookTitle }} · 第 {{ item.page }} 页</p>
       <p class="font-bold text-brand-600">
-        单词 {{ item.vocabDone ? '已完成' : '未做' }} ·
-        短语 {{ item.phraseDone ? '已完成' : '未做' }} ·
-        朗读 {{ item.recordDone ? `已录 ${item.recordScore}分` : '未录' }}
+        单词 {{ quizReportText(item.vocabDone, item.vocabRetries) }} ·
+        短语 {{ quizReportText(item.phraseDone, item.phraseRetries) }} ·
+        朗读 {{ recordReportText(item.recordDone, item.recordScore) }}
       </p>
     </div>
   </div>

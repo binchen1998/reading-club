@@ -199,6 +199,8 @@ def day_report(date: str = Query(...), user: User = Depends(get_current_user), d
                 "page": row.page,
                 "vocabDone": row.vocab_done,
                 "phraseDone": row.phrase_done,
+                "vocabRetries": row.vocab_retries,
+                "phraseRetries": row.phrase_retries,
                 "recordDone": row.record_done,
                 "recordScore": row.record_score,
                 "recordingId": row.recording_id,

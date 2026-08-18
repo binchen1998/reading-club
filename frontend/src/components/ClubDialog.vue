@@ -96,7 +96,7 @@ const cardStyle = computed(() => {
           class="card relative w-full"
           :class="[
             wide ? 'max-w-2xl' : 'max-w-md',
-            dock === 'bottom' || dock === 'side' || pos ? 'pointer-events-auto shadow-pop' : '',
+            'pointer-events-auto shadow-pop',
             fixed && dock === 'side' && !pos ? 'flex max-h-[40vh] flex-col overflow-hidden lg:h-[32rem] lg:max-h-[32rem]' : '',
             fixed && dock !== 'side' && !pos ? 'flex h-[32rem] flex-col overflow-hidden' : '',
             !fixed ? 'max-h-[88vh] overflow-y-auto' : '',

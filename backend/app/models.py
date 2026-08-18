@@ -42,6 +42,8 @@ class PageProgress(Base):
     lesson_date: Mapped[date] = mapped_column(Date, index=True)
     vocab_done: Mapped[bool] = mapped_column(Boolean, default=False)
     phrase_done: Mapped[bool] = mapped_column(Boolean, default=False)
+    vocab_retries: Mapped[int] = mapped_column(Integer, default=0)
+    phrase_retries: Mapped[int] = mapped_column(Integer, default=0)
     record_done: Mapped[bool] = mapped_column(Boolean, default=False)
     record_score: Mapped[int] = mapped_column(Integer, default=0)
     recording_id: Mapped[int] = mapped_column(Integer, default=0)

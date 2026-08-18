@@ -40,6 +40,15 @@ const submitted = ref(false)
 const quizCursor = ref(0)
 const quizRevealed = ref(false)
 const celebrating = ref(false)
+const quizHadWrong = ref(false)
+const quizNeedRetry = ref(false)
+const quizSeed = ref(0)
+const vocabDone = ref(false)
+const phraseDone = ref(false)
+const recordDone = ref(false)
+const vocabRetries = ref(0)
+const phraseRetries = ref(0)
+const pageGateHint = ref('')
 const wrongKeys = ref<Record<number, string[]>>({})
 const flowPaused = ref(false)
 const focusItem = ref<Item | null>(null)
@@ -71,8 +80,30 @@ const beat = computed(() => lesson.value?.beats?.[beatIndex.value])
 const firstBeat = computed(() => beatIndex.value <= 0)
 const lastBeat = computed(() => beatIndex.value >= (lesson.value?.beats?.length || 1) - 1)
 const sentences = computed(() => splitSentences(beat.value?.explain || ''))
-const vocabQs = computed(() => makeQuiz(beat.value?.word_items || [], lesson.value?.word_bank || []))
-const phraseQs = computed(() => makeQuiz(beat.value?.phrase_items || [], lesson.value?.phrase_bank || []))
+const vocabQs = computed(() => {
+  void quizSeed.value
+  return makeQuiz(beat.value?.word_items || [], lesson.value?.word_bank || [])
+})
+const phraseQs = computed(() => {
+  void quizSeed.value
+  return makeQuiz(beat.value?.phrase_items || [], lesson.value?.phrase_bank || [])
+})
+const needVocab = computed(() => (beat.value?.word_items || []).length > 0)
+const needPhrase = computed(() => (beat.value?.phrase_items || []).length > 0)
+const needRecord = computed(() => mergeShortSegments(beat.value?.segments || []).length > 0)
+const pageTasksReady = computed(() => {
+  if (needVocab.value && !vocabDone.value) return false
+  if (needPhrase.value && !phraseDone.value) return false
+  if (needRecord.value && !recordDone.value) return false
+  return true
+})
+const missingTasks = computed(() => {
+  const miss: string[] = []
+  if (needVocab.value && !vocabDone.value) miss.push('词汇全对')
+  if (needPhrase.value && !phraseDone.value) miss.push('短语全对')
+  if (needRecord.value && !recordDone.value) miss.push('朗读录成功')
+  return miss
+})
 const currentQuiz = computed(() => (step.value === 'vocab' ? vocabQs.value : phraseQs.value))
 const currentQuestion = computed(() => currentQuiz.value[quizCursor.value])
 const pageSegments = computed(() => mergeShortSegments(beat.value?.segments || []))
@@ -318,6 +349,8 @@ function startStep() {
   quizCursor.value = 0
   quizRevealed.value = false
   celebrating.value = false
+  quizHadWrong.value = false
+  quizNeedRetry.value = false
   wrongKeys.value = {}
   clearQuizTimer()
   clearRecordTimer()
@@ -341,6 +374,7 @@ function startActivity(next: 'vocab' | 'phrase' | 'record') {
   if (next === 'vocab' && !vocabQs.value.length) return
   if (next === 'phrase' && !phraseQs.value.length) return
   stopAudio()
+  pageGateHint.value = ''
   step.value = next
   startStep()
 }
@@ -363,6 +397,7 @@ function pickOption(key: string) {
   const item = currentQuestion.value?.item
   if (!opt?.ok) {
     sound.fail()
+    quizHadWrong.value = true
     wrongKeys.value = { ...wrongKeys.value, [quizCursor.value]: [...tried, key] }
     if (item) {
       apiPost('/api/wrongbook/add', {
@@ -383,7 +418,11 @@ function pickOption(key: string) {
     }).catch(() => undefined)
   }
   celebrating.value = true
-  sound.celebrate()
+  const lastItem = quizCursor.value >= currentQuiz.value.length - 1
+  const alreadyDone = step.value === 'phrase' ? phraseDone.value : vocabDone.value
+  quizNeedRetry.value = lastItem && quizHadWrong.value && !alreadyDone
+  if (quizNeedRetry.value) sound.fail()
+  else sound.celebrate()
   quizRevealed.value = true
   clearQuizTimer()
   quizTimer = window.setTimeout(() => {
@@ -430,7 +469,24 @@ function saveProgress(extra: Record<string, unknown>) {
 }
 
 function nextAfterQuiz() {
-  saveProgress(step.value === 'phrase' ? { phrase_done: true } : { vocab_done: true })
+  const isPhrase = step.value === 'phrase'
+  const alreadyDone = isPhrase ? phraseDone.value : vocabDone.value
+  if (quizHadWrong.value && !alreadyDone) {
+    if (isPhrase) phraseRetries.value += 1
+    else vocabRetries.value += 1
+    quizSeed.value += 1
+    startStep()
+    return
+  }
+  if (!alreadyDone) {
+    if (isPhrase) {
+      phraseDone.value = true
+      saveProgress({ phrase_done: true, phrase_retries: phraseRetries.value })
+    } else {
+      vocabDone.value = true
+      saveProgress({ vocab_done: true, vocab_retries: vocabRetries.value })
+    }
+  }
   closeActivity()
 }
 
@@ -450,8 +506,14 @@ async function advanceSegment() {
     return
   }
   if (pageClips.value.length) await flushPageRecording()
-  if (lastBeat.value) return
-  nextPage()
+  if (needRecord.value && !recordDone.value) {
+    if (!/失败/.test(uploadHint.value)) {
+      uploadHint.value = '跳过不计入完成度，但至少要录成功一段才能翻页'
+    }
+    return
+  }
+  closeActivity()
+  if (pageTasksReady.value && !lastBeat.value) nextPage()
 }
 
 async function startRecord() {
@@ -539,6 +601,7 @@ async function flushPageRecording() {
     })
     uploadHint.value = '本页朗读已上传'
     pageClips.value = []
+    recordDone.value = true
   } catch (err) {
     sound.fail()
     uploadHint.value = err instanceof Error ? err.message : '上传失败'
@@ -552,6 +615,11 @@ function goBack() {
 function goToBeat(index: number) {
   const max = (lesson.value?.beats?.length || 1) - 1
   if (index < 0 || index > max || index === beatIndex.value) return
+  if (index > beatIndex.value && !pageTasksReady.value) {
+    pageGateHint.value = `先完成：${missingTasks.value.join('、')}`
+    return
+  }
+  pageGateHint.value = ''
   clearQuizTimer()
   clearPassTimer()
   if (recording.value) stopRecord()
@@ -563,6 +631,39 @@ function goToBeat(index: number) {
   beatIndex.value = index
   step.value = 'explain'
   startStep()
+  void loadPageProgress()
+}
+
+async function loadPageProgress() {
+  const page = Number(beat.value?.page || 0)
+  if (!page) {
+    vocabDone.value = false
+    phraseDone.value = false
+    recordDone.value = false
+    vocabRetries.value = 0
+    phraseRetries.value = 0
+    return
+  }
+  try {
+    const q = new URLSearchParams({
+      series_id: String(route.params.seriesId || ''),
+      book_slug: String(route.params.bookSlug || ''),
+      chapter_id: String(route.params.chapterId || ''),
+      page: String(page),
+    })
+    const row = await api(`/api/progress/page?${q}`)
+    vocabDone.value = !!row?.vocabDone
+    phraseDone.value = !!row?.phraseDone
+    recordDone.value = !!row?.recordDone
+    vocabRetries.value = Number(row?.vocabRetries || 0)
+    phraseRetries.value = Number(row?.phraseRetries || 0)
+  } catch {
+    vocabDone.value = false
+    phraseDone.value = false
+    recordDone.value = false
+    vocabRetries.value = 0
+    phraseRetries.value = 0
+  }
 }
 
 function prevPage() {
@@ -641,6 +742,7 @@ watch(
 
 onMounted(async () => {
   data.value = await api(`/api/lessons/${route.params.seriesId}/${route.params.bookSlug}/${route.params.chapterId}`)
+  await loadPageProgress()
   startStep()
 })
 
@@ -676,12 +778,19 @@ onUnmounted(() => {
       <button
         class="rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-brand-700 shadow-pop disabled:opacity-40"
         type="button"
-        :disabled="lastBeat"
+        :disabled="lastBeat || !pageTasksReady"
+        :title="pageTasksReady || lastBeat ? '' : `先完成：${missingTasks.join('、')}`"
         @click="nextPage"
       >
         下一页
       </button>
     </div>
+    <p
+      v-if="pageGateHint || (!pageTasksReady && !lastBeat)"
+      class="fixed left-1/2 top-12 z-[90] -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-xs font-extrabold text-candy shadow-pop"
+    >
+      {{ pageGateHint || `先完成：${missingTasks.join('、')}` }}
+    </p>
     <div class="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
     <section class="relative min-h-[58dvh] min-w-0 flex-1 lg:min-h-0">
       <div class="h-full overflow-hidden rounded-2xl border border-brand-200/60 bg-brand-50">
@@ -745,7 +854,7 @@ onUnmounted(() => {
               :disabled="!vocabQs.length"
               @click="startActivity('vocab')"
             >
-              复习单词
+              {{ vocabDone ? '单词已过 ✓' : '复习单词' }}
             </button>
             <button
               class="btn-primary w-full"
@@ -753,9 +862,11 @@ onUnmounted(() => {
               :disabled="!phraseQs.length"
               @click="startActivity('phrase')"
             >
-              复习短语
+              {{ phraseDone ? '短语已过 ✓' : '复习短语' }}
             </button>
-            <button class="btn-candy w-full" type="button" @click="startActivity('record')">开始录制</button>
+            <button class="btn-candy w-full" type="button" @click="startActivity('record')">
+              {{ recordDone ? '朗读已录 ✓' : '开始录制' }}
+            </button>
           </div>
         </section>
 
@@ -797,8 +908,6 @@ onUnmounted(() => {
       :open="quizDialogOpen"
       :title="step === 'vocab' ? '复习词汇 · 英翻中' : '复习短语 · 英翻中'"
       :emoji="step === 'vocab' ? '🔤' : '💬'"
-      dock="side"
-      fixed
       draggable
       @close="pauseFlow"
     >
@@ -809,6 +918,12 @@ onUnmounted(() => {
             🔊 听单词
           </button>
         </div>
+        <p class="mb-1 text-center text-xs font-bold text-brand-600/70">
+          有错要整轮重来，全对才算过
+          <span v-if="(step === 'phrase' ? phraseRetries : vocabRetries) > 0">
+            · 已重试 {{ step === 'phrase' ? phraseRetries : vocabRetries }} 次
+          </span>
+        </p>
         <p class="mb-4 text-center text-3xl font-extrabold text-brand-700">{{ currentQuestion.item.en }}</p>
         <div class="flex flex-col gap-2">
           <button
@@ -840,14 +955,16 @@ onUnmounted(() => {
           class="pointer-events-none fixed inset-0 z-[70] flex items-center justify-center"
         >
           <div class="card animate-pop-in px-10 py-8 text-center shadow-pop">
-            <p class="text-6xl">🎉</p>
-            <p class="mt-3 text-2xl font-extrabold text-mint">答对了！</p>
+            <p class="text-6xl">{{ quizNeedRetry ? '🔁' : '🎉' }}</p>
+            <p class="mt-3 text-2xl font-extrabold" :class="quizNeedRetry ? 'text-candy' : 'text-mint'">
+              {{ quizNeedRetry ? '这轮有错，再来一遍' : '答对了！' }}
+            </p>
           </div>
         </div>
       </transition>
     </Teleport>
 
-    <ClubDialog :open="recordDialogOpen" title="读这一段" emoji="📖" dock="bottom" draggable @close="pauseFlow">
+    <ClubDialog :open="recordDialogOpen" title="读这一段" emoji="📖" draggable @close="pauseFlow">
       <p class="mb-2 chip bg-brand-100 text-brand-700">第 {{ segIndex + 1 }} / {{ pageSegments.length }} 段</p>
       <p class="mb-3 font-bold text-brand-600">书上黄框就是要读的。每个词最多 3 秒，读完可点停，时间到会自动停。</p>
       <div class="mb-3 flex items-center justify-between gap-2">
@@ -891,7 +1008,15 @@ onUnmounted(() => {
       <div v-else-if="lastScore != null" class="mt-3 text-center">
         <p class="text-3xl font-extrabold" :class="passed ? 'text-mint' : 'text-candy'">{{ lastScore }} 分</p>
         <p class="mt-1 font-extrabold" :class="passed ? 'text-mint' : 'text-candy'">
-          {{ passed ? (lastSegment && lastBeat ? '第一章先到这里。' : lastSegment ? '过了，去下一页' : '过了！') : '还没到 60 分，再读一次' }}
+          {{
+            passed
+              ? lastSegment && lastBeat && pageTasksReady
+                ? '第一章先到这里。'
+                : lastSegment && pageTasksReady
+                  ? '过了，可以翻页'
+                  : '过了！'
+              : '还没到 60 分，再读一次'
+          }}
         </p>
         <p v-if="lastHeard" class="mt-2 text-xs font-bold text-brand-600/60">听到了：{{ lastHeard }}</p>
       </div>
@@ -901,7 +1026,7 @@ onUnmounted(() => {
         type="button"
         @click="advanceSegment"
       >
-        先跳过这句
+        先跳过这句（不计入完成度）
       </button>
     </ClubDialog>
 

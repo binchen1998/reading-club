@@ -22,6 +22,8 @@ class ProgressIn(BaseModel):
     page: int
     vocab_done: bool | None = None
     phrase_done: bool | None = None
+    vocab_retries: int | None = None
+    phrase_retries: int | None = None
     record_done: bool | None = None
     record_score: int | None = None
     recording_id: int | None = None
@@ -38,6 +40,8 @@ def serialize_progress(row: PageProgress) -> dict:
         "lessonDate": row.lesson_date.isoformat() if row.lesson_date else None,
         "vocabDone": row.vocab_done,
         "phraseDone": row.phrase_done,
+        "vocabRetries": row.vocab_retries,
+        "phraseRetries": row.phrase_retries,
         "recordDone": row.record_done,
         "recordScore": row.record_score,
         "recordingId": row.recording_id,
@@ -71,6 +75,10 @@ def upsert_progress(db: Session, username: str, payload: ProgressIn) -> PageProg
         row.vocab_done = payload.vocab_done
     if payload.phrase_done is not None:
         row.phrase_done = payload.phrase_done
+    if payload.vocab_retries is not None:
+        row.vocab_retries = max(0, int(payload.vocab_retries))
+    if payload.phrase_retries is not None:
+        row.phrase_retries = max(0, int(payload.phrase_retries))
     if payload.record_done is not None:
         row.record_done = payload.record_done
     if payload.record_score is not None:
