@@ -3,6 +3,7 @@ import json
 from fastapi import APIRouter, HTTPException
 
 from ..config import BOOKS, CATALOG
+from ..lesson_worker import enqueue_book
 
 router = APIRouter(prefix="/api")
 
@@ -41,6 +42,8 @@ def series_detail(series_id: str):
         slug = _slug(book.get("title") or "", book.get("name") or "")
         local = BOOKS / series_id / slug / "book.json"
         ready = local.exists()
+        if ready:
+            enqueue_book(series_id, slug)
         books.append(
             {
                 "title": book.get("title"),

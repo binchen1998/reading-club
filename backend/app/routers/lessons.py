@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Query
 from ..book_pages import split_chapters
 from ..config import BOOKS, LESSONS
 from ..lesson_gen import ensure_lesson, lesson_exists
+from ..lesson_worker import enqueue_book, is_generating
 from ..ocr import load_page_ocr
 
 router = APIRouter(prefix="/api")
@@ -40,6 +41,7 @@ def book_detail(series_id: str, book_slug: str):
     if not path.exists():
         raise HTTPException(404, "书还没下载到本地")
     book = json.loads(path.read_text(encoding="utf-8"))
+    enqueue_book(series_id, book_slug)
     lesson_dir = LESSONS / series_id / book_slug
     by_id: dict[str, dict] = {}
     if lesson_dir.exists():
@@ -52,6 +54,7 @@ def book_detail(series_id: str, book_slug: str):
                 "title_zh": lesson.get("title_zh"),
                 "open": True,
                 "generated": True,
+                "generating": False,
             }
     for info in split_chapters(book.get("pages") or []):
         num = int(info.get("chapter") or 0)
@@ -67,6 +70,7 @@ def book_detail(series_id: str, book_slug: str):
             "title_zh": "",
             "open": True,
             "generated": False,
+            "generating": is_generating(series_id, book_slug, num),
         }
     chapters = sorted(by_id.values(), key=lambda row: int(row.get("chapter") or 0))
     return {"book": book, "chapters": chapters}

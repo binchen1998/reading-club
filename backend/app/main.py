@@ -1,9 +1,12 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import AUDIO, BOOKS, HOST, PORT, RECORDINGS, ROOT
+from .lesson_worker import start_lesson_worker
 from .routers import (
     admin,
     assets,
@@ -28,7 +31,14 @@ from .timeutil import server_now_iso, shanghai_today
 DIST = ROOT / "frontend" / "dist"
 NO_CACHE = {"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"}
 
-app = FastAPI(title="Reading Club")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    start_lesson_worker()
+    yield
+
+
+app = FastAPI(title="Reading Club", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

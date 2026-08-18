@@ -20,7 +20,7 @@ import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
 import { beginGenerate, endGenerate } from '../stores/generate'
-import { ensureOcr, ensureTts } from '../utils/ensureAsset'
+import { ensureOcr, ensureTts, prefetchPageAssets } from '../utils/ensureAsset'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
 import { sound } from '../utils/sound'
@@ -418,6 +418,26 @@ function clearRecordTimer() {
   }
 }
 
+function prefetchCurrentBeat() {
+  const current = beat.value
+  if (!current) return
+  prefetchPageAssets({
+    texts: [
+      ...sentences.value,
+      ...(current.word_items || []).map((item: Item) => item.en),
+      ...(current.phrase_items || []).map((item: Item) => item.en),
+      ...pageSegments.value,
+      current.english || '',
+    ],
+    ocrItems: pageSegments.value.map((text) => ({
+      series_id: String(route.params.seriesId),
+      book_slug: String(route.params.bookSlug),
+      page: Number(current.page || 0),
+      text,
+    })),
+  })
+}
+
 function startStep() {
   answers.value = {}
   submitted.value = false
@@ -441,6 +461,7 @@ function startStep() {
   lastHeard.value = ''
   scoreError.value = ''
   passed.value = false
+  prefetchCurrentBeat()
   if (step.value === 'explain') nextTick(playExplain)
   if (step.value === 'record') nextTick(highlightSegment)
 }
