@@ -1,4 +1,7 @@
-"""后台预生成课稿、讲解 TTS、朗读词框，不必等读到那一页。"""
+"""按用户正在读的书生成课稿、讲解 TTS、朗读词框。
+
+启动和浏览书目时不预生成。只有阅读页发起生成后，才排队这本书。
+"""
 
 from __future__ import annotations
 
@@ -51,10 +54,6 @@ def start_lesson_worker() -> None:
     threading.Thread(target=_loop, daemon=True, name="lesson-worker").start()
     for i in range(INTERACTIVE_WORKERS):
         threading.Thread(target=_interactive_loop, daemon=True, name=f"gen-worker-{i}").start()
-    try:
-        enqueue_all_local()
-    except Exception:
-        logger.exception("scan local books for prebuild failed")
 
 
 def enqueue_book(series_id: str, book_slug: str) -> None:

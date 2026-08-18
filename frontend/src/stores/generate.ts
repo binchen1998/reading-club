@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 export const generateLabel = ref('')
 
@@ -12,4 +12,13 @@ export function beginGenerate(label: string) {
 export function endGenerate() {
   depth = Math.max(0, depth - 1)
   if (depth === 0) generateLabel.value = ''
+}
+
+export async function waitGenerateShown() {
+  await nextTick()
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve())
+    })
+  })
 }

@@ -1,5 +1,5 @@
 import { apiGet, apiPost } from '../api'
-import { beginGenerate, endGenerate } from '../stores/generate'
+import { beginGenerate, endGenerate, waitGenerateShown } from '../stores/generate'
 import { waitJobResult } from './jobSse'
 
 type TtsResult = { url?: string; exists?: boolean; created?: boolean; source?: string }
@@ -18,6 +18,7 @@ type AssetJob<T> = {
   checked: Promise<void>
   needsGenerate: boolean
   done: boolean
+  releaseGenerate: () => void
 }
 
 const TTS_PREFETCH_CONCURRENCY = 4
@@ -43,10 +44,18 @@ function ocrCacheKey(payload: OcrPayload): string {
 }
 
 async function waitForAsset<T>(job: AssetJob<T>, purpose: string, silent?: boolean): Promise<T> {
-  if (silent) return job.promise
+  if (silent) {
+    job.releaseGenerate()
+    return job.promise
+  }
   await job.checked
-  if (job.done || !job.needsGenerate) return job.promise
+  if (job.done || !job.needsGenerate) {
+    job.releaseGenerate()
+    return job.promise
+  }
   beginGenerate(purpose)
+  await waitGenerateShown()
+  job.releaseGenerate()
   try {
     return await job.promise
   } finally {
@@ -54,9 +63,15 @@ async function waitForAsset<T>(job: AssetJob<T>, purpose: string, silent?: boole
   }
 }
 
-function startJob<T>(run: (job: AssetJob<T>, markChecked: () => void) => Promise<T>): AssetJob<T> {
+function startJob<T>(
+  run: (job: AssetJob<T>, markChecked: () => void, waitGenerate: () => Promise<void>) => Promise<T>,
+): AssetJob<T> {
   let settled = false
   let resolveChecked: () => void = () => undefined
+  let resolveGenerate: () => void = () => undefined
+  const generateGate = new Promise<void>((resolve) => {
+    resolveGenerate = resolve
+  })
   const job: AssetJob<T> = {
     promise: Promise.resolve() as Promise<T>,
     checked: new Promise<void>((resolve) => {
@@ -64,6 +79,7 @@ function startJob<T>(run: (job: AssetJob<T>, markChecked: () => void) => Promise
     }),
     needsGenerate: false,
     done: false,
+    releaseGenerate: resolveGenerate,
   }
   const markChecked = () => {
     if (settled) return
@@ -72,10 +88,11 @@ function startJob<T>(run: (job: AssetJob<T>, markChecked: () => void) => Promise
   }
   job.promise = (async () => {
     try {
-      return await run(job, markChecked)
+      return await run(job, markChecked, () => generateGate)
     } finally {
       job.done = true
       markChecked()
+      resolveGenerate()
     }
   })()
   return job
@@ -96,7 +113,7 @@ async function runPool<T>(items: T[], limit: number, fn: (item: T) => Promise<un
 function startTtsJob(value: string, purpose: string): AssetJob<string> {
   const existing = ttsJobs.get(value)
   if (existing) return existing
-  const job = startJob<string>(async (state, markChecked) => {
+  const job = startJob<string>(async (state, markChecked, waitGenerate) => {
     const cached = ttsCache.get(value)
     if (cached) return cached
     const check = (await apiGet(
@@ -108,6 +125,7 @@ function startTtsJob(value: string, purpose: string): AssetJob<string> {
     }
     state.needsGenerate = true
     markChecked()
+    await waitGenerate()
     const started = (await apiPost('/api/assets/tts/generate', { text: value, purpose })) as {
       exists?: boolean
       status?: string
@@ -137,7 +155,7 @@ function startOcrJob(payload: OcrPayload): AssetJob<Array<Record<string, unknown
   const existing = ocrJobs.get(key)
   if (existing) return existing
   const purpose = payload.purpose || '这一句的词框'
-  const job = startJob<Array<Record<string, unknown>>>(async (state, markChecked) => {
+  const job = startJob<Array<Record<string, unknown>>>(async (state, markChecked, waitGenerate) => {
     const cached = ocrCache.get(key)
     if (cached) return cached
     const check = (await apiPost('/api/ocr/words', { ...payload, purpose, check: true })) as OcrResult
@@ -148,6 +166,7 @@ function startOcrJob(payload: OcrPayload): AssetJob<Array<Record<string, unknown
     }
     state.needsGenerate = true
     markChecked()
+    await waitGenerate()
     const started = (await apiPost('/api/ocr/words/generate', { ...payload, purpose })) as {
       exists?: boolean
       status?: string

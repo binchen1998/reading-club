@@ -19,7 +19,7 @@ import { concatClips } from '../utils/concatClips'
 import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
-import { beginGenerate, endGenerate } from '../stores/generate'
+import { beginGenerate, endGenerate, waitGenerateShown } from '../stores/generate'
 import { ensureOcr, ensureTts, prefetchPageAssets } from '../utils/ensureAsset'
 import { waitJobResult } from '../utils/jobSse'
 import { stopSpeak } from '../utils/speak'
@@ -965,6 +965,7 @@ onMounted(async () => {
   const check = (await api(`${path}?check=1`)) as { exists?: boolean }
   if (!check?.exists) {
     beginGenerate('讲解')
+    await waitGenerateShown()
     try {
       const job = (await apiPost(`${path}/generate`)) as { exists?: boolean; job_id?: string }
       if (job?.job_id && !job.exists) await waitJobResult(job.job_id)

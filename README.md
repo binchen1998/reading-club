@@ -101,10 +101,14 @@ python -m scripts.prebuild_content --series NateTheGreat --book hungry-book-club
 
 ## 下载更多书
 
+书目页显示「仅书目」= 本地还没有 `content/books/{系列}/{slug}/book.json`（页图和页 JSON 也还没下）。先拉书目，再按下基本页资源。**这个脚本不会生成讲解、OCR、TTS**，那些等用户打开阅读页后再由 worker 按需跑。不要用上面的 `prebuild_content` 来「开书」。
+
 ```powershell
 $env:PYTHONPATH = "D:\git\reading-club"
 python -m scripts.fetch_catalog
-python -m scripts.fetch_book --series NateTheGreat --book "Hungry Book Club"
+python -m scripts.fetch_book --series FancyNancy
+python -m scripts.fetch_book --series FancyNancy --book "Fancy NANCY and the Boy from Paris"
+python -m scripts.fetch_book --all
 ```
 
-全书目已导入；其它系列图片先不下载。
+已有 `book.json` 默认跳过，加 `--force` 才重下。下载完成后刷新书目页，即可点进去读。

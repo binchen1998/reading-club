@@ -1,4 +1,7 @@
-"""下载一本书的全部页图 + 页 JSON 到本地。"""
+"""下载书的基本页资源（页图 + 页 JSON + book.json）到本地。
+
+不生成讲解、OCR、TTS；那些等用户打开阅读页后再由 worker 按需生成。
+"""
 
 from __future__ import annotations
 
@@ -124,11 +127,69 @@ def fetch_book(series_id: str, title_or_name: str, max_pages: int = 200) -> Path
     return dest
 
 
+def _catalog_series(series_id: str) -> dict:
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    row = next((s for s in catalog["series"] if s["id"] == series_id), None)
+    if not row:
+        raise KeyError(series_id)
+    return row
+
+
+def fetch_series(series_id: str, skip_existing: bool = True) -> list[Path]:
+    row = _catalog_series(series_id)
+    books = row.get("books") or []
+    print(f"== {series_id}  {row.get('title')}  ({len(books)} 本)", flush=True)
+    done: list[Path] = []
+    for book in books:
+        title = book.get("title") or book.get("name") or ""
+        slug = book_slug(book.get("title") or "", book.get("name") or "")
+        dest = BOOKS / series_id / slug / "book.json"
+        if skip_existing and dest.exists():
+            print(f"  skip {slug}（已有 book.json）", flush=True)
+            done.append(dest.parent)
+            continue
+        print(f"  fetch {title}", flush=True)
+        try:
+            done.append(fetch_book(series_id, title))
+        except Exception as exc:
+            print(f"  FAIL {title}: {exc}", flush=True)
+    return done
+
+
+def fetch_all(skip_existing: bool = True) -> list[Path]:
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    done: list[Path] = []
+    for row in catalog.get("series") or []:
+        done.extend(fetch_series(row["id"], skip_existing=skip_existing))
+    return done
+
+
 if __name__ == "__main__":
     import argparse
+    import sys
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--series", default="NateTheGreat")
-    parser.add_argument("--book", default="Hungry Book Club")
+    parser = argparse.ArgumentParser(
+        description="只下载页图 / 页 JSON / book.json，不跑讲解、OCR、TTS。"
+    )
+    parser.add_argument("--series", default="", help="系列 id，如 FancyNancy。省略 --book 时下载整套")
+    parser.add_argument("--book", default="", help="书名或 CDN name。省略则下载该系列全部书")
+    parser.add_argument("--all", action="store_true", help="下载 catalog 里全部系列")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="已有 book.json 也重新下载",
+    )
     args = parser.parse_args()
-    print(fetch_book(args.series, args.book))
+    skip = not args.force
+
+    if args.all:
+        paths = fetch_all(skip_existing=skip)
+        print(f"done {len(paths)} books")
+    elif args.series and args.book:
+        print(fetch_book(args.series, args.book))
+    elif args.series:
+        paths = fetch_series(args.series, skip_existing=skip)
+        print(f"done {len(paths)} books in {args.series}")
+    else:
+        parser.print_help()
+        sys.exit(2)

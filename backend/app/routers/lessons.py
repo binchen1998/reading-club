@@ -7,7 +7,7 @@ from ..book_pages import split_chapters
 from ..config import BOOKS, LESSONS
 from ..gen_jobs import job_payload
 from ..lesson_gen import lesson_exists
-from ..lesson_worker import enqueue_book, enqueue_chapter, enqueue_lesson_job, is_generating
+from ..lesson_worker import enqueue_book, enqueue_lesson_job, is_generating
 from ..ocr import load_page_ocr
 
 router = APIRouter(prefix="/api")
@@ -42,7 +42,6 @@ def book_detail(series_id: str, book_slug: str):
     if not path.exists():
         raise HTTPException(404, "书还没下载到本地")
     book = json.loads(path.read_text(encoding="utf-8"))
-    enqueue_book(series_id, book_slug)
     lesson_dir = LESSONS / series_id / book_slug
     by_id: dict[str, dict] = {}
     if lesson_dir.exists():
@@ -129,5 +128,5 @@ def lesson_generate(series_id: str, book_slug: str, chapter_id: str):
     if lesson_exists(series_id, book_slug, chapter):
         return {"exists": True, "job_id": "", "status": "done"}
     job = enqueue_lesson_job(series_id, book_slug, chapter)
-    enqueue_chapter(series_id, book_slug, chapter)
+    enqueue_book(series_id, book_slug)
     return job_payload(job)

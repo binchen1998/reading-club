@@ -7,7 +7,6 @@ from ..auth import get_current_user
 from ..book_pages import split_chapters
 from ..config import BOOKS, CATALOG
 from ..db import get_db
-from ..lesson_worker import enqueue_book
 from ..models import User
 from ..routers.progress import book_cursors_for_series, serialize_cursor
 
@@ -47,8 +46,6 @@ def series_detail(
         slug = book_slug_of(book.get("title") or "", book.get("name") or "")
         local = BOOKS / series_id / slug / "book.json"
         ready = local.exists()
-        if ready:
-            enqueue_book(series_id, slug)
         cursor = cursors.get(slug)
         last_page = book_last_page(series_id, slug) if ready else 0
         cursor_info = serialize_cursor(cursor, last_page) if cursor else {}
