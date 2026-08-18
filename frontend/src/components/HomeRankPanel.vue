@@ -91,8 +91,8 @@ watch(tab, load, { immediate: true })
   <div class="card !p-2">
     <div class="mb-2 space-y-1.5">
       <div class="min-w-0">
-        <div class="text-xs font-extrabold leading-tight text-brand-700">{{ panelTitle }}</div>
-        <p v-if="tab === 'rise' && weekLabel" class="mt-0.5 truncate text-[10px] font-bold text-brand-600/50">
+        <div class="text-sm font-extrabold leading-tight text-brand-700">{{ panelTitle }}</div>
+        <p v-if="tab === 'rise' && weekLabel" class="mt-0.5 truncate text-xs font-bold text-brand-600/50">
           {{ weekLabel }}
         </p>
       </div>
@@ -105,7 +105,7 @@ watch(tab, load, { immediate: true })
           ] as const)"
           :key="t[0]"
           type="button"
-          class="rounded-full border px-1.5 py-0.5 text-[10px] font-bold transition"
+          class="rounded-full border px-2 py-0.5 text-xs font-bold transition"
           :class="
             tab === t[0]
               ? 'border-brand-500 bg-brand-500 text-white'
@@ -137,14 +137,14 @@ watch(tab, load, { immediate: true })
         :class="isSelf(e) ? 'bg-brand-50 ring-1 ring-brand-200' : 'hover:bg-brand-50/70'"
         @click="openProfile(e)"
       >
-        <span class="w-4 shrink-0 text-center text-[10px] font-extrabold text-brand-600/40">#{{ e.rank }}</span>
-        <UserAvatar :avatar="e.avatar" size="xs" rounded="lg" />
-        <div class="min-w-0 max-w-[4.5rem] flex-1 lg:max-w-[5.5rem]">
-          <p class="truncate text-[11px] font-bold text-brand-700">{{ safeDisplayName(e.name, e.username) }}</p>
-          <p class="truncate text-[10px] font-bold text-brand-600/50">{{ subline(e) }}</p>
+        <span class="w-5 shrink-0 text-center text-xs font-extrabold text-brand-600/40">#{{ e.rank }}</span>
+        <UserAvatar :avatar="e.avatar" size="sm" rounded="lg" />
+        <div class="min-w-0 max-w-[6.5rem] flex-1">
+          <p class="truncate text-sm font-bold text-brand-700">{{ safeDisplayName(e.name, e.username) }}</p>
+          <p class="truncate text-xs font-bold text-brand-600/50">{{ subline(e) }}</p>
         </div>
         <span
-          class="ml-auto shrink-0 text-[11px] font-extrabold"
+          class="ml-auto shrink-0 text-sm font-extrabold"
           :class="tab === 'rise' ? 'text-mint' : tab === 'honor' ? 'text-candy' : 'text-brand-500'"
         >
           {{ displayValue(e) }}
@@ -152,7 +152,7 @@ watch(tab, load, { immediate: true })
       </button>
     </div>
 
-    <div v-if="user.username" class="mt-2 border-t border-brand-100 pt-1.5 text-[10px] font-bold text-brand-600/50">
+    <div v-if="user.username" class="mt-2 border-t border-brand-100 pt-1.5 text-xs font-bold text-brand-600/50">
       我的排名：{{ selfRankLabel }}
     </div>
   </div>

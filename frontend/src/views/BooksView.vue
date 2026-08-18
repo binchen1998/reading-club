@@ -40,7 +40,7 @@ onMounted(async () => {
           <div v-else class="grid h-full place-items-center text-3xl">📖</div>
         </div>
         <div class="space-y-0.5 p-2">
-          <h2 class="line-clamp-2 text-sm font-extrabold leading-snug text-brand-700">{{ s.title }}</h2>
+          <h2 class="line-clamp-2 text-base font-extrabold leading-snug text-brand-700">{{ s.title }}</h2>
           <p class="text-xs font-bold text-brand-600/60">{{ s.book_count }} 本</p>
         </div>
       </router-link>

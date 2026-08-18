@@ -1179,7 +1179,7 @@ onUnmounted(() => {
     </section>
 
     <aside class="flex h-full w-[min(22.5rem,40vw)] shrink-0 flex-col space-y-2 overflow-y-auto lg:w-[360px] lg:space-y-3">
-        <p class="truncate text-sm font-extrabold text-brand-700 lg:text-base">
+        <p class="truncate text-base font-extrabold text-brand-700">
           {{ lesson.title_zh }} · 第 {{ beat.page }} 页 · {{ beatIndex + 1 }}/{{ lesson.beats.length }}
         </p>
         <section class="card space-y-2 p-3 lg:space-y-3 lg:p-5">
@@ -1277,7 +1277,7 @@ onUnmounted(() => {
         </section>
 
         <section class="card space-y-2 p-3 lg:space-y-3 lg:p-5">
-          <p class="text-sm font-extrabold text-brand-700 lg:text-base">这一页重点</p>
+          <p class="text-base font-extrabold text-brand-700">这一页重点</p>
           <div>
             <p class="mb-1 text-[11px] font-extrabold text-brand-500 lg:mb-2 lg:text-xs">词</p>
             <div class="flex flex-wrap gap-1 lg:gap-2">

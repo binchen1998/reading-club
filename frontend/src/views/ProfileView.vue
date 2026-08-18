@@ -163,7 +163,7 @@ onMounted(async () => {
         <UserAvatar :avatar="owner.avatarUrl || owner.avatar" size="xl" rounded="2xl" />
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="truncate text-xl font-extrabold text-brand-700">
+            <h2 class="truncate text-2xl font-extrabold text-brand-700">
               {{ safeDisplayName(owner.nickname, owner.username) }}
             </h2>
             <button
@@ -242,7 +242,7 @@ onMounted(async () => {
               <div v-else class="grid h-full place-items-center text-3xl">📖</div>
             </div>
             <div class="p-2">
-              <p class="truncate text-xs font-extrabold text-brand-700">
+              <p class="truncate text-sm font-extrabold text-brand-700">
                 {{ work.bookTitle }} · 第 {{ work.page }} 页
               </p>
               <p class="text-xs font-bold text-brand-600">{{ work.overallScore }} 分 · ♥ {{ work.likeCount }}</p>
@@ -289,7 +289,7 @@ onMounted(async () => {
           <div class="flex gap-2">
             <UserAvatar :avatar="message.authorAvatar" size="sm" />
             <div class="min-w-0 flex-1">
-              <p class="text-xs font-bold text-brand-600/70">
+              <p class="text-sm font-bold text-brand-600/70">
                 {{ safeDisplayName(message.authorName, message.authorUsername || message.username) }}
               </p>
               <p class="text-sm text-brand-700">{{ message.content }}</p>
@@ -319,7 +319,7 @@ onMounted(async () => {
           >
             <UserAvatar :avatar="reply.authorAvatar" size="xs" />
             <div>
-              <p class="text-xs font-bold text-brand-600/70">
+              <p class="text-sm font-bold text-brand-600/70">
                 {{ safeDisplayName(reply.authorName, reply.authorUsername || reply.username) }}
               </p>
               <p class="text-sm text-brand-700">{{ reply.content }}</p>
@@ -368,7 +368,7 @@ onMounted(async () => {
           @click="modal = ''"
         >
           <UserAvatar :avatar="person.avatar" size="sm" />
-          <span class="text-sm font-bold text-brand-700">
+          <span class="text-base font-bold text-brand-700">
             {{ safeDisplayName(person.nickname, person.username) }}
           </span>
         </router-link>

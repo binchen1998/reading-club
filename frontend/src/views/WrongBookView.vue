@@ -47,7 +47,7 @@ onMounted(load)
         <span class="chip bg-brand-100 text-brand-700">{{ item.kind === 'phrase' ? '短语' : '词汇' }}</span>
         <p class="mt-2 text-2xl font-extrabold text-brand-700">{{ item.en }}</p>
         <p class="font-bold text-brand-600">{{ item.zh }}</p>
-        <p class="mt-1 text-xs font-bold text-brand-500">
+        <p class="mt-1 text-sm font-bold text-brand-500">
           {{ item.bookTitle }} · 第 {{ item.page }} 页 · 错 {{ item.wrongCount }} 次
         </p>
       </div>

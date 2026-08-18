@@ -154,7 +154,7 @@ onMounted(load)
           <div class="flex min-w-0 w-1/2 flex-col gap-2 p-3 lg:gap-3 lg:p-4">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0">
-                <h2 class="text-sm font-extrabold leading-snug text-brand-700 lg:truncate lg:text-lg">
+                <h2 class="text-base font-extrabold leading-snug text-brand-700 lg:truncate lg:text-xl">
                   {{ item.bookTitle }} · 第 {{ item.page }} 页
                 </h2>
                 <p v-if="item.lessonDate" class="mt-0.5 text-[11px] font-bold text-brand-600/60 lg:text-xs">
@@ -194,7 +194,7 @@ onMounted(load)
             >
               <UserAvatar :avatar="item.avatar" size="sm" rounded="xl" />
               <div class="min-w-0">
-                <div class="truncate text-sm font-extrabold text-brand-700 lg:text-base">
+                <div class="truncate text-base font-extrabold text-brand-700">
                   {{ safeDisplayName(item.nickname, item.username) }}
                 </div>
                 <div class="text-[11px] text-brand-600/50 lg:text-xs">点击查看主页</div>
@@ -232,7 +232,7 @@ onMounted(load)
           <div class="flex gap-2">
             <UserAvatar :avatar="c.authorAvatar" size="sm" />
             <div class="min-w-0 flex-1">
-              <p class="text-xs font-bold text-brand-600/70">
+              <p class="text-sm font-bold text-brand-600/70">
                 {{ safeDisplayName(c.authorName, c.username) }}
               </p>
               <p class="mt-0.5 text-sm text-brand-700">{{ c.content }}</p>
@@ -262,7 +262,7 @@ onMounted(load)
           >
             <UserAvatar :avatar="reply.authorAvatar" size="xs" />
             <div>
-              <p class="text-xs font-bold text-brand-600/70">
+              <p class="text-sm font-bold text-brand-600/70">
                 {{ safeDisplayName(reply.authorName, reply.username) }}
               </p>
               <p class="text-sm text-brand-700">{{ reply.content }}</p>

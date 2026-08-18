@@ -46,14 +46,14 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="grid grid-cols-[minmax(0,1fr)_minmax(6.75rem,min(12rem,20vw))] items-start gap-2 lg:gap-3">
+  <div class="grid grid-cols-[minmax(0,1fr)_minmax(8rem,min(14.5rem,24vw))] items-start gap-2 lg:gap-3">
     <section class="min-w-0 space-y-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
-          <h1 class="text-xl font-extrabold text-brand-700 lg:text-3xl">朗读广场</h1>
+          <h1 class="text-2xl font-extrabold text-brand-700 lg:text-3xl">朗读广场</h1>
           <div class="flex gap-1">
             <button
-              class="rounded-full px-2.5 py-1 text-xs font-extrabold"
+              class="rounded-full px-2.5 py-1 text-sm font-extrabold"
               :class="sort === 'latest' ? 'bg-candy text-white' : 'bg-white text-brand-700'"
               type="button"
               @click="onSort('latest')"
@@ -61,7 +61,7 @@ onMounted(load)
               最新
             </button>
             <button
-              class="rounded-full px-2.5 py-1 text-xs font-extrabold"
+              class="rounded-full px-2.5 py-1 text-sm font-extrabold"
               :class="sort === 'likes' ? 'bg-candy text-white' : 'bg-white text-brand-700'"
               type="button"
               @click="onSort('likes')"
@@ -117,13 +117,13 @@ onMounted(load)
             </span>
           </div>
           <div class="space-y-1 p-2">
-            <p class="truncate text-xs font-extrabold text-brand-700">
+            <p class="truncate text-sm font-extrabold text-brand-700">
               {{ item.bookTitle }} · 第 {{ item.page }} 页
             </p>
             <div class="flex items-center gap-1.5">
-              <UserAvatar :avatar="item.avatar" size="xs" />
-              <span class="truncate text-xs font-bold text-brand-600/70">{{ item.nickname }}</span>
-              <span class="ml-auto shrink-0 text-xs font-bold text-candy">♥ {{ item.likeCount || 0 }}</span>
+              <UserAvatar :avatar="item.avatar" size="sm" />
+              <span class="truncate text-sm font-bold text-brand-600/70">{{ item.nickname }}</span>
+              <span class="ml-auto shrink-0 text-sm font-bold text-candy">♥ {{ item.likeCount || 0 }}</span>
             </div>
           </div>
         </router-link>
@@ -163,14 +163,14 @@ onMounted(load)
 }
 
 .square-stat-num {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #ea580c;
   line-height: 1.2;
 }
 
 .square-stat-label {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   color: #fb923c;
   white-space: nowrap;
 }

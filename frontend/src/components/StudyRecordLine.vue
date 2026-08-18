@@ -53,7 +53,7 @@ onUnmounted(() => document.removeEventListener('click', closeTip))
 
 <template>
   <div class="flex items-center gap-1.5 rounded-2xl bg-brand-50 px-2 py-1.5 lg:gap-2 lg:px-3 lg:py-2">
-    <p class="min-w-0 flex-1 truncate text-xs font-extrabold text-brand-700 lg:text-base" :title="title">{{ title }}</p>
+    <p class="min-w-0 flex-1 truncate text-sm font-extrabold text-brand-700 lg:text-base" :title="title">{{ title }}</p>
     <div class="flex shrink-0 items-center gap-1">
       <button
         type="button"

@@ -72,7 +72,7 @@ onMounted(async () => {
 <template>
   <div class="space-y-4">
     <section class="card">
-      <h2 class="mb-3 text-lg font-extrabold text-brand-700">消息中心</h2>
+      <h2 class="mb-3 text-xl font-extrabold text-brand-700">消息中心</h2>
       <div v-if="loading" class="py-8 text-center text-sm font-bold text-brand-600/50">加载中…</div>
       <div v-else-if="!items.length" class="py-8 text-center text-sm font-bold text-brand-600/50">
         暂时没有新消息
@@ -88,7 +88,7 @@ onMounted(async () => {
           {{ (item.type || item.kind) === 'follow' ? '👋' : (item.type || item.kind) === 'like' ? '♥' : '💬' }}
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-bold text-brand-700">
+          <p class="text-base font-bold text-brand-700">
             <span>{{
               safeDisplayName(item.actorNickname || item.actor_nickname, item.actorUsername || item.actor_username)
             }}</span>
