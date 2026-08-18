@@ -88,15 +88,15 @@ watch(tab, load, { immediate: true })
 </script>
 
 <template>
-  <div class="card !p-2 lg:!p-3.5">
-    <div class="mb-2 space-y-1.5 lg:mb-2.5 lg:space-y-2">
+  <div class="card !p-2">
+    <div class="mb-2 space-y-1.5">
       <div class="min-w-0">
-        <div class="text-xs font-extrabold leading-tight text-brand-700 lg:text-sm">{{ panelTitle }}</div>
-        <p v-if="tab === 'rise' && weekLabel" class="mt-0.5 hidden text-xs font-bold text-brand-600/50 lg:block">
-          本周 {{ weekLabel }}
+        <div class="text-xs font-extrabold leading-tight text-brand-700">{{ panelTitle }}</div>
+        <p v-if="tab === 'rise' && weekLabel" class="mt-0.5 truncate text-[10px] font-bold text-brand-600/50">
+          {{ weekLabel }}
         </p>
       </div>
-      <div class="flex flex-nowrap gap-0.5 lg:gap-1">
+      <div class="flex flex-nowrap gap-0.5">
         <button
           v-for="t in ([
             ['rise', '上升'],
@@ -105,7 +105,7 @@ watch(tab, load, { immediate: true })
           ] as const)"
           :key="t[0]"
           type="button"
-          class="rounded-full border px-1.5 py-0.5 text-[10px] font-bold transition lg:px-2.5 lg:py-1 lg:text-xs"
+          class="rounded-full border px-1.5 py-0.5 text-[10px] font-bold transition"
           :class="
             tab === t[0]
               ? 'border-brand-500 bg-brand-500 text-white'
@@ -133,19 +133,18 @@ watch(tab, load, { immediate: true })
         v-for="e in list"
         :key="`${tab}-${e.rank}-${e.username}`"
         type="button"
-        class="flex w-full items-center gap-1 rounded-xl px-0.5 py-1 text-left transition lg:gap-2 lg:px-1 lg:py-1.5"
+        class="flex w-full items-center gap-1 rounded-xl px-0.5 py-1 text-left transition"
         :class="isSelf(e) ? 'bg-brand-50 ring-1 ring-brand-200' : 'hover:bg-brand-50/70'"
         @click="openProfile(e)"
       >
-        <span class="w-5 shrink-0 text-center text-[10px] font-extrabold text-brand-600/40 lg:w-7 lg:text-xs">#{{ e.rank }}</span>
-        <span class="hidden lg:inline-flex"><UserAvatar :avatar="e.avatar" size="md" rounded="xl" /></span>
-        <span class="inline-flex lg:hidden"><UserAvatar :avatar="e.avatar" size="xs" rounded="lg" /></span>
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-[11px] font-bold text-brand-700 lg:text-sm">{{ safeDisplayName(e.name, e.username) }}</p>
-          <p class="hidden truncate text-xs font-bold text-brand-600/50 lg:block">{{ subline(e) }}</p>
+        <span class="w-4 shrink-0 text-center text-[10px] font-extrabold text-brand-600/40">#{{ e.rank }}</span>
+        <UserAvatar :avatar="e.avatar" size="xs" rounded="lg" />
+        <div class="min-w-0 max-w-[4.5rem] flex-1 lg:max-w-[5.5rem]">
+          <p class="truncate text-[11px] font-bold text-brand-700">{{ safeDisplayName(e.name, e.username) }}</p>
+          <p class="truncate text-[10px] font-bold text-brand-600/50">{{ subline(e) }}</p>
         </div>
         <span
-          class="shrink-0 text-[11px] font-extrabold lg:text-sm"
+          class="ml-auto shrink-0 text-[11px] font-extrabold"
           :class="tab === 'rise' ? 'text-mint' : tab === 'honor' ? 'text-candy' : 'text-brand-500'"
         >
           {{ displayValue(e) }}
@@ -153,7 +152,7 @@ watch(tab, load, { immediate: true })
       </button>
     </div>
 
-    <div v-if="user.username" class="mt-2 border-t border-brand-100 pt-1.5 text-[10px] font-bold text-brand-600/50 lg:mt-2.5 lg:pt-2 lg:text-xs">
+    <div v-if="user.username" class="mt-2 border-t border-brand-100 pt-1.5 text-[10px] font-bold text-brand-600/50">
       我的排名：{{ selfRankLabel }}
     </div>
   </div>

@@ -46,7 +46,7 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="grid grid-cols-[minmax(0,1fr)_minmax(7.5rem,min(18.75rem,30vw))] items-start gap-2 lg:gap-3">
+  <div class="grid grid-cols-[minmax(0,1fr)_minmax(6.75rem,min(12rem,20vw))] items-start gap-2 lg:gap-3">
     <section class="min-w-0 space-y-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
