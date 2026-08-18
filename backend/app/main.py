@@ -1,11 +1,9 @@
-from pathlib import Path
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-from .config import AUDIO, BOOKS, RECORDINGS, ROOT
+from .config import AUDIO, BOOKS, HOST, PORT, RECORDINGS, ROOT
 from .db import init_db
 from .routers import (
     admin,
@@ -25,8 +23,10 @@ from .routers import (
     wrongbook,
 )
 from .routers.share import share_page
+from .timeutil import server_now_iso, shanghai_today
 
 DIST = ROOT / "frontend" / "dist"
+NO_CACHE = {"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"}
 
 app = FastAPI(title="Reading Club")
 app.add_middleware(
@@ -59,16 +59,50 @@ app.get("/share/{rec_id}")(share_page)
 app.mount("/media/books", StaticFiles(directory=BOOKS), name="books")
 app.mount("/media/audio", StaticFiles(directory=AUDIO), name="audio")
 app.mount("/media/recordings", StaticFiles(directory=RECORDINGS), name="recordings")
-if DIST.exists():
-    app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
+
+_assets = DIST / "assets"
+if _assets.exists():
+    app.mount("/assets", StaticFiles(directory=str(_assets)), name="assets")
+
+
+@app.get("/api/health")
+def health():
+    return {
+        "ok": True,
+        "service": "reading-club",
+        "server_now": server_now_iso(),
+        "today": shanghai_today().isoformat(),
+        "timezone": "Asia/Shanghai",
+    }
+
+
+def _serve_index():
+    index = DIST / "index.html"
+    if not index.exists():
+        return HTMLResponse(
+            "<h1>前端尚未构建</h1><p>开发请运行 <code>cd frontend && npm run dev</code>，"
+            "生产请在服务器执行 <code>npm run deploy</code>。</p>",
+            status_code=200,
+        )
+    return FileResponse(str(index), headers=NO_CACHE)
+
+
+@app.get("/")
+async def index():
+    return _serve_index()
 
 
 @app.get("/{full_path:path}")
-async def spa(full_path: str):
-    if DIST.exists():
-        file = DIST / full_path
-        if full_path and file.exists() and file.is_file():
-            return FileResponse(file)
-        return FileResponse(DIST / "index.html")
-    return {"ok": True, "hint": "frontend not built"}
+async def spa_fallback(full_path: str):
+    if full_path.startswith(("api/", "assets/", "media/", "share/")):
+        raise HTTPException(status_code=404)
+    candidate = DIST / full_path
+    if candidate.is_file():
+        return FileResponse(str(candidate))
+    return _serve_index()
 
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("app.main:app", host=HOST, port=PORT, reload=True)

@@ -1,7 +1,11 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(ROOT / ".env")
+load_dotenv(ROOT / "backend" / ".env")
 CONTENT = ROOT / "content"
 CATALOG = CONTENT / "catalog.json"
 BOOKS = CONTENT / "books"
@@ -33,6 +37,9 @@ QINIU_ZONE = (os.getenv("QINIU_ZONE") or os.getenv("QINIU_REGION") or "").strip(
 QINIU_UPLOAD_HOST = (os.getenv("QINIU_UPLOAD_HOST") or "").strip()
 QINIU_PRACTICE_PREFIX = os.getenv("QINIU_PRACTICE_PREFIX") or "reading-club/practices"
 QINIU_ASSET_PREFIX = os.getenv("QINIU_ASSET_PREFIX") or "reading-club/assets"
+QINIU_FRONTEND_PREFIX = (os.getenv("QINIU_FRONTEND_PREFIX") or os.getenv("QINIU_DEPLOY_PREFIX") or "reading-club").strip().strip("/")
+HOST = os.getenv("HOST") or "0.0.0.0"
+PORT = int(os.getenv("PORT") or "8001")
 JWT_SECRET = os.getenv("JWT_SECRET") or "reading_club_jwt_secret_2026"
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME") or "admin"
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD") or "coding61"

@@ -15,6 +15,7 @@ __pycache__/
 # frontend
 frontend/node_modules/
 frontend/dist/
+frontend/dist-next/
 frontend/.vite/
 
 # generated local data
