@@ -32,7 +32,7 @@ const emit = defineEmits<{
   <Teleport to="body">
     <div
       v-if="open"
-      class="record-bar pointer-events-auto fixed inset-x-0 bottom-0 z-[75] border-t border-brand-200/70 bg-white/95 px-2 py-1.5 shadow-[0_-6px_20px_rgba(15,23,42,0.08)] backdrop-blur-sm"
+      class="record-bar pointer-events-auto fixed inset-x-0 bottom-0 z-[75] border-t border-brand-200/70 bg-white/95 px-2 py-1.5 pb-[max(0.4rem,env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(15,23,42,0.08)] backdrop-blur-sm"
     >
       <div class="mx-auto flex max-w-[1400px] flex-wrap items-center gap-2">
         <span class="chip shrink-0 bg-brand-100 text-brand-700">第 {{ segIndex + 1 }} / {{ segCount }} 段</span>

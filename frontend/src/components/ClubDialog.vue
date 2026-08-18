@@ -132,7 +132,7 @@ const cardStyle = computed(() => {
     <transition name="fade">
       <div
         v-if="open"
-        class="fixed z-[60] p-4"
+        class="fixed z-[60] p-2 sm:p-4"
         :class="
           pos
             ? 'inset-0 pointer-events-none'
@@ -152,7 +152,7 @@ const cardStyle = computed(() => {
             'pointer-events-auto shadow-pop',
             fixed && dock === 'side' && !pos ? 'flex max-h-[40vh] flex-col overflow-hidden lg:h-[32rem] lg:max-h-[32rem]' : '',
             fixed && dock !== 'side' && !pos ? 'flex h-[32rem] flex-col overflow-hidden' : '',
-            !fixed ? 'max-h-[88vh] overflow-y-auto' : '',
+            !fixed ? 'max-h-[80dvh] overflow-y-auto sm:max-h-[88vh]' : '',
             !pos ? 'animate-pop-in' : '',
             dragging ? 'cursor-grabbing' : '',
           ]"

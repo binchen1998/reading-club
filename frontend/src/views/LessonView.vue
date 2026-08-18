@@ -769,17 +769,21 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="lesson && beat" class="flex h-full min-h-0 flex-col" :class="recordBarOpen ? 'pb-14' : ''">
-    <div class="fixed left-1/2 top-2 z-[90] flex -translate-x-1/2 items-center gap-2">
+  <div
+    v-if="lesson && beat"
+    class="flex h-full min-h-0 flex-col overflow-hidden"
+    :class="recordBarOpen ? 'pb-14' : 'pb-[env(safe-area-inset-bottom)]'"
+  >
+    <div class="fixed left-1/2 top-1.5 z-[90] flex -translate-x-1/2 items-center gap-1.5 lg:top-2 lg:gap-2">
       <button
-        class="rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-brand-700 shadow-pop"
+        class="rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-extrabold text-brand-700 shadow-pop lg:px-4 lg:py-2 lg:text-sm"
         type="button"
         @click="goBack"
       >
         ← 返回
       </button>
       <button
-        class="rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-brand-700 shadow-pop disabled:opacity-40"
+        class="rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-extrabold text-brand-700 shadow-pop disabled:opacity-40 lg:px-4 lg:py-2 lg:text-sm"
         type="button"
         :disabled="firstBeat"
         @click="prevPage"
@@ -787,7 +791,7 @@ onUnmounted(() => {
         上一页
       </button>
       <button
-        class="rounded-full bg-white/90 px-4 py-2 text-sm font-extrabold text-brand-700 shadow-pop disabled:opacity-40"
+        class="rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-extrabold text-brand-700 shadow-pop disabled:opacity-40 lg:px-4 lg:py-2 lg:text-sm"
         type="button"
         :disabled="lastBeat"
         @click="nextPage"
@@ -795,9 +799,9 @@ onUnmounted(() => {
         下一页
       </button>
     </div>
-    <div class="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
-    <section class="relative min-h-[58dvh] min-w-0 flex-1 lg:min-h-0">
-      <div class="h-full overflow-hidden rounded-2xl border border-brand-200/60 bg-brand-50">
+    <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:flex-row lg:gap-3">
+    <section class="relative min-h-0 min-w-0 flex-1">
+      <div class="h-full overflow-hidden rounded-xl border border-brand-200/60 bg-brand-50 lg:rounded-2xl">
         <BookStage
           :src="beat.image"
           :boxes="displayBoxes"
@@ -809,7 +813,7 @@ onUnmounted(() => {
       </div>
       <button
         v-if="flowPaused && step !== 'explain'"
-        class="btn-candy absolute bottom-3 left-3 right-3 z-10"
+        class="btn-candy absolute bottom-2 left-2 right-2 z-10 max-lg:py-2 max-lg:text-sm"
         type="button"
         @click="resumeFlow"
       >
@@ -817,18 +821,18 @@ onUnmounted(() => {
       </button>
     </section>
 
-    <aside class="max-h-[40vh] space-y-3 overflow-y-auto lg:max-h-none lg:h-full lg:w-[360px] lg:shrink-0">
-        <p class="font-extrabold text-brand-700">
+    <aside class="shrink-0 space-y-2 lg:flex lg:h-full lg:w-[360px] lg:shrink-0 lg:flex-col lg:space-y-3 lg:overflow-y-auto">
+        <p class="truncate text-sm font-extrabold text-brand-700 lg:text-base">
           {{ lesson.title_zh }} · 第 {{ beat.page }} 页 · {{ beatIndex + 1 }}/{{ lesson.beats.length }}
         </p>
-        <section class="card space-y-3">
+        <section class="card space-y-2 p-3 lg:space-y-3 lg:p-5">
           <div class="flex items-center justify-between gap-2">
-            <p class="text-xs font-extrabold uppercase tracking-wide text-brand-600">讲解</p>
-            <label class="flex items-center gap-1 text-xs font-bold text-brand-600/70">
+            <p class="text-[11px] font-extrabold uppercase tracking-wide text-brand-600 lg:text-xs">讲解</p>
+            <label class="flex items-center gap-1 text-[11px] font-bold text-brand-600/70 lg:text-xs">
               句间停
               <input
                 v-model.number="gapSec"
-                class="w-14 rounded-xl border border-brand-200 bg-white px-2 py-1 font-bold text-brand-700"
+                class="w-11 rounded-xl border border-brand-200 bg-white px-1.5 py-0.5 font-bold text-brand-700 lg:w-14 lg:px-2 lg:py-1"
                 type="number"
                 min="0"
                 max="5"
@@ -837,7 +841,7 @@ onUnmounted(() => {
               秒
             </label>
           </div>
-          <div class="max-h-[42vh] space-y-2 overflow-y-auto pr-1">
+          <div class="hidden max-h-[42vh] space-y-2 overflow-y-auto pr-1 lg:block">
             <button
               v-for="(sent, i) in sentences"
               :id="`sent-${i}`"
@@ -850,10 +854,10 @@ onUnmounted(() => {
               {{ sent }}
             </button>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button class="btn-ghost w-full" type="button" @click="playExplain">再听一遍</button>
+          <div class="grid grid-cols-2 gap-1.5 lg:gap-2">
+            <button class="btn-ghost w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs" type="button" @click="playExplain">再听一遍</button>
             <button
-              class="btn-primary w-full"
+              class="btn-primary w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs"
               type="button"
               :disabled="!vocabQs.length"
               @click="startActivity('vocab')"
@@ -861,29 +865,29 @@ onUnmounted(() => {
               {{ vocabDone ? '单词已过 ✓' : '复习单词' }}
             </button>
             <button
-              class="btn-primary w-full"
+              class="btn-primary w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs"
               type="button"
               :disabled="!phraseQs.length"
               @click="startActivity('phrase')"
             >
               {{ phraseDone ? '短语已过 ✓' : '复习短语' }}
             </button>
-            <button class="btn-candy w-full" type="button" @click="startActivity('record')">
+            <button class="btn-candy w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs" type="button" @click="startActivity('record')">
               {{ recordDone ? '朗读已录 ✓' : '开始录制' }}
             </button>
           </div>
         </section>
 
-        <section class="card space-y-3">
-          <p class="font-extrabold text-brand-700">这一页重点</p>
+        <section class="card space-y-2 p-3 lg:space-y-3 lg:p-5">
+          <p class="text-sm font-extrabold text-brand-700 lg:text-base">这一页重点</p>
           <div>
-            <p class="mb-2 text-xs font-extrabold text-brand-500">词</p>
-            <div class="flex flex-wrap gap-2">
+            <p class="mb-1 text-[11px] font-extrabold text-brand-500 lg:mb-2 lg:text-xs">词</p>
+            <div class="flex flex-wrap gap-1 lg:gap-2">
               <button
                 v-for="w in beat.word_items"
                 :key="w.en"
                 type="button"
-                class="chip bg-brand-100 text-brand-700 transition hover:bg-brand-200"
+                class="chip bg-brand-100 text-brand-700 transition hover:bg-brand-200 max-lg:px-2 max-lg:py-0.5 max-lg:text-xs"
                 @click="openFocus(w)"
               >
                 {{ w.en }}
@@ -891,13 +895,13 @@ onUnmounted(() => {
             </div>
           </div>
           <div>
-            <p class="mb-2 text-xs font-extrabold text-brand-500">短语</p>
-            <div class="flex flex-wrap gap-2">
+            <p class="mb-1 text-[11px] font-extrabold text-brand-500 lg:mb-2 lg:text-xs">短语</p>
+            <div class="flex flex-wrap gap-1 lg:gap-2">
               <button
                 v-for="p in beat.phrase_items"
                 :key="p.en"
                 type="button"
-                class="chip bg-sky/15 text-brand-700 transition hover:bg-sky/25"
+                class="chip bg-sky/15 text-brand-700 transition hover:bg-sky/25 max-lg:px-2 max-lg:py-0.5 max-lg:text-xs"
                 @click="openFocus(p)"
               >
                 {{ p.en }}
@@ -928,13 +932,13 @@ onUnmounted(() => {
             · 已重试 {{ step === 'phrase' ? phraseRetries : vocabRetries }} 次
           </span>
         </p>
-        <p class="mb-4 text-center text-3xl font-extrabold text-brand-700">{{ currentQuestion.item.en }}</p>
+        <p class="mb-3 text-center text-2xl font-extrabold text-brand-700 sm:mb-4 sm:text-3xl">{{ currentQuestion.item.en }}</p>
         <div class="flex flex-col gap-2">
           <button
             v-for="opt in currentQuestion.options"
             :key="opt.key"
             type="button"
-            class="flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-lg font-bold transition active:scale-95"
+            class="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-base font-bold transition active:scale-95 sm:px-4 sm:py-3 sm:text-lg"
             :class="optionClass(opt)"
             :disabled="celebrating || (wrongKeys[quizCursor] || []).includes(opt.key)"
             @click="pickOption(opt.key)"
@@ -958,9 +962,9 @@ onUnmounted(() => {
           v-if="celebrating"
           class="pointer-events-none fixed inset-0 z-[70] flex items-center justify-center"
         >
-          <div class="card animate-pop-in px-10 py-8 text-center shadow-pop">
-            <p class="text-6xl">{{ quizNeedRetry ? '🔁' : '🎉' }}</p>
-            <p class="mt-3 text-2xl font-extrabold" :class="quizNeedRetry ? 'text-candy' : 'text-mint'">
+          <div class="card animate-pop-in px-6 py-5 text-center shadow-pop sm:px-10 sm:py-8">
+            <p class="text-5xl sm:text-6xl">{{ quizNeedRetry ? '🔁' : '🎉' }}</p>
+            <p class="mt-2 text-xl font-extrabold sm:mt-3 sm:text-2xl" :class="quizNeedRetry ? 'text-candy' : 'text-mint'">
               {{ quizNeedRetry ? '这轮有错，再来一遍' : '答对了！' }}
             </p>
           </div>

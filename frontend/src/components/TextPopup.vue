@@ -70,10 +70,10 @@ function close() {
     <transition name="fade">
       <div
         v-if="open"
-        class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/45 p-4"
+        class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/45 p-2 sm:p-4"
         @click.self="close"
       >
-        <div class="card relative w-full max-w-xl animate-pop-in px-5 py-6">
+        <div class="card relative w-full max-w-xl animate-pop-in px-3 py-4 sm:px-5 sm:py-6">
           <button class="game-result-close" type="button" aria-label="关闭" @click="close">×</button>
           <div class="flex flex-wrap items-center justify-center gap-2 pr-6">
             <button

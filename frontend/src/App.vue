@@ -112,7 +112,7 @@ onUnmounted(() => {
       </header>
       <main
         class="mx-auto"
-        :class="reading ? 'h-[100dvh] overflow-hidden px-2 pb-2 pt-14' : 'max-w-[1400px] px-4 pb-16 pt-4 lg:px-6'"
+        :class="reading ? 'h-[100dvh] overflow-hidden px-1.5 pb-1.5 pt-11 lg:px-2 lg:pb-2 lg:pt-14' : 'max-w-[1400px] px-4 pb-16 pt-4 lg:px-6'"
       >
         <RouterView v-slot="{ Component, route: r }">
           <transition name="fade">
