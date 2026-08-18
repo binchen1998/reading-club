@@ -152,6 +152,11 @@ const displayBoxes = computed(() => {
   return raw.map((box) => inflateBox(box))
 })
 const bookKey = computed(() => `${route.params.seriesId}/${route.params.bookSlug}`)
+const showAssistant = computed(() => {
+  const raw = route.query.assistant
+  const value = Array.isArray(raw) ? raw[0] : raw
+  return String(value || '').toLowerCase() === 'yes'
+})
 const pageHotspots = computed(() => pageOcr.value)
 const dictBanks = computed<DictItem[]>(() => [
   ...(lesson.value?.word_bank || []),
@@ -1151,9 +1156,9 @@ onUnmounted(() => {
         下一页
       </button>
     </div>
-    <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:flex-row lg:gap-3">
+    <div class="flex min-h-0 flex-1 flex-row gap-2 overflow-hidden lg:gap-3">
     <section class="relative min-h-0 min-w-0 flex-1">
-      <div class="h-full overflow-hidden rounded-xl border border-brand-200/60 bg-brand-50 lg:rounded-2xl">
+      <div class="h-full overflow-hidden rounded-2xl border border-brand-200/60 bg-brand-50">
         <BookStage
           :src="beat.image"
           :boxes="displayBoxes"
@@ -1173,7 +1178,7 @@ onUnmounted(() => {
       </button>
     </section>
 
-    <aside class="shrink-0 space-y-2 lg:flex lg:h-full lg:w-[360px] lg:shrink-0 lg:flex-col lg:space-y-3 lg:overflow-y-auto">
+    <aside class="flex h-full w-[min(22.5rem,40vw)] shrink-0 flex-col space-y-2 overflow-y-auto lg:w-[360px] lg:space-y-3">
         <p class="truncate text-sm font-extrabold text-brand-700 lg:text-base">
           {{ lesson.title_zh }} · 第 {{ beat.page }} 页 · {{ beatIndex + 1 }}/{{ lesson.beats.length }}
         </p>
@@ -1214,7 +1219,7 @@ onUnmounted(() => {
           <p v-if="explainWaitingTts" class="text-[11px] font-bold text-brand-600/70 lg:text-xs">
             正在等待朗读...
           </p>
-          <div class="max-h-[28vh] space-y-2 overflow-y-auto pr-1 lg:max-h-[42vh]">
+          <div class="max-h-[42vh] space-y-2 overflow-y-auto pr-1">
             <div
               v-if="explainBusy"
               class="rounded-2xl bg-sunny/80 px-3 py-2 font-bold leading-7 text-brand-700"
@@ -1453,9 +1458,9 @@ onUnmounted(() => {
     />
 
     <UserCameraPip :book-key="bookKey" />
-    <AssistantLive2dPip :visible="true" />
+    <AssistantLive2dPip :visible="showAssistant" />
     <AiAskListenFab
-      :visible="true"
+      :visible="showAssistant"
       :listening="askListening"
       :stream="askStream"
       :disabled="askBusy || recording"
@@ -1463,7 +1468,7 @@ onUnmounted(() => {
       @finish="finishAsk"
     />
     <p
-      v-if="askError || askBusy"
+      v-if="showAssistant && (askError || askBusy)"
       class="pointer-events-none fixed bottom-24 left-1/2 z-[93] -translate-x-1/2 rounded-full bg-white/95 px-4 py-1.5 text-xs font-extrabold text-candy shadow-pop"
     >
       {{ askBusy ? '助教正在想…' : askError }}
