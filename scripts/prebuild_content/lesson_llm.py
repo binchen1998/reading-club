@@ -10,6 +10,31 @@ from scripts.prebuild_content.pages import clip_segment_to_page
 
 logger = logging.getLogger("prebuild_content")
 PROMPT_PATH = Path(__file__).resolve().parent / "prompt.md"
+WORD_RE = re.compile(r"[A-Za-z']+")
+
+
+def page_item_quota(english: str) -> int:
+    """本页单词/短句数量：按英文篇幅落在 2–5。"""
+    n = len(WORD_RE.findall(english or ""))
+    if n <= 40:
+        return 2
+    if n <= 70:
+        return 3
+    if n <= 110:
+        return 4
+    return 5
+
+
+def _uniq(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for item in items:
+        key = item.lower()
+        if not item or key in seen:
+            continue
+        seen.add(key)
+        out.append(item)
+    return out
 
 
 def load_prompt() -> str:
@@ -107,12 +132,15 @@ def sanitize_lesson(lesson: dict, chapter: dict) -> dict:
             for seg in (beat.get("segments") or [])
             if str(seg).strip()
         ]
+        quota = page_item_quota(english)
+        words = _uniq(str(w).strip() for w in (beat.get("words") or []))[:quota]
+        phrases = _uniq(str(p).strip() for p in (beat.get("phrases") or []))[:quota]
         beats.append(
             {
                 "page": page_no,
                 "explain": str(beat.get("explain") or "").strip(),
-                "words": [str(w).strip() for w in (beat.get("words") or []) if str(w).strip()],
-                "phrases": [str(p).strip() for p in (beat.get("phrases") or []) if str(p).strip()],
+                "words": words,
+                "phrases": phrases,
                 "segments": segments,
             }
         )

@@ -22,6 +22,7 @@ PAGES = [
         "phrases": [
             {"en": "Nate the Great", "zh": "大侦探奈特"},
             {"en": "a pile of books", "zh": "一大堆书"},
+            {"en": "I am a detective", "zh": "我是侦探"},
         ],
     },
     {
@@ -32,10 +33,14 @@ PAGES = [
             {"en": "cookbook", "zh": "食谱书"},
             {"en": "wreck", "zh": "破坏"},
             {"en": "president", "zh": "主席；会长"},
+            {"en": "strange", "zh": "奇怪的"},
         ],
         "phrases": [
             {"en": "book club", "zh": "读书俱乐部"},
             {"en": "a bunch of books", "zh": "一堆书"},
+            {"en": "great news", "zh": "好消息"},
+            {"en": "piled on her head", "zh": "堆在她头上"},
+            {"en": "Rosamond's Ready Readers", "zh": "罗莎蒙德的准备读者"},
         ],
     },
     {
@@ -43,6 +48,7 @@ PAGES = [
         "explain": "Rosamond 解释：These books help me hold my head high and look like a president. hold my head high 是把头抬高，显得很神气。Nate 心里想，这可是个 very strange president，strange 就是奇怪。书顶在头上当主席，他觉得这件事本身就很怪。",
         "words": [
             {"en": "strange", "zh": "奇怪的"},
+            {"en": "president", "zh": "主席；会长"},
         ],
         "phrases": [
             {"en": "hold my head high", "zh": "昂首挺胸"},
@@ -55,12 +61,12 @@ PAGES = [
         "words": [
             {"en": "treats", "zh": "点心"},
             {"en": "torn", "zh": "撕破的"},
-            {"en": "ripped", "zh": "扯破的"},
             {"en": "ruined", "zh": "毁了的"},
         ],
         "phrases": [
             {"en": "kitchen table", "zh": "厨房桌子"},
             {"en": "club meeting", "zh": "俱乐部聚会"},
+            {"en": "torn, ripped, ruined", "zh": "撕了、扯了、毁了"},
         ],
     },
 ]
