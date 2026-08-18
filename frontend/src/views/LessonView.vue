@@ -1112,7 +1112,7 @@ onUnmounted(() => {
       @close="closeTextPopup"
     />
 
-    <UserCameraPip />
+    <UserCameraPip :book-key="bookKey" />
     <AssistantLive2dPip :visible="true" />
     <AiAskListenFab
       :visible="true"

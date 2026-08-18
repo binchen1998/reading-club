@@ -5,8 +5,13 @@ const enabled = ref(false)
 const starting = ref(false)
 const stream = shallowRef<MediaStream | null>(null)
 const error = ref('')
-/** 固定定位：null 表示使用默认锚点 */
-const pos = ref<{ left: number; top: number } | null>(null)
+type PipPos = { left: number; top: number }
+
+/** 固定定位：null 表示尚未落到屏幕上 */
+const pos = ref<PipPos | null>(null)
+/** 当前书内拖动缓存；换书后失效 */
+let boundBookKey = ''
+let cachedPos: PipPos | null = null
 
 /** 用于取消尚未完成的 getUserMedia（离开页面时） */
 let startEpoch = 0
@@ -72,12 +77,26 @@ export function useUserCamera() {
     stop()
   }
 
-  function setPos(left: number, top: number) {
-    pos.value = { left, top }
+  function bindBook(bookKey: string) {
+    const key = bookKey.trim()
+    if (key === boundBookKey) return
+    boundBookKey = key
+    cachedPos = null
+    pos.value = null
+  }
+
+  function setPos(left: number, top: number, remember = false) {
+    const next = { left, top }
+    pos.value = next
+    if (remember && boundBookKey) cachedPos = next
   }
 
   function resetPos() {
     pos.value = null
+  }
+
+  function takeCachedPos(): PipPos | null {
+    return cachedPos ? { ...cachedPos } : null
   }
 
   function liveVideoTrack(): MediaStreamTrack | null {
@@ -96,8 +115,10 @@ export function useUserCamera() {
     start,
     stop,
     close,
+    bindBook,
     setPos,
     resetPos,
+    takeCachedPos,
     liveVideoTrack,
   }
 }

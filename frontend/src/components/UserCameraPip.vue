@@ -3,12 +3,13 @@ import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { useUserCamera } from '../composables/useUserCamera'
 
+const props = defineProps<{ bookKey: string }>()
+
 const PIP_W = 168
 const PIP_H = 126
 const MARGIN = 16
-const ANCHOR_GAP = 10
 
-const { enabled, stream, pos, close, setPos, resetPos } = useUserCamera()
+const { enabled, stream, pos, close, bindBook, setPos, takeCachedPos } = useUserCamera()
 const videoEl = ref<HTMLVideoElement | null>(null)
 const rootEl = ref<HTMLDivElement | null>(null)
 const dragging = ref(false)
@@ -27,24 +28,21 @@ function clampPos(left: number, top: number) {
   }
 }
 
-function anchorRect(): DOMRect | null {
-  const el = document.querySelector('[data-camera-pip-anchor]')
-  return el instanceof HTMLElement ? el.getBoundingClientRect() : null
+function placeTopRight() {
+  userMoved.value = false
+  const next = clampPos(window.innerWidth - PIP_W - MARGIN, MARGIN)
+  setPos(next.left, next.top, false)
 }
 
-function placeAboveAnchor() {
-  const rect = anchorRect()
-  if (rect) {
-    const left = rect.left + (rect.width - PIP_W) / 2
-    const top = rect.top - PIP_H - ANCHOR_GAP
-    const next = clampPos(left, top)
-    setPos(next.left, next.top)
+function applyCachedOrDefault() {
+  const cached = takeCachedPos()
+  if (cached) {
+    const next = clampPos(cached.left, cached.top)
+    userMoved.value = true
+    setPos(next.left, next.top, true)
     return
   }
-  setPos(
-    Math.max(MARGIN, window.innerWidth - PIP_W - MARGIN),
-    Math.max(MARGIN, window.innerHeight - PIP_H - 120),
-  )
+  placeTopRight()
 }
 
 function bindStream() {
@@ -62,22 +60,27 @@ function bindStream() {
 
 async function ensureVisibleAndBound() {
   if (!enabled.value || !stream.value) return
-  if (!userMoved.value || !pos.value) placeAboveAnchor()
+  if (!pos.value) applyCachedOrDefault()
   await nextTick()
   bindStream()
 }
+
+watch(
+  () => props.bookKey,
+  (key) => {
+    bindBook(key)
+    userMoved.value = false
+    if (enabled.value && stream.value) placeTopRight()
+  },
+  { immediate: true },
+)
 
 watch(stream, (s) => {
   if (s) void ensureVisibleAndBound()
 })
 
 watch(enabled, (on) => {
-  if (!on) {
-    userMoved.value = false
-    resetPos()
-    return
-  }
-  void ensureVisibleAndBound()
+  if (on) void ensureVisibleAndBound()
 })
 
 watch(videoEl, (el) => {
@@ -100,7 +103,7 @@ function onPointerMove(e: PointerEvent) {
   if (!dragging.value || pointerId !== e.pointerId) return
   userMoved.value = true
   const next = clampPos(e.clientX - dragOffsetX, e.clientY - dragOffsetY)
-  setPos(next.left, next.top)
+  setPos(next.left, next.top, true)
 }
 
 function onPointerUp(e: PointerEvent) {
@@ -115,13 +118,14 @@ function onClose() {
 }
 
 function onResize() {
-  if (!pos.value) return
+  if (!enabled.value) return
   if (!userMoved.value) {
-    placeAboveAnchor()
+    placeTopRight()
     return
   }
+  if (!pos.value) return
   const next = clampPos(pos.value.left, pos.value.top)
-  setPos(next.left, next.top)
+  setPos(next.left, next.top, true)
 }
 
 onMounted(() => {
