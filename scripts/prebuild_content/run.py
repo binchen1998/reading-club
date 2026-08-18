@@ -63,14 +63,14 @@ def process_book(
     only: str,
     force: bool,
 ) -> None:
-    chapters = split_chapters(book.get("pages") or [])
+    chapters = split_chapters(book.get("pages") or [], book.get("title") or "")
     if chapter:
         chapters = [c for c in chapters if int(c.get("chapter") or 0) == chapter]
         if not chapters:
             print(f"[skip] {series_id}/{slug} 没有第 {chapter} 章", flush=True)
             return
     if not chapters:
-        print(f"[skip] {series_id}/{slug} 没识别到 Chapter 正文", flush=True)
+        print(f"[skip] {series_id}/{slug} 没有可读页", flush=True)
         return
 
     for info in chapters:

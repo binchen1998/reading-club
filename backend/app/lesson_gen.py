@@ -60,7 +60,7 @@ def generate_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
             book = load_book(series_id, book_slug)
         except FileNotFoundError as exc:
             raise RuntimeError("书目里没有这本书") from exc
-        chapters = split_chapters(book.get("pages") or [])
+        chapters = split_chapters(book.get("pages") or [], book.get("title") or "")
         info = next((row for row in chapters if int(row.get("chapter") or 0) == chapter), None)
         if info is None:
             raise RuntimeError("这一章还没开放")

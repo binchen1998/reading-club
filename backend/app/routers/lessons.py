@@ -56,7 +56,7 @@ def book_detail(series_id: str, book_slug: str):
                 "generated": True,
                 "generating": False,
             }
-    for info in split_chapters(book.get("pages") or []):
+    for info in split_chapters(book.get("pages") or [], book.get("title") or ""):
         num = int(info.get("chapter") or 0)
         if not num:
             continue

@@ -103,24 +103,33 @@ def annotate_pages(pages: list[dict]) -> list[dict]:
     return rows
 
 
-def split_chapters(pages: list[dict]) -> list[dict]:
+def split_chapters(pages: list[dict], title: str = "") -> list[dict]:
     annotated = annotate_pages(pages)
-    chapters: list[dict] = []
-    current: dict | None = None
-    for row in annotated:
-        num = chapter_number(row["english"])
-        if num is not None:
-            if current:
-                chapters.append(current)
-            title_line = _norm(row["english"]).split(".")[0][:80]
-            current = {"chapter": num, "title": title_line, "pages": [row]}
-            continue
-        if current is None:
-            continue
-        current["pages"].append(row)
-    if current:
-        chapters.append(current)
-    return chapters
+    if not annotated:
+        for page in pages or []:
+            english = (page.get("english") or "").strip()
+            if not english:
+                continue
+            annotated.append(
+                {
+                    "page": int(page.get("page") or 0),
+                    "english": english,
+                    "translate": page.get("translate") or "",
+                    "carry_from_prev": False,
+                    "continues_on_next": False,
+                    "prev_page_tail": "",
+                    "next_page_head": "",
+                }
+            )
+    if not annotated:
+        return []
+    return [
+        {
+            "chapter": 1,
+            "title": (title or "").strip() or "全书",
+            "pages": annotated,
+        }
+    ]
 
 
 def clip_segment_to_page(segment: str, page_english: str) -> str:

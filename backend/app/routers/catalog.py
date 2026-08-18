@@ -82,7 +82,7 @@ def book_last_page(series_id: str, book_slug: str) -> int:
     try:
         pages = [
             int(page.get("page") or 0)
-            for chapter in split_chapters(book.get("pages") or [])
+            for chapter in split_chapters(book.get("pages") or [], book.get("title") or "")
             for page in chapter.get("pages") or []
         ]
     except Exception:

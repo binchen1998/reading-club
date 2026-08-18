@@ -39,7 +39,7 @@ def _book_chapters(series_id: str, book_slug: str, fetch: bool = False) -> list[
     if not book:
         return []
     try:
-        chapters = split_chapters(book.get("pages") or [])
+        chapters = split_chapters(book.get("pages") or [], book.get("title") or "")
     except Exception:
         logger.exception("read book failed %s/%s", series_id, book_slug)
         return []

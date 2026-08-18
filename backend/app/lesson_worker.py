@@ -66,7 +66,7 @@ def enqueue_book(series_id: str, book_slug: str) -> None:
         return
     try:
         book = load_book(series_id, book_slug)
-        chapters = split_chapters(book.get("pages") or [])
+        chapters = split_chapters(book.get("pages") or [], book.get("title") or "")
     except Exception:
         logger.exception("enqueue book failed %s/%s", series_id, book_slug)
         return
