@@ -83,7 +83,7 @@ onUnmounted(() => {
         <div class="relative mx-auto flex min-h-[3.5rem] max-w-[1400px] items-center justify-between gap-3 px-4 py-3 lg:px-6">
           <RouterLink :to="clubLink('/home')" class="flex items-center gap-2 text-lg font-extrabold text-brand-700">
             <span class="animate-float">📖</span>
-            <span class="max-md:hidden">英语阅读俱乐部</span>
+            <span class="max-md:hidden">袋鼠英语阅读</span>
           </RouterLink>
           <nav class="flex flex-wrap items-center justify-end gap-2 text-sm font-extrabold">
             <RouterLink
