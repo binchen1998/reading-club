@@ -34,6 +34,12 @@ export function pickVideoRecorderMime(): string | undefined {
   return firstSupported(WEBM_VIDEO_CANDIDATES)
 }
 
+const AUDIO_CANDIDATES = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm']
+
+export function pickAudioRecorderMime(): string | undefined {
+  return firstSupported(AUDIO_CANDIDATES)
+}
+
 export function blobContainerMime(mimeOrType: string | undefined): string {
   const t = (mimeOrType || '').toLowerCase()
   if (t.includes('mp4') || t.includes('avc1') || t.includes('mp4a')) return 'video/mp4'

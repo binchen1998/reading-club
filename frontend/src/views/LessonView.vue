@@ -8,6 +8,9 @@ import AssistantLive2dPip from '../components/AssistantLive2dPip.vue'
 import BookStage from '../components/BookStage.vue'
 import ClubDialog from '../components/ClubDialog.vue'
 import TextPopup from '../components/TextPopup.vue'
+import UserCameraPip from '../components/UserCameraPip.vue'
+import { useUserCamera } from '../composables/useUserCamera'
+import { useUserStore } from '../stores/user'
 import { recognizeAudio } from '../utils/asr'
 import { speakAssistantText, stopAssistantSpeak } from '../utils/assistantTts'
 import { concatClips } from '../utils/concatClips'
@@ -17,6 +20,7 @@ import { scoreEnglish } from '../utils/score'
 import { ensureOcr, ensureTts } from '../utils/ensureAsset'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
+import { sound } from '../utils/sound'
 import { uploadReading } from '../utils/uploadReading'
 
 type Item = { en: string; zh: string }
@@ -24,6 +28,8 @@ type Choice = { key: string; text: string; ok: boolean }
 
 const route = useRoute()
 const router = useRouter()
+const user = useUserStore()
+const camera = useUserCamera()
 const data = ref<any>(null)
 const beatIndex = ref(0)
 const step = ref<'explain' | 'vocab' | 'phrase' | 'record'>('explain')
@@ -356,6 +362,7 @@ function pickOption(key: string) {
   answers.value = { ...answers.value, [quizCursor.value]: key }
   const item = currentQuestion.value?.item
   if (!opt?.ok) {
+    sound.fail()
     wrongKeys.value = { ...wrongKeys.value, [quizCursor.value]: [...tried, key] }
     if (item) {
       apiPost('/api/wrongbook/add', {
@@ -376,6 +383,7 @@ function pickOption(key: string) {
     }).catch(() => undefined)
   }
   celebrating.value = true
+  sound.celebrate()
   quizRevealed.value = true
   clearQuizTimer()
   quizTimer = window.setTimeout(() => {
@@ -454,7 +462,12 @@ async function startRecord() {
   passed.value = false
   uploadHint.value = ''
   clearPassTimer()
-  pageRecorder = await recordPageClip(beat.value.image)
+  sound.recStart()
+  pageRecorder = await recordPageClip(beat.value.image, {
+    cameraStream: camera.liveVideoTrack() ? camera.stream.value : null,
+    avatar: user.avatar,
+    nickname: user.nickname,
+  })
   recording.value = true
   const total = Math.max(SEC_PER_WORD, recordWords.value * SEC_PER_WORD)
   const deadline = Date.now() + total * 1000
@@ -484,18 +497,23 @@ async function scoreBlob(clip: PageClip) {
   busy.value = true
   scoreError.value = ''
   try {
-    const heard = await recognizeAudio(clip.blob, 'en')
+    const heard = await recognizeAudio(clip.asrBlob || clip.blob, 'en')
     const result = scoreEnglish(currentSeg.value, heard)
     lastScore.value = result.score
     lastHeard.value = result.heard
     passed.value = result.score >= PASS_SCORE
     if (passed.value) {
+      if (lastSegment.value && lastBeat.value) sound.bigCelebrate()
+      else sound.celebrate()
       pageClips.value = [...pageClips.value, { ...clip, score: result.score }]
       clearPassTimer()
       if (lastSegment.value) await flushPageRecording()
       passTimer = window.setTimeout(advanceSegment, lastSegment.value ? 800 : 1600)
+    } else {
+      sound.fail()
     }
   } catch (err) {
+    sound.fail()
     scoreError.value = err instanceof Error ? err.message : '评分失败'
   } finally {
     busy.value = false
@@ -522,6 +540,7 @@ async function flushPageRecording() {
     uploadHint.value = '本页朗读已上传'
     pageClips.value = []
   } catch (err) {
+    sound.fail()
     uploadHint.value = err instanceof Error ? err.message : '上传失败'
   }
 }
@@ -575,7 +594,16 @@ async function playFrom(start: number) {
 }
 
 function pauseFlow() {
+  sound.dismiss()
   closeActivity()
+}
+
+async function toggleCamera() {
+  if (camera.enabled.value) {
+    camera.close()
+    return
+  }
+  await camera.start()
 }
 
 function resumeFlow() {
@@ -592,6 +620,10 @@ function openFocus(item: Item) {
 watch(gapSec, (value) => localStorage.setItem('club-tts-gap', String(value)))
 
 watch(beatIndex, () => closeTextPopup())
+
+watch(recordDialogOpen, (open) => {
+  if (open) void camera.start()
+})
 
 watch(
   () => [step.value, quizCursor.value, segIndex.value] as const,
@@ -617,6 +649,7 @@ onUnmounted(() => {
   clearPassTimer()
   clearRecordTimer()
   if (recording.value) stopRecord()
+  camera.stop()
   stopAskStream()
   stopAudio()
 })
@@ -766,6 +799,7 @@ onUnmounted(() => {
       :emoji="step === 'vocab' ? '🔤' : '💬'"
       dock="side"
       fixed
+      draggable
       @close="pauseFlow"
     >
       <template v-if="currentQuestion">
@@ -813,9 +847,23 @@ onUnmounted(() => {
       </transition>
     </Teleport>
 
-    <ClubDialog :open="recordDialogOpen" title="读这一段" emoji="📖" dock="bottom" @close="pauseFlow">
+    <ClubDialog :open="recordDialogOpen" title="读这一段" emoji="📖" dock="bottom" draggable @close="pauseFlow">
       <p class="mb-2 chip bg-brand-100 text-brand-700">第 {{ segIndex + 1 }} / {{ pageSegments.length }} 段</p>
       <p class="mb-3 font-bold text-brand-600">书上黄框就是要读的。每个词最多 3 秒，读完可点停，时间到会自动停。</p>
+      <div class="mb-3 flex items-center justify-between gap-2">
+        <button
+          class="chip bg-brand-100 text-brand-700 disabled:opacity-50"
+          type="button"
+          :disabled="camera.starting"
+          @click="toggleCamera"
+        >
+          {{ camera.enabled ? '📷 关闭摄像头' : '📷 打开摄像头' }}
+        </button>
+        <span class="text-xs font-bold text-brand-600/70">
+          {{ camera.enabled ? '成片右上角叠你的脸' : '成片右上角用头像' }}
+        </span>
+      </div>
+      <p v-if="camera.error && !camera.enabled" class="mb-2 text-xs font-bold text-candy">{{ camera.error }}</p>
       <div v-if="recording" class="mb-3 text-center">
         <p class="text-5xl font-extrabold tabular-nums" :class="recordLeft <= 3 ? 'text-candy' : 'text-brand-700'">
           {{ Math.ceil(recordLeft) }}
@@ -831,7 +879,7 @@ onUnmounted(() => {
           />
         </div>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div data-camera-pip-anchor class="flex flex-wrap gap-2">
         <button v-if="!recording && !busy" class="btn-candy flex-1" type="button" @click="startRecord">
           {{ lastScore != null && !passed ? '再读一次' : '开始录音' }}
         </button>
@@ -873,6 +921,7 @@ onUnmounted(() => {
       @close="closeTextPopup"
     />
 
+    <UserCameraPip />
     <AssistantLive2dPip :visible="true" />
     <AiAskListenFab
       :visible="true"
