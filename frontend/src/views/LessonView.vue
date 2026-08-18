@@ -1171,22 +1171,6 @@ onUnmounted(() => {
         单词过了才能复习短语，短语过了才能自主朗读。
       </p>
       <div class="mt-5 flex flex-col gap-2">
-        <button
-          v-if="needVocab && !vocabDone && vocabQs.length"
-          class="btn-primary w-full"
-          type="button"
-          @click="startActivity('vocab')"
-        >
-          去复习单词
-        </button>
-        <button
-          v-else-if="needPhrase && !phraseDone && phraseQs.length"
-          class="btn-primary w-full"
-          type="button"
-          @click="startActivity('phrase')"
-        >
-          去复习短语
-        </button>
         <button class="btn-ghost w-full" type="button" @click="readPromptOpen = false">知道了</button>
       </div>
     </ClubDialog>
