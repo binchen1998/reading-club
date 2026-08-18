@@ -28,7 +28,7 @@ onMounted(async () => {
       <h1 class="text-3xl font-extrabold text-brand-700">章节书书架</h1>
       <p class="mt-1 font-bold text-brand-600/80">页图直接用原站资源，打开就能读。</p>
     </div>
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-5 gap-3">
       <router-link
         v-for="s in data.series"
         :key="s.id"
@@ -37,12 +37,11 @@ onMounted(async () => {
       >
         <div class="aspect-[3/4] overflow-hidden bg-brand-100">
           <img v-if="coverOf(s)" :src="coverOf(s)" :alt="s.title" class="h-full w-full object-cover" />
-          <div v-else class="grid h-full place-items-center text-5xl">📖</div>
+          <div v-else class="grid h-full place-items-center text-3xl">📖</div>
         </div>
-        <div class="space-y-1 p-4">
-          <span class="chip bg-mint/15 text-mint">可阅读</span>
-          <h2 class="text-xl font-extrabold text-brand-700">{{ s.title }}</h2>
-          <p class="font-bold text-brand-600/60">{{ s.book_count }} 本</p>
+        <div class="space-y-0.5 p-2">
+          <h2 class="line-clamp-2 text-sm font-extrabold leading-snug text-brand-700">{{ s.title }}</h2>
+          <p class="text-xs font-bold text-brand-600/60">{{ s.book_count }} 本</p>
         </div>
       </router-link>
     </div>
