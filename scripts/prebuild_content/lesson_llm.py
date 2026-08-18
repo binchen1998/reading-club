@@ -113,14 +113,19 @@ def generate_chapter_lesson(chapter: dict) -> dict[str, Any]:
         chapter.get("title") or "",
     )
     client = _client()
+    if len(pages) == 1:
+        page_no = pages[0].get("page")
+        task = (
+            f"这是单页课稿，不是整章。必须输出恰好 1 个 beat，且 beat.page 必须是 {page_no}。"
+            "即使这一页像封面、目录或简介，只要有英文也要生成 beat，不要返回空 beats，不要改页码。\n\n"
+        )
+    else:
+        task = "请为下面这一章生成课稿 JSON。务必处理跨页截断句子。输入里有英文的页都要有 beat。\n\n"
     messages = [
         {"role": "system", "content": load_prompt()},
         {
             "role": "user",
-            "content": (
-                "请为下面这一章生成课稿 JSON。务必处理跨页截断句子。\n\n"
-                + json.dumps(payload, ensure_ascii=False, indent=2)
-            ),
+            "content": task + json.dumps(payload, ensure_ascii=False, indent=2),
         },
     ]
     last_err: Exception | None = None
@@ -129,7 +134,7 @@ def generate_chapter_lesson(chapter: dict) -> dict[str, Any]:
         raw = (resp.choices[0].message.content or "").strip()
         try:
             lesson = extract_json(raw)
-            cleaned = sanitize_lesson(lesson, chapter)
+            cleaned = sanitize_lesson(lesson, chapter, allow_fallback=(attempt == 3))
             logger.info(
                 "课稿完成 chapter=%s beats=%s",
                 cleaned.get("chapter"),
@@ -142,10 +147,38 @@ def generate_chapter_lesson(chapter: dict) -> dict[str, Any]:
     raise RuntimeError(f"课稿生成失败: {last_err}")
 
 
-def sanitize_lesson(lesson: dict, chapter: dict) -> dict:
-    page_map = {int(row["page"]): row for row in chapter.get("pages") or []}
+def _fallback_segments(english: str) -> list[str]:
+    text = (english or "").strip()
+    if not text:
+        return []
+    parts = [part.strip() for part in re.split(r"(?<=[.!?…])\s+|\n+", text) if part.strip()]
+    return parts or [text]
+
+
+def fallback_page_beat(page: dict) -> dict[str, Any]:
+    english = page.get("english") or ""
+    explain = str(page.get("guide") or page.get("translate") or "").strip()
+    if not explain:
+        explain = "先看这一页上的英文。"
+    return {
+        "page": int(page["page"]),
+        "explain": explain,
+        "words": [],
+        "phrases": [],
+        "segments": _fallback_segments(english),
+    }
+
+
+def sanitize_lesson(lesson: dict, chapter: dict, allow_fallback: bool = True) -> dict:
+    pages = list(chapter.get("pages") or [])
+    page_map = {int(row["page"]): row for row in pages}
+    raw_beats = [beat for beat in (lesson.get("beats") or []) if isinstance(beat, dict)]
+    if len(page_map) == 1 and raw_beats:
+        only = next(iter(page_map))
+        for beat in raw_beats:
+            beat["page"] = only
     beats = []
-    for beat in lesson.get("beats") or []:
+    for beat in raw_beats:
         try:
             page_no = int(beat.get("page"))
         except (TypeError, ValueError):
@@ -171,6 +204,10 @@ def sanitize_lesson(lesson: dict, chapter: dict) -> dict:
                 "segments": segments,
             }
         )
+    if not beats and allow_fallback:
+        beats = [fallback_page_beat(row) for row in pages if (row.get("english") or "").strip()]
+        if beats:
+            logger.warning("课稿 beats 无效，已用本页英文回退 pages=%s", [b["page"] for b in beats])
     lesson["chapter"] = int(chapter.get("chapter") or lesson.get("chapter") or 1)
     lesson["title"] = str(lesson.get("title") or chapter.get("title") or f"Chapter {lesson['chapter']}")
     lesson["title_zh"] = str(lesson.get("title_zh") or "")
