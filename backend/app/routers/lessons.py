@@ -3,10 +3,10 @@ import re
 
 from fastapi import APIRouter, HTTPException, Query
 
+from ..book_pages import split_chapters
 from ..config import BOOKS, LESSONS
 from ..lesson_gen import ensure_lesson, lesson_exists
 from ..ocr import load_page_ocr
-from scripts.prebuild_content.pages import split_chapters
 
 router = APIRouter(prefix="/api")
 WORD_RE = re.compile(r"[A-Za-z']+")

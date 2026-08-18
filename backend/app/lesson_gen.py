@@ -61,7 +61,8 @@ def ensure_lesson(series_id: str, book_slug: str, chapter: int) -> dict:
         if not book_path.exists():
             raise HTTPException(status_code=404, detail="书还没下载到本地")
         from scripts.prebuild_content.lesson_llm import generate_chapter_lesson_full
-        from scripts.prebuild_content.pages import split_chapters
+
+        from .book_pages import split_chapters
 
         book = json.loads(book_path.read_text(encoding="utf-8"))
         chapters = split_chapters(book.get("pages") or [])
