@@ -185,6 +185,9 @@ onMounted(async () => {
               编辑资料
             </button>
           </div>
+          <p v-if="isSelf && owner.username" class="mt-1 text-xs font-bold text-brand-600/50">
+            ID：{{ owner.username }}
+          </p>
           <p class="mt-1 text-xs font-bold text-brand-600/60">
             <button type="button" @click="openPeople('followers')">粉丝 {{ data.followers ?? 0 }}</button>
             ·
