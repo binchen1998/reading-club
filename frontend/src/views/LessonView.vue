@@ -52,6 +52,7 @@ const vocabRetries = ref(0)
 const phraseRetries = ref(0)
 const pageGateOpen = ref(false)
 const pageGateConfirm = ref(false)
+const readPromptOpen = ref(false)
 const wrongKeys = ref<Record<number, string[]>>({})
 const flowPaused = ref(false)
 const focusItem = ref<Item | null>(null)
@@ -115,6 +116,10 @@ const missingTasks = computed(() => {
   if (needRecord.value && !recordDone.value) miss.push('朗读录成功')
   return miss
 })
+const phraseLocked = computed(() => needVocab.value && !vocabDone.value)
+const recordLocked = computed(
+  () => (needVocab.value && !vocabDone.value) || (needPhrase.value && !phraseDone.value),
+)
 const currentQuiz = computed(() => (step.value === 'vocab' ? vocabQs.value : phraseQs.value))
 const currentQuestion = computed(() => currentQuiz.value[quizCursor.value])
 const pageSegments = computed(() => mergeShortSegments(beat.value?.segments || []))
@@ -357,6 +362,9 @@ async function playExplain(from = 0) {
   if (gen === playGen) {
     explainPlaying.value = false
     explainPaused.value = false
+    if ((needVocab.value && !vocabDone.value) || (needPhrase.value && !phraseDone.value)) {
+      readPromptOpen.value = true
+    }
   }
 }
 
@@ -436,10 +444,12 @@ function startStep() {
 
 function startActivity(next: 'vocab' | 'phrase' | 'record') {
   if (next === 'vocab' && !vocabQs.value.length) return
-  if (next === 'phrase' && !phraseQs.value.length) return
+  if (next === 'phrase' && (!phraseQs.value.length || phraseLocked.value)) return
+  if (next === 'record' && recordLocked.value) return
   stopAudio()
   pageGateOpen.value = false
   pageGateConfirm.value = false
+  readPromptOpen.value = false
   step.value = next
   startStep()
 }
@@ -723,6 +733,7 @@ function goToBeat(index: number, force = false) {
   }
   pageGateOpen.value = false
   pageGateConfirm.value = false
+  readPromptOpen.value = false
   clearQuizTimer()
   clearPassTimer()
   if (recording.value) stopRecord()
@@ -976,14 +987,21 @@ onUnmounted(() => {
               {{ vocabDone ? '单词已过 ✓' : '复习单词' }}
             </button>
             <button
-              class="btn-primary w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs"
+              class="btn-primary w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs disabled:cursor-not-allowed"
               type="button"
-              :disabled="!phraseQs.length"
+              :disabled="!phraseQs.length || phraseLocked"
+              :title="phraseLocked ? '请先完成单词复习' : ''"
               @click="startActivity('phrase')"
             >
               {{ phraseDone ? '短语已过 ✓' : '复习短语' }}
             </button>
-            <button class="btn-candy w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs" type="button" @click="startActivity('record')">
+            <button
+              class="btn-candy w-full max-lg:px-2 max-lg:py-2 max-lg:text-xs disabled:cursor-not-allowed"
+              type="button"
+              :disabled="recordLocked"
+              :title="recordLocked ? (phraseLocked ? '请先完成单词复习' : '请先完成短语复习') : ''"
+              @click="startActivity('record')"
+            >
               {{ recordDone ? '朗读已录 ✓' : '开始录制' }}
             </button>
           </div>
@@ -1136,6 +1154,34 @@ onUnmounted(() => {
       @close="pauseFlow"
       @toggle-camera="toggleCamera"
     />
+
+    <ClubDialog :open="readPromptOpen" title="先自己读一遍" emoji="📖" @close="readPromptOpen = false">
+      <p class="font-bold leading-7 text-brand-700">
+        讲解听完了。请先自己把这一页读一遍，然后复习单词和短语。
+      </p>
+      <p class="mt-3 text-sm font-bold text-brand-600/70">
+        单词过了才能复习短语，短语过了才能开始录制。
+      </p>
+      <div class="mt-5 flex flex-col gap-2">
+        <button
+          v-if="needVocab && !vocabDone && vocabQs.length"
+          class="btn-primary w-full"
+          type="button"
+          @click="startActivity('vocab')"
+        >
+          去复习单词
+        </button>
+        <button
+          v-else-if="needPhrase && !phraseDone && phraseQs.length"
+          class="btn-primary w-full"
+          type="button"
+          @click="startActivity('phrase')"
+        >
+          去复习短语
+        </button>
+        <button class="btn-ghost w-full" type="button" @click="readPromptOpen = false">知道了</button>
+      </div>
+    </ClubDialog>
 
     <ClubDialog :open="pageGateOpen" title="还不能翻页" emoji="🔒" @close="closePageGate">
       <p class="font-bold text-brand-700">本页任务还没做完，先完成这些：</p>
