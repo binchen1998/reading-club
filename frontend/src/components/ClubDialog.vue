@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -17,10 +17,20 @@ const props = withDefaults(
 const emit = defineEmits<{ close: [] }>()
 
 const cardEl = ref<HTMLDivElement | null>(null)
-const pos = ref<{ left: number; top: number } | null>(null)
+const handleEl = ref<HTMLDivElement | null>(null)
+const pos = ref<{ left: number; top: number; width: number } | null>(null)
 const dragging = ref(false)
+
+const DRAG_THRESHOLD = 3
+let activePointer: number | null = null
+let pending = false
 let dragOffsetX = 0
 let dragOffsetY = 0
+let startClientX = 0
+let startClientY = 0
+let startLeft = 0
+let startTop = 0
+let startWidth = 0
 
 watch(
   () => props.open,
@@ -29,38 +39,80 @@ watch(
       pos.value = null
       dragging.value = false
     }
+    stopDrag()
   },
 )
 
+function stopDrag() {
+  window.removeEventListener('pointermove', onWindowMove)
+  window.removeEventListener('pointerup', onWindowUp)
+  window.removeEventListener('pointercancel', onWindowUp)
+  pending = false
+  dragging.value = false
+  activePointer = null
+}
+
 function onDragStart(e: PointerEvent) {
   if (!props.draggable) return
+  if (e.button != null && e.button !== 0) return
   if ((e.target as HTMLElement).closest('button')) return
   const el = cardEl.value
   if (!el) return
+  e.preventDefault()
   const rect = el.getBoundingClientRect()
+  activePointer = e.pointerId
+  pending = true
+  dragging.value = true
+  startClientX = e.clientX
+  startClientY = e.clientY
+  startLeft = rect.left
+  startTop = rect.top
+  startWidth = rect.width
   dragOffsetX = e.clientX - rect.left
   dragOffsetY = e.clientY - rect.top
-  pos.value = { left: rect.left, top: rect.top }
-  dragging.value = true
-  el.setPointerCapture(e.pointerId)
-}
-
-function onDragMove(e: PointerEvent) {
-  if (!dragging.value) return
-  const left = Math.min(Math.max(8, e.clientX - dragOffsetX), window.innerWidth - 80)
-  const top = Math.min(Math.max(8, e.clientY - dragOffsetY), window.innerHeight - 48)
-  pos.value = { left, top }
-}
-
-function onDragEnd(e: PointerEvent) {
-  if (!dragging.value) return
-  dragging.value = false
+  window.addEventListener('pointermove', onWindowMove)
+  window.addEventListener('pointerup', onWindowUp)
+  window.addEventListener('pointercancel', onWindowUp)
   try {
-    cardEl.value?.releasePointerCapture(e.pointerId)
+    handleEl.value?.setPointerCapture(e.pointerId)
   } catch {
     /* ignore */
   }
 }
+
+function applyPos(clientX: number, clientY: number) {
+  const maxL = Math.max(8, window.innerWidth - 80)
+  const maxT = Math.max(8, window.innerHeight - 48)
+  pos.value = {
+    left: Math.min(Math.max(8, clientX - dragOffsetX), maxL),
+    top: Math.min(Math.max(8, clientY - dragOffsetY), maxT),
+    width: startWidth,
+  }
+}
+
+function onWindowMove(e: PointerEvent) {
+  if (activePointer !== e.pointerId) return
+  if (pending) {
+    const dx = e.clientX - startClientX
+    const dy = e.clientY - startClientY
+    if (dx * dx + dy * dy < DRAG_THRESHOLD * DRAG_THRESHOLD) return
+    pending = false
+    applyPos(startClientX, startClientY)
+  }
+  applyPos(e.clientX, e.clientY)
+}
+
+function onWindowUp(e: PointerEvent) {
+  if (activePointer != null && e.pointerId !== activePointer) return
+  try {
+    if (activePointer != null) handleEl.value?.releasePointerCapture(activePointer)
+  } catch {
+    /* ignore */
+  }
+  stopDrag()
+}
+
+onBeforeUnmount(stopDrag)
 
 const cardStyle = computed(() => {
   if (!pos.value) return undefined
@@ -68,7 +120,8 @@ const cardStyle = computed(() => {
     position: 'fixed' as const,
     left: `${pos.value.left}px`,
     top: `${pos.value.top}px`,
-    width: 'min(28rem, calc(100vw - 2rem))',
+    width: `${pos.value.width}px`,
+    maxWidth: 'none',
     margin: '0',
   }
 })
@@ -109,17 +162,18 @@ const cardStyle = computed(() => {
         >
           <button class="game-result-close" type="button" aria-label="关闭" @click="emit('close')">×</button>
           <div
-            class="mb-4 flex items-center gap-2 pr-8"
+            ref="handleEl"
+            class="mb-4 -mx-2 -mt-1 flex items-center gap-2 rounded-2xl px-2 py-2 pr-10"
             :class="draggable ? 'select-none touch-none' : ''"
             :style="draggable ? { cursor: dragging ? 'grabbing' : 'grab' } : undefined"
             @pointerdown="onDragStart"
-            @pointermove="onDragMove"
-            @pointerup="onDragEnd"
-            @pointercancel="onDragEnd"
           >
+            <span v-if="draggable" class="grid h-8 w-6 shrink-0 place-items-center text-brand-400" aria-hidden="true">
+              <span class="leading-none tracking-tight">⋮⋮</span>
+            </span>
             <span v-if="emoji" class="text-2xl">{{ emoji }}</span>
             <h2 class="text-xl font-extrabold text-brand-700">{{ title }}</h2>
-            <span v-if="draggable" class="ml-auto text-xs font-bold text-brand-600/50">拖标题可挪开</span>
+            <span v-if="draggable" class="ml-auto text-xs font-bold text-brand-600/50">按住拖走</span>
           </div>
           <div :class="fixed ? 'flex min-h-0 flex-1 flex-col' : ''">
             <slot />

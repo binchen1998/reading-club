@@ -105,15 +105,9 @@ export function useAssistantPipFrame(options: {
   }
 
   function placeDefault() {
-    const fabRight = Math.max(16, margin.value)
-    const fabBottom = Math.max(20, margin.value)
-    const askBtnH = window.innerWidth >= 640 ? 64 : 56
-    const gapAboveAsk = 14
-    const bottomPad = fabBottom + askBtnH + gapAboveAsk
-    const next = clampPos(
-      window.innerWidth - pipW.value - fabRight,
-      window.innerHeight - pipH.value - bottomPad,
-    )
+    const leftPad = Math.max(16, margin.value)
+    const bottomPad = Math.max(20, margin.value)
+    const next = clampPos(leftPad, window.innerHeight - pipH.value - bottomPad)
     left.value = next.left
     top.value = next.top
   }

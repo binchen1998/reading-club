@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 右下角助教 Live2D（叠在「我要提问」上方）：提问回复用 Magic TTS 驱动口型。
+ * 左下角助教 Live2D：提问回复用 Magic TTS 驱动口型。
  */
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as PIXI from 'pixi.js'
