@@ -38,16 +38,30 @@ function loadAvatarImage(src: string): Promise<HTMLImageElement | null> {
   })
 }
 
-function waitRecorderStop(mr: MediaRecorder): Promise<void> {
+function waitRecorderStop(mr: MediaRecorder, timeoutMs = 5000): Promise<void> {
   return new Promise((resolve) => {
     if (mr.state === 'inactive') {
       resolve()
       return
     }
-    mr.addEventListener('stop', () => resolve(), { once: true })
+    const timer = window.setTimeout(resolve, timeoutMs)
+    mr.addEventListener(
+      'stop',
+      () => {
+        window.clearTimeout(timer)
+        resolve()
+      },
+      { once: true },
+    )
+    try {
+      if (mr.state === 'recording') mr.requestData()
+    } catch {
+      /* ignore */
+    }
     try {
       mr.stop()
     } catch {
+      window.clearTimeout(timer)
       resolve()
     }
   })

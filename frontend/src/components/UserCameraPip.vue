@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .user-camera-pip {
   position: fixed;
-  z-index: 80;
+  z-index: 70;
   overflow: hidden;
   border-radius: 16px;
   border: 2px solid rgba(255, 255, 255, 0.92);

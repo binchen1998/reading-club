@@ -39,18 +39,6 @@ const emit = defineEmits<{
         <p class="hidden min-w-0 flex-1 truncate text-xs font-bold text-brand-600 sm:block">
           书上黄框就是要读的 · 每词最多 3 秒 · 读完可点停
         </p>
-        <button
-          class="chip shrink-0 bg-brand-100 text-brand-700 disabled:opacity-50"
-          type="button"
-          :disabled="cameraStarting"
-          @click="emit('toggleCamera')"
-        >
-          {{ cameraEnabled ? '📷 关摄像头' : '📷 开摄像头' }}
-        </button>
-        <p v-if="cameraError && !cameraEnabled" class="hidden text-[11px] font-bold text-candy lg:block">
-          {{ cameraError }}
-        </p>
-
         <div v-if="recording" class="flex min-w-0 flex-1 items-center gap-2">
           <span
             class="w-8 shrink-0 text-center text-lg font-black tabular-nums"
@@ -78,7 +66,15 @@ const emit = defineEmits<{
           <span v-if="lastHeard" class="font-bold text-brand-600/50"> · 听到：{{ lastHeard }}</span>
         </p>
 
-        <div data-camera-pip-anchor class="ml-auto flex shrink-0 items-center gap-1.5">
+        <div data-camera-pip-anchor class="relative z-20 ml-auto flex shrink-0 items-center gap-1.5">
+          <button
+            class="chip shrink-0 bg-brand-100 text-brand-700 disabled:opacity-50"
+            type="button"
+            :disabled="cameraStarting"
+            @click="emit('toggleCamera')"
+          >
+            {{ cameraEnabled ? '📷 关摄像头' : '📷 开摄像头' }}
+          </button>
           <button
             v-if="!recording && !busy"
             class="btn-candy px-3 py-1.5 text-xs sm:text-sm"

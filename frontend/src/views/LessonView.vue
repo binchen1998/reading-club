@@ -568,11 +568,18 @@ async function scoreBlob(clip: PageClip) {
   busy.value = true
   scoreError.value = ''
   try {
-    const heard = await recognizeAudio(clip.asrBlob || clip.blob, 'en')
+    const asrSource = clip.asrBlob && clip.asrBlob.size > 1000 ? clip.asrBlob : clip.blob
+    const heard = await Promise.race([
+      recognizeAudio(asrSource, 'en'),
+      new Promise<string>((_, reject) => {
+        window.setTimeout(() => reject(new Error('评分超时，请再读一次')), 45000)
+      }),
+    ])
     const result = scoreEnglish(currentSeg.value, heard)
     lastScore.value = result.score
     lastHeard.value = result.heard
     passed.value = result.score >= PASS_SCORE
+    busy.value = false
     if (passed.value) {
       if (lastSegment.value && lastBeat.value) sound.bigCelebrate()
       else sound.celebrate()
