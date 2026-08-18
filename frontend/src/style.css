@@ -134,26 +134,7 @@ body {
 }
 
 .book-mark-read {
-  background-color: #ffe566;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 140, 40, 0.45);
-  animation: book-mark-read-flow 2.4s ease-in-out infinite;
-}
-
-@keyframes book-mark-read-flow {
-  0%,
-  100% {
-    background-color: #ffe566;
-  }
-  50% {
-    background-color: #ff6a38;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .book-mark-read {
-    animation: none;
-    background-color: #ffc53d;
-  }
+  background: rgba(255, 214, 64, 0.7);
 }
 
 .book-mark-focus {

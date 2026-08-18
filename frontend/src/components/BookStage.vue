@@ -164,7 +164,7 @@ onUnmounted(() => {
             v-for="(box, i) in boxes"
             :id="i === 0 ? 'read-box-0' : undefined"
             :key="`mark-${i}`"
-            class="book-mark absolute"
+            class="book-mark absolute transition-all duration-150"
             :class="box.active ? 'book-mark-read' : 'book-mark-focus'"
             :style="{ left: box.left + '%', top: box.top + '%', width: box.width + '%', height: box.height + '%' }"
           />
@@ -187,19 +187,6 @@ onUnmounted(() => {
 <style scoped>
 .book-stage {
   touch-action: none;
-}
-.book-mark-read {
-  background-color: #ffe566;
-  animation: read-mark-color 2.4s ease-in-out infinite;
-}
-@keyframes read-mark-color {
-  0%,
-  100% {
-    background-color: #ffe566;
-  }
-  50% {
-    background-color: #ff6a38;
-  }
 }
 .book-hotspot {
   cursor: pointer;
