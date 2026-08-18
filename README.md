@@ -111,4 +111,4 @@ python -m scripts.fetch_book --series FancyNancy --book "Fancy NANCY and the Boy
 python -m scripts.fetch_book --all
 ```
 
-已有 `book.json` 默认跳过，加 `--force` 才重下。下载完成后刷新书目页，即可点进去读。
+默认 8 路并行；已下完的书会跳过，中断后再跑同一条命令即可续传。加 `--force` 才整本重下。下载完成后刷新书目页，即可点进去读。
