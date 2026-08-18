@@ -13,6 +13,8 @@ from .cache_keys import (
     SQUARE_COMMENTS_INDEX,
     SQUARE_DETAIL,
     SQUARE_DETAIL_INDEX,
+    SQUARE_LIST_INDEX,
+    SQUARE_STATS,
     USER_ME,
     WRONG_INDEX,
 )
@@ -34,9 +36,15 @@ def invalidate_profile(username: str) -> None:
     cache_delete(USER_ME.format(username=username))
 
 
+def invalidate_square_pages() -> None:
+    cache_delete_indexed(SQUARE_LIST_INDEX)
+    cache_delete(SQUARE_STATS)
+
+
 def invalidate_square_detail(recording_id: int) -> None:
     cache_delete(SQUARE_DETAIL.format(recording_id=recording_id))
     cache_delete_indexed(SQUARE_DETAIL_INDEX)
+    invalidate_square_pages()
 
 
 def invalidate_square_comments(recording_id: int) -> None:
@@ -73,7 +81,7 @@ def invalidate_notif_list(username: str) -> None:
 
 
 def invalidate_on_publish(username: str, recording_id: int) -> None:
-    """上传完成：刷新个人缓存与详情；广场列表只靠 worker 覆盖，禁止 invalidate 快照。"""
+    """上传完成：刷新个人缓存、详情和广场分页。排行榜只靠 worker 覆盖。"""
     invalidate_reports(username)
     invalidate_profile(username)
     invalidate_square_detail(recording_id)

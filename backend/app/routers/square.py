@@ -11,6 +11,9 @@ from ..cache_keys import (
     SQUARE_COMMENTS_INDEX,
     SQUARE_DETAIL,
     SQUARE_DETAIL_INDEX,
+    SQUARE_LIST,
+    SQUARE_LIST_INDEX,
+    SQUARE_STATS,
 )
 from ..db import get_db
 from ..display_name import leaderboard_display_name
@@ -19,7 +22,8 @@ from ..models import Recording, RecordingComment, RecordingLike, User
 from ..notifications import create_notification
 from ..page_cache import cache_get, cache_set
 from ..schemas import CommentIn
-from ..square_snapshot import FIRST_PAGE_SIZE, get_sort_items, load_snapshot, normalize_sort, snapshot_is_ready
+from ..square_snapshot import normalize_sort
+from ..timeutil import shanghai_today
 
 router = APIRouter(prefix="/api/square", tags=["square"])
 
@@ -64,45 +68,41 @@ def _comment_payload(comment: RecordingComment, author: User | None) -> dict:
     }
 
 
-@router.get("/stats")
-def square_stats():
-    snap = load_snapshot()
-    return snap.get("stats") or {"publicCount": 0, "todayCount": 0}
+def _public_filters():
+    return (
+        Recording.status == "completed",
+        Recording.is_public.is_(True),
+    )
 
 
-@router.get("/list")
-def square_list(
-    page: int = Query(1, ge=1),
-    page_size: int = Query(12, ge=1, le=50),
-    sort: str = Query("latest"),
-    db: Session = Depends(get_db),
-):
-    sort_key = normalize_sort(sort)
-    snap = load_snapshot()
-    if page == 1 and page_size <= FIRST_PAGE_SIZE and snapshot_is_ready(snap):
-        items = get_sort_items(snap, sort_key)[:page_size]
-        stats = snap.get("stats") or {}
-        return {
-            "page": 1,
-            "pageSize": page_size,
-            "total": int(stats.get("publicCount") or stats.get("public_count") or 0),
-            "items": items,
-            "fromSnapshot": True,
-        }
-    total = (
+def _query_square_stats(db: Session) -> dict:
+    public_count = (
+        db.execute(select(func.count()).select_from(Recording).where(*_public_filters())).scalar() or 0
+    )
+    today_count = (
         db.execute(
             select(func.count()).select_from(Recording).where(
-                Recording.status == "completed",
-                Recording.is_public.is_(True),
+                *_public_filters(),
+                Recording.lesson_date == shanghai_today(),
             )
         ).scalar()
         or 0
     )
+    return {
+        "publicCount": int(public_count),
+        "todayCount": int(today_count),
+        "public_count": int(public_count),
+        "today_count": int(today_count),
+    }
+
+
+def _query_square_page(db: Session, page: int, page_size: int, sort_key: str) -> dict:
+    total = db.execute(select(func.count()).select_from(Recording).where(*_public_filters())).scalar() or 0
     order = desc(Recording.like_count) if sort_key == "likes" else desc(Recording.completed_at)
     rows = (
         db.execute(
             select(Recording)
-            .where(Recording.status == "completed", Recording.is_public.is_(True))
+            .where(*_public_filters())
             .order_by(order)
             .offset((page - 1) * page_size)
             .limit(page_size)
@@ -126,8 +126,35 @@ def square_list(
             )
             for row in rows
         ],
-        "fromSnapshot": False,
+        "cached": False,
     }
+
+
+@router.get("/stats")
+def square_stats(db: Session = Depends(get_db)):
+    cached = cache_get(SQUARE_STATS)
+    if isinstance(cached, dict):
+        return cached
+    payload = _query_square_stats(db)
+    cache_set(SQUARE_STATS, payload)
+    return payload
+
+
+@router.get("/list")
+def square_list(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(12, ge=1, le=50),
+    sort: str = Query("latest"),
+    db: Session = Depends(get_db),
+):
+    sort_key = normalize_sort(sort)
+    cache_key = SQUARE_LIST.format(sort=sort_key, page=page, page_size=page_size)
+    cached = cache_get(cache_key)
+    if isinstance(cached, dict):
+        return {**cached, "cached": True}
+    payload = _query_square_page(db, page, page_size, sort_key)
+    cache_set(cache_key, payload, indexes=[SQUARE_LIST_INDEX])
+    return payload
 
 
 @router.get("/{recording_id}")

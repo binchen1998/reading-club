@@ -6,6 +6,7 @@ from pathlib import Path
 
 from app.backup_database import backup_storage_enabled, log_backup_storage_status
 from app.database_backup_worker import run_database_backup_loop
+from app.leaderboard_cache_worker import run_leaderboard_cache_loop
 from app.square_snapshot_worker import run_square_snapshot_loop
 
 logger = logging.getLogger(__name__)
@@ -83,12 +84,20 @@ def main() -> None:
         daemon=True,
     )
     backup_thread.start()
-    logger.info("started workers: backup, square-snapshot")
+    leaderboard_thread = threading.Thread(
+        target=run_leaderboard_cache_loop,
+        args=(stop,),
+        name="leaderboard-worker",
+        daemon=True,
+    )
+    leaderboard_thread.start()
+    logger.info("started workers: backup, square-snapshot, leaderboard")
     try:
         run_square_snapshot_loop(stop)
     finally:
         stop.set()
         backup_thread.join(timeout=8)
+        leaderboard_thread.join(timeout=8)
         lock.release()
 
 

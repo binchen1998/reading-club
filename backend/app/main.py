@@ -13,6 +13,7 @@ from .routers import (
     catalog,
     dict as dict_router,
     jobs,
+    leaderboard,
     lessons,
     media,
     ocr,
@@ -66,6 +67,7 @@ app.include_router(progress.router)
 app.include_router(practice.router)
 app.include_router(wrongbook.router)
 app.include_router(square.router)
+app.include_router(leaderboard.router)
 app.include_router(profile.router)
 app.include_router(teaching.router)
 app.get("/share/{rec_id}")(share_page)
