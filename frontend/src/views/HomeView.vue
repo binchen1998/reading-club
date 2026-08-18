@@ -41,7 +41,6 @@ onMounted(async () => {
   <div class="space-y-5">
     <div>
       <h1 class="text-3xl font-extrabold text-brand-700">{{ user.nickname || user.username }} 的阅读首页</h1>
-      <p class="mt-1 font-bold text-brand-600/80">按页统计单词、短语和朗读。点日历看当天。</p>
     </div>
     <div v-if="stats" class="grid gap-3 sm:grid-cols-4">
       <div class="card text-center">
