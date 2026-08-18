@@ -123,6 +123,14 @@ def ocr_key(series_id: str, book_slug: str, page: int, digest: str) -> str:
     return f"{QINIU_ASSET_PREFIX}/ocr/{series_id}/{book_slug}/{page:03d}-{digest}.json"
 
 
+def series_cover_key(series_id: str) -> str:
+    return f"{QINIU_ASSET_PREFIX}/covers/{series_id}.jpg"
+
+
+def covers_json_key() -> str:
+    return f"{QINIU_ASSET_PREFIX}/covers.json"
+
+
 def qiniu_delete(key: str) -> None:
     if not qiniu_enabled() or not key:
         return
@@ -145,11 +153,12 @@ def qiniu_exists(key: str) -> bool:
     return getattr(info, "status_code", 0) == 200
 
 
-def qiniu_put_bytes(key: str, data: bytes) -> None:
+def qiniu_put_bytes(key: str, data: bytes, mime_type: str | None = None) -> None:
     from qiniu import put_data
 
     token = create_upload_token(key)["token"]
-    _ret, info = put_data(token, key, data)
+    kwargs = {"mime_type": mime_type} if mime_type else {}
+    _ret, info = put_data(token, key, data, **kwargs)
     if getattr(info, "status_code", 0) not in (200, 614):
         raise RuntimeError(f"七牛上传失败: {getattr(info, 'text_body', info)}")
 

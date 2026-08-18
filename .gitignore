@@ -31,6 +31,7 @@ storage/*.sqlite-journal
 backend/.background-workers.lock
 backend/.database-backup-state.json
 storage/backups/
+storage/cover-preview/
 
 # os / editor
 .DS_Store
