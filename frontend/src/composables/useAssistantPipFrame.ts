@@ -5,6 +5,16 @@ import { computePipSize } from '../utils/pipLayout'
 const STORAGE_KEY = 'club-assistant-pip-frame'
 const MIN_W = 88
 const MIN_H = 110
+/** 助教正下方提问按钮预留高度（按钮 + 间距） */
+export const ASSISTANT_ASK_STACK = 40
+
+const pipW = ref(126)
+const pipH = ref(168)
+const margin = ref(12)
+const left = ref(0)
+const top = ref(0)
+const userMoved = ref(false)
+const userSized = ref(false)
 
 export type AssistantResizeCorner = 'nw' | 'ne' | 'sw' | 'se'
 
@@ -37,15 +47,8 @@ export function useAssistantPipFrame(options: {
   onFrameChange?: () => void
 }) {
   const rootEl = ref<HTMLDivElement | null>(null)
-  const pipW = ref(126)
-  const pipH = ref(168)
-  const margin = ref(12)
-  const left = ref(0)
-  const top = ref(0)
   const dragging = ref(false)
   const resizing = ref(false)
-  const userMoved = ref(false)
-  const userSized = ref(false)
 
   let dragOffsetX = 0
   let dragOffsetY = 0
@@ -75,7 +78,10 @@ export function useAssistantPipFrame(options: {
 
   function clampPos(l: number, t: number, w = pipW.value, h = pipH.value) {
     const maxL = Math.max(margin.value, window.innerWidth - w - margin.value)
-    const maxT = Math.max(margin.value, window.innerHeight - h - margin.value)
+    const maxT = Math.max(
+      margin.value,
+      window.innerHeight - h - margin.value - ASSISTANT_ASK_STACK,
+    )
     return {
       left: Math.min(maxL, Math.max(margin.value, l)),
       top: Math.min(maxT, Math.max(margin.value, t)),
@@ -106,7 +112,7 @@ export function useAssistantPipFrame(options: {
 
   function placeDefault() {
     const leftPad = Math.max(16, margin.value)
-    const bottomPad = Math.max(20, margin.value)
+    const bottomPad = Math.max(16, margin.value) + ASSISTANT_ASK_STACK
     const next = clampPos(leftPad, window.innerHeight - pipH.value - bottomPad)
     left.value = next.left
     top.value = next.top
@@ -244,4 +250,9 @@ export function useAssistantPipFrame(options: {
     onPointerMove,
     onPointerUp,
   }
+}
+
+/** 提问按钮跟助教共用同一套坐标 */
+export function useAssistantPipRect() {
+  return { left, top, pipW, pipH }
 }
