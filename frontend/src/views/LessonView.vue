@@ -970,8 +970,14 @@ async function loadPageOcr() {
     return
   }
   const key = `${route.params.seriesId}/${route.params.bookSlug}/${page}`
+  const fromBeat = (current.ocr || []) as Box[]
+  if (fromBeat.length) {
+    pageOcrCache.set(key, fromBeat)
+    pageOcr.value = fromBeat
+    return
+  }
   const cached = pageOcrCache.get(key)
-  if (cached) {
+  if (cached?.length) {
     pageOcr.value = cached
     return
   }
@@ -983,7 +989,7 @@ async function loadPageOcr() {
     })
     const row = await api(`/api/ocr/page?${q}`)
     const boxes = (row?.ocr || []) as Box[]
-    pageOcrCache.set(key, boxes)
+    if (boxes.length) pageOcrCache.set(key, boxes)
     pageOcr.value = boxes
   } catch {
     pageOcr.value = []

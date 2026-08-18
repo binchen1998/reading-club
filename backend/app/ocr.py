@@ -10,6 +10,27 @@ from PIL import Image, ImageOps
 import pytesseract
 
 
+def jpeg_size_from_bytes(data: bytes) -> tuple[int, int] | None:
+    if len(data) < 4 or data[:2] != b"\xff\xd8":
+        return None
+    index = 2
+    size = len(data)
+    while index + 9 < size:
+        if data[index] != 0xFF:
+            return None
+        marker = data[index + 1]
+        if marker in (0xC0, 0xC1, 0xC2):
+            height = int.from_bytes(data[index + 5 : index + 7], "big")
+            width = int.from_bytes(data[index + 7 : index + 9], "big")
+            return width, height
+        if marker in (0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0x01):
+            index += 2
+            continue
+        length = int.from_bytes(data[index + 2 : index + 4], "big")
+        index += 2 + length
+    return None
+
+
 def jpeg_size(path: Path) -> tuple[int, int]:
     with path.open("rb") as handle:
         if handle.read(2) != b"\xff\xd8":
@@ -300,11 +321,19 @@ def word_boxes_for_text(pages_dir: Path, page_no: int, text: str, cache_dir: Pat
 def load_remote_page_ocr(series_id: str, book_slug: str, page_no: int) -> list[dict]:
     from io import BytesIO
 
-    from .remote_book import page_image_bytes, page_paddle
+    from .remote_book import page_image_bytes, page_image_prefix, page_paddle
 
     raw = page_paddle(series_id, book_slug, page_no)
-    data = page_image_bytes(series_id, book_slug, page_no)
-    if not raw or not data:
+    if not raw:
         return []
-    image = Image.open(BytesIO(data))
-    return parse_paddle(raw, image.size[0], image.size[1])
+    size = jpeg_size_from_bytes(page_image_prefix(series_id, book_slug, page_no) or b"")
+    if not size:
+        data = page_image_bytes(series_id, book_slug, page_no)
+        if not data:
+            return []
+        size = Image.open(BytesIO(data)).size
+    return parse_paddle(raw, size[0], size[1])
+
+
+def page_ocr_boxes(series_id: str, book_slug: str, page_no: int) -> list[dict]:
+    return load_remote_page_ocr(series_id, book_slug, page_no)

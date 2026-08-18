@@ -134,11 +134,28 @@ def _page_row(series_id: str, book_slug: str, page: int) -> dict:
     }
 
 
+def _attach_cdn_ocr(series_id: str, book_slug: str, page: int, lesson: dict) -> dict:
+    from .ocr import load_remote_page_ocr
+
+    ocr = load_remote_page_ocr(series_id, book_slug, page)
+    for beat in lesson.get("beats") or []:
+        beat["ocr"] = ocr
+    if ocr:
+        logger.info("单页写入 CDN paddle 词框 %s/%s p%s count=%s", series_id, book_slug, page, len(ocr))
+    else:
+        logger.warning("单页未读到 CDN paddle %s/%s p%s", series_id, book_slug, page)
+    return lesson
+
+
 def generate_page_lesson(series_id: str, book_slug: str, page: int) -> dict:
     page = int(page)
     path = page_lesson_file(series_id, book_slug, page)
     if path.exists():
-        return json.loads(path.read_text(encoding="utf-8"))
+        lesson = json.loads(path.read_text(encoding="utf-8"))
+        if not any((row.get("ocr") or []) for row in lesson.get("beats") or []):
+            _attach_cdn_ocr(series_id, book_slug, page, lesson)
+            _write_lesson(path, lesson)
+        return lesson
     if get_openai_client() is None:
         raise RuntimeError("未配置 OPENAI_API_KEY，无法生成讲解")
     from .openai_llm import openai_base_url
@@ -148,7 +165,11 @@ def generate_page_lesson(series_id: str, book_slug: str, page: int) -> dict:
     lock = _lock_for(key)
     with lock:
         if path.exists():
-            return json.loads(path.read_text(encoding="utf-8"))
+            lesson = json.loads(path.read_text(encoding="utf-8"))
+            if not any((row.get("ocr") or []) for row in lesson.get("beats") or []):
+                _attach_cdn_ocr(series_id, book_slug, page, lesson)
+                _write_lesson(path, lesson)
+            return lesson
         from scripts.prebuild_content.lesson_llm import fallback_page_beat, generate_chapter_lesson
 
         from .remote_book import catalog_book, peek_book
@@ -175,6 +196,7 @@ def generate_page_lesson(series_id: str, book_slug: str, page: int) -> dict:
                     }
                 ],
             }
+            _attach_cdn_ocr(series_id, book_slug, page, lesson)
             _write_lesson(path, lesson)
             logger.info("单页无正文，跳过模型 %s", key)
             return lesson
@@ -193,6 +215,7 @@ def generate_page_lesson(series_id: str, book_slug: str, page: int) -> dict:
             }
         if not lesson.get("beats"):
             lesson["beats"] = [fallback_page_beat(row)]
+        _attach_cdn_ocr(series_id, book_slug, page, lesson)
         _write_lesson(path, lesson)
         logger.info("单页课稿完成 %s", key)
         return lesson

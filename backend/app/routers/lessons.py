@@ -116,6 +116,7 @@ def _assemble_lesson(series_id: str, book_slug: str, book: dict) -> dict:
                         "words": picked.get("words") or [],
                         "phrases": picked.get("phrases") or [],
                         "segments": picked.get("segments") or [],
+                        "ocr": picked.get("ocr") or [],
                         "generated": True,
                     }
                 )
@@ -133,7 +134,7 @@ def _assemble_lesson(series_id: str, book_slug: str, book: dict) -> dict:
                 "image": page_image_url(series_id, book_slug, page_no),
                 "english": rec.get("english") or "",
                 "translate": rec.get("translate") or "",
-                "ocr": [],
+                "ocr": beat.get("ocr") or [],
                 "word_items": [word_map[key] for key in beat.get("words") or [] if key in word_map],
                 "phrase_items": [phrase_map[key] for key in beat.get("phrases") or [] if key in phrase_map],
                 "segments": merge_short_segments(beat.get("segments") or []),

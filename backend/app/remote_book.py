@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import http.client
 import json
 import logging
 import threading
@@ -38,28 +39,52 @@ def _encode(url: str) -> str:
     )
 
 
-def fetch_bytes(url: str) -> bytes | None:
-    req = urllib.request.Request(_encode(url), headers={"User-Agent": CDN_UA})
-    try:
-        with urllib.request.urlopen(req, timeout=40) as resp:
-            data = resp.read()
-    except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-            return None
-        raise
-    except (urllib.error.URLError, TimeoutError, ConnectionError):
-        return None
-    return data if data and len(data) > 20 else None
+def fetch_bytes(url: str, limit: int | None = None) -> bytes | None:
+    headers = {"User-Agent": CDN_UA}
+    if limit:
+        headers["Range"] = f"bytes=0-{int(limit) - 1}"
+    req = urllib.request.Request(_encode(url), headers=headers)
+    last_err = None
+    for _ in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=40) as resp:
+                chunks: list[bytes] = []
+                total = 0
+                while True:
+                    chunk = resp.read(64 * 1024)
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                    total += len(chunk)
+                    if limit and total >= limit:
+                        break
+            data = b"".join(chunks)
+            if limit:
+                data = data[:limit]
+            return data if data and len(data) > 20 else None
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return None
+            last_err = exc
+        except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.IncompleteRead) as exc:
+            last_err = exc
+    if last_err:
+        logger.warning("cdn fetch failed %s %s", url, last_err)
+    return None
 
 
-def fetch_json(url: str) -> dict | None:
+def fetch_json_any(url: str):
     raw = fetch_bytes(url)
     if not raw:
         return None
     try:
-        data = json.loads(raw.decode("utf-8"))
+        return json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError):
         return None
+
+
+def fetch_json(url: str) -> dict | None:
+    data = fetch_json_any(url)
     return data if isinstance(data, dict) else None
 
 
@@ -111,8 +136,12 @@ def page_image_bytes(series_id: str, book_slug: str, page: int) -> bytes | None:
     return fetch_bytes(page_urls(series_id, book_slug, page)["image"])
 
 
+def page_image_prefix(series_id: str, book_slug: str, page: int, limit: int = 65536) -> bytes | None:
+    return fetch_bytes(page_urls(series_id, book_slug, page)["image"], limit=limit)
+
+
 def page_paddle(series_id: str, book_slug: str, page: int):
-    return fetch_json(page_urls(series_id, book_slug, page)["paddle"])
+    return fetch_json_any(page_urls(series_id, book_slug, page)["paddle"])
 
 
 def load_one_page(series_id: str, book_slug: str, page: int) -> dict | None:

@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from ..assets import lookup_ocr
 from ..gen_jobs import job_payload
 from ..lesson_worker import enqueue_ocr_job
+from ..ocr import page_ocr_boxes
 from ..remote_book import book_exists
 
 router = APIRouter(prefix="/api")
@@ -16,6 +17,17 @@ class WordOcrBody(BaseModel):
     text: str = Field(..., min_length=1)
     purpose: str = "这一句的词框"
     check: bool = False
+
+
+@router.get("/ocr/page")
+def ocr_page(
+    series_id: str = Query(...),
+    book_slug: str = Query(...),
+    page: int = Query(..., ge=0),
+):
+    if not book_exists(series_id, book_slug):
+        raise HTTPException(404, "没有这本书")
+    return {"ocr": page_ocr_boxes(series_id, book_slug, page)}
 
 
 @router.post("/ocr/words")
