@@ -79,7 +79,7 @@ const mergeTitle = ref('正在合成视频')
 const mergeHint = ref('')
 const mergePercent = ref(0)
 const mergeFailed = ref(false)
-const mergePhase = ref<'working' | 'ask-merge' | 'ask-upload' | 'ask-discard' | 'uploading' | 'failed'>('working')
+const mergePhase = ref<'working' | 'ask-merge' | 'ask-upload' | 'uploading' | 'failed'>('working')
 const mergeCanceling = ref(false)
 const sharePublic = ref(false)
 const pageClips = ref<PageClip[]>([])
@@ -753,12 +753,6 @@ function showAskUpload() {
   mergeHint.value = '要上传到云端吗？勾选后会同时公开到广场，之后也可在视频详情页更改。'
 }
 
-function askDiscardVideo() {
-  mergePhase.value = 'ask-discard'
-  mergeTitle.value = '确定舍弃这段视频？'
-  mergeHint.value = '舍弃后不会上传到云端，本页朗读进度仍会保留。'
-}
-
 function cancelMerge() {
   if (mergePhase.value !== 'working' || !mergeAbort || mergeCanceling.value) return
   mergeCanceling.value = true
@@ -768,10 +762,6 @@ function cancelMerge() {
 }
 
 function closeMergeDialog() {
-  if (mergePhase.value === 'ask-discard') {
-    showAskUpload()
-    return
-  }
   if (mergePhase.value === 'working') {
     cancelMerge()
     return
@@ -1449,7 +1439,7 @@ onUnmounted(() => {
         class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4"
       >
         <div class="card w-full max-w-md px-6 py-6 shadow-pop" role="dialog" aria-modal="true" aria-live="polite">
-          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-discard' ? '🗑️' : mergePhase === 'ask-upload' ? '☁️' : mergePhase === 'ask-merge' ? '⏳' : '🎬' }}</p>
+          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-upload' ? '☁️' : mergePhase === 'ask-merge' ? '⏳' : '🎬' }}</p>
           <h2 class="mt-3 text-center text-xl font-extrabold text-brand-700">{{ mergeTitle }}</h2>
           <p class="mt-2 text-center text-sm font-bold text-brand-700/70">{{ mergeHint }}</p>
           <div v-if="mergePhase === 'working' || mergePhase === 'uploading' || mergeFailed" class="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
@@ -1492,11 +1482,7 @@ onUnmounted(() => {
               上传后公开到广场
             </label>
             <button class="btn-primary w-full" type="button" @click="pickMerge('upload')">上传到云端</button>
-            <button class="btn-ghost w-full" type="button" @click="askDiscardVideo">舍弃视频</button>
-          </div>
-          <div v-else-if="mergePhase === 'ask-discard'" class="mt-5 flex flex-col gap-2">
-            <button class="btn-candy w-full" type="button" @click="pickMerge('skip')">确定舍弃</button>
-            <button class="btn-ghost w-full" type="button" @click="showAskUpload">再想想</button>
+            <button class="btn-ghost w-full" type="button" @click="pickMerge('skip')">舍弃视频</button>
           </div>
         </div>
       </div>
