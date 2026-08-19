@@ -70,7 +70,6 @@ const emit = defineEmits<{
 
         <p v-else-if="busy" class="min-w-0 flex-1 text-base font-extrabold text-brand-700/80">正在评分…</p>
         <p v-else-if="scoreError" class="min-w-0 flex-1 text-base font-extrabold text-candy">{{ scoreError }}</p>
-        <p v-else-if="uploadHint" class="min-w-0 flex-1 text-base font-extrabold text-brand-700">{{ uploadHint }}</p>
         <p
           v-else-if="lastScore != null"
           class="min-w-0 flex-1 text-base font-extrabold"
@@ -79,6 +78,7 @@ const emit = defineEmits<{
           {{ lastScore }} 分 · {{ passText }}
           <span v-if="lastHeard" class="font-bold text-brand-700/50"> · 听到：{{ lastHeard }}</span>
         </p>
+        <p v-else-if="uploadHint" class="min-w-0 flex-1 text-base font-extrabold text-brand-700">{{ uploadHint }}</p>
 
         <div class="relative z-20 ml-auto flex shrink-0 items-center gap-2">
           <button
