@@ -8,6 +8,7 @@ import EntryView from './views/EntryView.vue'
 import HomeView from './views/HomeView.vue'
 import LessonView from './views/LessonView.vue'
 import MessagesView from './views/MessagesView.vue'
+import MeView from './views/MeView.vue'
 import ProfileView from './views/ProfileView.vue'
 import SeriesView from './views/SeriesView.vue'
 import SquareDetailView from './views/SquareDetailView.vue'
@@ -24,7 +25,8 @@ const router = createRouter({
     { path: '/wrong-book', component: WrongBookView, meta: { auth: true } },
     { path: '/square', component: SquareView, meta: { auth: true } },
     { path: '/square/:id', component: SquareDetailView, meta: { auth: true, secondary: true } },
-    { path: '/me', component: ProfileView, meta: { auth: true } },
+    { path: '/me', component: MeView, meta: { auth: true } },
+    { path: '/me/home', component: ProfileView, meta: { auth: true } },
     { path: '/user/:userKey', component: ProfileView, meta: { auth: true, secondary: true } },
     { path: '/messages', component: MessagesView, meta: { auth: true } },
     { path: '/day', component: DayView, meta: { auth: true, secondary: true } },

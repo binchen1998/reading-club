@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from pydantic import BaseModel
+from sqlalchemy import desc, func, select
 from sqlalchemy.orm import Session
 
 from .. import qiniu_upload
@@ -74,6 +75,37 @@ def _own_recording(db: Session, practice_id: int, user: User) -> Recording:
     if rec is None or rec.username != user.username:
         raise HTTPException(status_code=404, detail="录音不存在")
     return rec
+
+
+@router.get("/mine")
+def list_mine(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(12, ge=1, le=50),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    filters = (
+        Recording.username == user.username,
+        Recording.status == "completed",
+    )
+    total = db.execute(select(func.count()).select_from(Recording).where(*filters)).scalar() or 0
+    rows = (
+        db.execute(
+            select(Recording)
+            .where(*filters)
+            .order_by(desc(Recording.completed_at), desc(Recording.id))
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
+        .scalars()
+        .all()
+    )
+    return {
+        "total": int(total),
+        "page": page,
+        "pageSize": page_size,
+        "items": [serialize_recording(row) for row in rows],
+    }
 
 
 def _mark_progress(db: Session, rec: Recording) -> None:

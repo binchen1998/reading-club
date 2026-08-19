@@ -24,7 +24,7 @@ const navItems = [
   { path: '/wrong-book', label: '错题本', match: ['/wrong-book'] },
   { path: '/square', label: '广场', match: ['/square'] },
   { path: '/messages', label: '消息', match: ['/messages'] },
-  { path: '/me', label: '我的', match: ['/me', '/user'] },
+  { path: '/me', label: '我的', match: ['/me'] },
 ] as const
 
 function navActive(match: readonly string[]) {
