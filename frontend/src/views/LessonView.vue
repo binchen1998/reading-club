@@ -15,7 +15,7 @@ import { useUserCamera } from '../composables/useUserCamera'
 import { useUserStore } from '../stores/user'
 import { recognizeAudio } from '../utils/asr'
 import { speakAssistantText, stopAssistantSpeak } from '../utils/assistantTts'
-import { concatClips } from '../utils/concatClips'
+import { concatClips, isMergeAborted } from '../utils/concatClips'
 import type { DictItem } from '../utils/dict'
 import { recordPageClip, type PageClip } from '../utils/recordPage'
 import { scoreEnglish } from '../utils/score'
@@ -79,11 +79,13 @@ const mergeTitle = ref('正在合成视频')
 const mergeHint = ref('')
 const mergePercent = ref(0)
 const mergeFailed = ref(false)
-const mergePhase = ref<'working' | 'ask-upload' | 'ask-discard' | 'uploading' | 'failed'>('working')
+const mergePhase = ref<'working' | 'ask-merge' | 'ask-upload' | 'ask-discard' | 'uploading' | 'failed'>('working')
+const mergeCanceling = ref(false)
 const sharePublic = ref(false)
 const pageClips = ref<PageClip[]>([])
 let flushingPage = false
-let mergeChoice: ((value: 'skip' | 'upload') => void) | null = null
+let mergeChoice: ((value: 'skip' | 'upload' | 'merge') => void) | null = null
+let mergeAbort: AbortController | null = null
 let pageRecorder: { stop: () => Promise<PageClip> } | null = null
 let quizTimer: number | null = null
 let passTimer: number | null = null
@@ -715,15 +717,34 @@ async function scoreBlob(clip: PageClip) {
 }
 
 function waitMergeChoice() {
-  return new Promise<'skip' | 'upload'>((resolve) => {
+  return new Promise<'skip' | 'upload' | 'merge'>((resolve) => {
     mergeChoice = resolve
   })
 }
 
-function pickMerge(value: 'skip' | 'upload') {
+function pickMerge(value: 'skip' | 'upload' | 'merge') {
   const resolve = mergeChoice
   mergeChoice = null
   resolve?.(value)
+}
+
+function pageClipScore(clips = pageClips.value) {
+  if (!clips.length) return 0
+  return Math.round(clips.reduce((sum, item) => sum + item.score, 0) / clips.length)
+}
+
+function skipMergeKeepProgress(page?: number) {
+  const score = pageClipScore()
+  pageClips.value = []
+  recordDone.value = true
+  saveProgress({ record_done: true, record_score: score, ...(page != null ? { page } : {}) })
+  uploadHint.value = '已跳过合并，本页朗读进度已保留'
+}
+
+function showAskMerge(hint?: string) {
+  mergePhase.value = 'ask-merge'
+  mergeTitle.value = '本页朗读已完成'
+  mergeHint.value = hint || '是否合成完整视频？多段合并可能需要很长时间，期间可以取消。跳过也会保留本页朗读进度。'
 }
 
 function showAskUpload() {
@@ -738,9 +759,21 @@ function askDiscardVideo() {
   mergeHint.value = '舍弃后不会上传到云端，本页朗读进度仍会保留。'
 }
 
+function cancelMerge() {
+  if (mergePhase.value !== 'working' || !mergeAbort || mergeCanceling.value) return
+  mergeCanceling.value = true
+  mergeTitle.value = '正在取消'
+  mergeHint.value = '正在停止合成…'
+  mergeAbort.abort()
+}
+
 function closeMergeDialog() {
   if (mergePhase.value === 'ask-discard') {
     showAskUpload()
+    return
+  }
+  if (mergePhase.value === 'working') {
+    cancelMerge()
     return
   }
   if (mergeChoice) pickMerge('skip')
@@ -753,76 +786,116 @@ async function flushPageRecording() {
   if (!pageClips.value.length || !beat.value || flushingPage) return
   flushingPage = true
   mergeFailed.value = false
-  mergePhase.value = 'working'
   mergeOpen.value = true
-  mergeTitle.value = '正在合成视频'
-  mergeHint.value = '多段朗读合成成片需要一点时间，请稍候'
-  mergePercent.value = 0
+  const page = beat.value.page
+  const seriesId = String(route.params.seriesId)
+  const bookSlug = String(route.params.bookSlug)
+  const bookTitle = String(lesson.value?.title_zh || lesson.value?.title || '')
+  const chapterId = String(route.params.chapterId)
   try {
-    uploadHint.value = '正在合并本页朗读…'
-    const merged = await concatClips(pageClips.value, ({ percent, text }) => {
+    const needMerge = pageClips.value.filter((item) => item.blob.size > 1000).length > 1
+    if (needMerge) {
+      showAskMerge()
+      const mergePick = await waitMergeChoice()
+      if (mergePick !== 'merge') {
+        skipMergeKeepProgress(page)
+        return
+      }
+    }
+    while (true) {
+      mergeFailed.value = false
+      mergeCanceling.value = false
+      mergePhase.value = 'working'
       mergeTitle.value = '正在合成视频'
-      mergeHint.value = text
-      mergePercent.value = percent
-    })
-    merged.score = Math.round(pageClips.value.reduce((sum, item) => sum + item.score, 0) / pageClips.value.length)
-    pageClips.value = []
-    recordDone.value = true
-    saveProgress({ record_done: true, record_score: merged.score })
-    if (user.isGuest) {
-      uploadHint.value = '本页朗读已保存在本地'
-      mergeTitle.value = '合成完成'
-      mergeHint.value = '本页朗读已保存在本地'
-      mergePercent.value = 100
-      await sleep(400)
-      return
-    }
-    const saved = await saveReadingLocal({
-      clip: merged,
-      seriesId: String(route.params.seriesId),
-      bookSlug: String(route.params.bookSlug),
-      bookTitle: String(lesson.value?.title_zh || lesson.value?.title || ''),
-      chapterId: String(route.params.chapterId),
-      page: beat.value.page,
-      onProgress: (text) => {
-        uploadHint.value = text
-        mergeTitle.value = '正在保存'
-        mergeHint.value = text
-        mergePercent.value = Math.max(mergePercent.value, 92)
-      },
-    })
-    uploadHint.value = '本页朗读已保存在本地'
-    mergePercent.value = 100
-    if (!saved.canCloud) {
-      mergeTitle.value = '合成完成'
-      mergeHint.value = '本页朗读已保存在本地'
-      await sleep(400)
-      return
-    }
-    sharePublic.value = false
-    showAskUpload()
-    const uploadPick = await waitMergeChoice()
-    if (uploadPick !== 'upload') {
-      uploadHint.value = '本页朗读已保存在本地'
-      return
-    }
-    mergePhase.value = 'uploading'
-    mergeTitle.value = '正在上传'
-    mergeHint.value = '正在上传到云端…'
-    const uploaded = await uploadReadingCloud({
-      id: saved.id,
-      clip: merged,
-      isPublic: sharePublic.value,
-      onProgress: (text) => {
-        uploadHint.value = text
+      mergeHint.value = needMerge ? '多段朗读合成成片可能需要较长时间，可以随时取消' : '正在保存本页朗读…'
+      mergePercent.value = 0
+      mergeAbort = new AbortController()
+      try {
+        uploadHint.value = needMerge ? '正在合并本页朗读…' : '正在保存本页朗读…'
+        const merged = await concatClips(
+          pageClips.value,
+          ({ percent, text }) => {
+            if (mergeAbort?.signal.aborted) return
+            mergeTitle.value = '正在合成视频'
+            mergeHint.value = text
+            mergePercent.value = percent
+          },
+          mergeAbort.signal,
+        )
+        merged.score = pageClipScore()
+        pageClips.value = []
+        recordDone.value = true
+        saveProgress({ record_done: true, record_score: merged.score, page })
+        if (user.isGuest) {
+          uploadHint.value = '本页朗读已保存在本地'
+          mergeTitle.value = '合成完成'
+          mergeHint.value = '本页朗读已保存在本地'
+          mergePercent.value = 100
+          await sleep(400)
+          return
+        }
+        const saved = await saveReadingLocal({
+          clip: merged,
+          seriesId,
+          bookSlug,
+          bookTitle,
+          chapterId,
+          page,
+          onProgress: (text) => {
+            uploadHint.value = text
+            mergeTitle.value = '正在保存'
+            mergeHint.value = text
+            mergePercent.value = Math.max(mergePercent.value, 92)
+          },
+        })
+        uploadHint.value = '本页朗读已保存在本地'
+        mergePercent.value = 100
+        if (!saved.canCloud) {
+          mergeTitle.value = '合成完成'
+          mergeHint.value = '本页朗读已保存在本地'
+          await sleep(400)
+          return
+        }
+        sharePublic.value = false
+        showAskUpload()
+        const uploadPick = await waitMergeChoice()
+        if (uploadPick !== 'upload') {
+          uploadHint.value = '本页朗读已保存在本地'
+          return
+        }
+        mergePhase.value = 'uploading'
         mergeTitle.value = '正在上传'
-        mergeHint.value = text
-        const m = text.match(/(\d+)\s*%/)
-        mergePercent.value = m ? Number(m[1]) : Math.max(mergePercent.value, 92)
-      },
-    })
-    mergePercent.value = 100
-    uploadHint.value = uploaded.isPublic ? '已公开到广场' : '已上传，仅自己可见'
+        mergeHint.value = '正在上传到云端…'
+        const uploaded = await uploadReadingCloud({
+          id: saved.id,
+          clip: merged,
+          isPublic: sharePublic.value,
+          onProgress: (text) => {
+            uploadHint.value = text
+            mergeTitle.value = '正在上传'
+            mergeHint.value = text
+            const m = text.match(/(\d+)\s*%/)
+            mergePercent.value = m ? Number(m[1]) : Math.max(mergePercent.value, 92)
+          },
+        })
+        mergePercent.value = 100
+        uploadHint.value = uploaded.isPublic ? '已公开到广场' : '已上传，仅自己可见'
+        return
+      } catch (err) {
+        if (isMergeAborted(err)) {
+          showAskMerge('已取消合成。再次合并仍可能需要较长时间，也可以先跳过。')
+          const mergePick = await waitMergeChoice()
+          if (mergePick !== 'merge') {
+            skipMergeKeepProgress(page)
+            return
+          }
+          continue
+        }
+        throw err
+      } finally {
+        mergeAbort = null
+      }
+    }
   } catch (err) {
     sound.fail()
     const msg = err instanceof Error ? err.message : '保存失败'
@@ -1376,7 +1449,7 @@ onUnmounted(() => {
         class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
       >
         <div class="card w-full max-w-md px-6 py-6 shadow-pop" role="dialog" aria-modal="true" aria-live="polite">
-          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-discard' ? '🗑️' : mergePhase === 'ask-upload' ? '☁️' : '🎬' }}</p>
+          <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-discard' ? '🗑️' : mergePhase === 'ask-upload' ? '☁️' : mergePhase === 'ask-merge' ? '⏳' : '🎬' }}</p>
           <h2 class="mt-3 text-center text-xl font-extrabold text-brand-700">{{ mergeTitle }}</h2>
           <p class="mt-2 text-center text-sm font-bold text-brand-700/70">{{ mergeHint }}</p>
           <div v-if="mergePhase === 'working' || mergePhase === 'uploading' || mergeFailed" class="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
@@ -1400,6 +1473,19 @@ onUnmounted(() => {
           >
             知道了
           </button>
+          <button
+            v-else-if="mergePhase === 'working'"
+            class="btn-ghost mt-5 w-full"
+            type="button"
+            :disabled="mergeCanceling"
+            @click="cancelMerge"
+          >
+            {{ mergeCanceling ? '正在取消…' : '取消合并' }}
+          </button>
+          <div v-else-if="mergePhase === 'ask-merge'" class="mt-5 flex flex-col gap-2">
+            <button class="btn-primary w-full" type="button" @click="pickMerge('merge')">开始合并</button>
+            <button class="btn-ghost w-full" type="button" @click="pickMerge('skip')">暂不合并</button>
+          </div>
           <div v-else-if="mergePhase === 'ask-upload'" class="mt-5 flex flex-col gap-2">
             <label class="flex items-center gap-2 rounded-2xl bg-brand-50 px-3 py-2 text-sm font-bold text-brand-700">
               <input v-model="sharePublic" class="h-4 w-4 accent-brand-500" type="checkbox" />
