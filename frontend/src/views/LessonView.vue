@@ -1178,7 +1178,7 @@ onUnmounted(() => {
       </button>
     </section>
 
-    <aside class="flex h-full w-[min(22.5rem,40vw)] shrink-0 flex-col space-y-2 overflow-y-auto lg:w-[360px] lg:space-y-3">
+    <aside class="flex h-full min-h-0 w-[min(22.5rem,40vw)] shrink-0 flex-col space-y-2 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] lg:w-[360px] lg:space-y-3">
         <p class="truncate text-base font-extrabold text-brand-700">
           {{ lesson.title_zh }} · 第 {{ beat.page }} 页 · {{ beatIndex + 1 }}/{{ lesson.beats.length }}
         </p>
@@ -1219,7 +1219,7 @@ onUnmounted(() => {
           <p v-if="explainWaitingTts" class="text-[11px] font-bold text-brand-600/70 lg:text-xs">
             正在等待朗读...
           </p>
-          <div class="max-h-[42vh] space-y-2 overflow-y-auto pr-1">
+          <div class="space-y-2 pr-1 max-lg:max-h-none lg:max-h-[42vh] lg:overflow-y-auto">
             <div
               v-if="explainBusy"
               class="rounded-2xl bg-sunny/80 px-3 py-2 font-bold leading-7 text-brand-700"
