@@ -52,7 +52,7 @@ function bookHint(book: BookRow) {
       <div v-for="book in data.books" :key="book.slug" class="card flex items-center gap-3 !py-4">
         <div class="min-w-0 flex-1">
           <p class="text-xs font-bold text-brand-500">No. {{ book.number }}</p>
-          <h2 class="mt-0.5 text-xl font-extrabold leading-snug text-brand-700">{{ book.title }}</h2>
+          <h2 class="mt-0.5 text-lg font-extrabold leading-snug text-brand-700">{{ book.title }}</h2>
           <p v-if="bookHint(book)" class="mt-1 text-xs font-bold text-brand-600/50">{{ bookHint(book) }}</p>
         </div>
         <router-link

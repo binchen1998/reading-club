@@ -154,7 +154,7 @@ onMounted(load)
           <div class="flex min-w-0 w-1/2 flex-col gap-2 p-3 lg:gap-3 lg:p-4">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0">
-                <h2 class="text-base font-extrabold leading-snug text-brand-700 lg:truncate lg:text-xl">
+                <h2 class="text-base font-extrabold leading-snug text-brand-700 lg:truncate lg:text-lg">
                   {{ item.bookTitle }} · 第 {{ item.page }} 页
                 </h2>
                 <p v-if="item.lessonDate" class="mt-0.5 text-[11px] font-bold text-brand-600/60 lg:text-xs">

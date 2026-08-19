@@ -163,7 +163,7 @@ onMounted(async () => {
         <UserAvatar :avatar="owner.avatarUrl || owner.avatar" size="xl" rounded="2xl" />
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="truncate text-2xl font-extrabold text-brand-700">
+            <h2 class="truncate text-xl font-extrabold text-brand-700">
               {{ safeDisplayName(owner.nickname, owner.username) }}
             </h2>
             <button

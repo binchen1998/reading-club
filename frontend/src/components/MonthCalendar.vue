@@ -56,7 +56,7 @@ onMounted(load)
   <section class="card !p-2.5 lg:!p-5">
     <div class="mb-2 flex items-center justify-between lg:mb-3">
       <button class="font-extrabold text-brand-600" type="button" @click="prevMonth">‹</button>
-      <p class="text-base font-extrabold text-brand-700">{{ monthTitle }}</p>
+      <p class="text-sm font-extrabold text-brand-700 lg:text-base">{{ monthTitle }}</p>
       <button class="font-extrabold text-brand-600" type="button" @click="nextMonth">›</button>
     </div>
     <div class="grid grid-cols-7 gap-0.5 text-center text-[10px] font-bold text-brand-500 lg:gap-1 lg:text-xs">

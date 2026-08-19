@@ -50,10 +50,10 @@ onMounted(load)
     <section class="min-w-0 space-y-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
-          <h1 class="text-2xl font-extrabold text-brand-700 lg:text-3xl">朗读广场</h1>
+          <h1 class="text-xl font-extrabold text-brand-700 lg:text-3xl">朗读广场</h1>
           <div class="flex gap-1">
             <button
-              class="rounded-full px-2.5 py-1 text-sm font-extrabold"
+              class="rounded-full px-2.5 py-1 text-xs font-extrabold"
               :class="sort === 'latest' ? 'bg-candy text-white' : 'bg-white text-brand-700'"
               type="button"
               @click="onSort('latest')"
@@ -61,7 +61,7 @@ onMounted(load)
               最新
             </button>
             <button
-              class="rounded-full px-2.5 py-1 text-sm font-extrabold"
+              class="rounded-full px-2.5 py-1 text-xs font-extrabold"
               :class="sort === 'likes' ? 'bg-candy text-white' : 'bg-white text-brand-700'"
               type="button"
               @click="onSort('likes')"
@@ -163,14 +163,14 @@ onMounted(load)
 }
 
 .square-stat-num {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #ea580c;
   line-height: 1.2;
 }
 
 .square-stat-label {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   color: #fb923c;
   white-space: nowrap;
 }

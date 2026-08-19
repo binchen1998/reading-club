@@ -85,7 +85,7 @@ onUnmounted(() => {
             <span class="animate-float">📖</span>
             <span class="max-md:hidden">袋鼠英语-阅读俱乐部</span>
           </RouterLink>
-          <nav class="flex flex-nowrap items-center justify-end gap-1 text-sm font-extrabold lg:gap-2">
+          <nav class="flex flex-nowrap items-center justify-end gap-1 text-xs font-extrabold lg:gap-2 lg:text-sm">
             <RouterLink
               v-for="item in navItems"
               :key="item.path"
