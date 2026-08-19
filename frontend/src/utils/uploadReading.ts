@@ -82,3 +82,7 @@ export async function setReadingPublic(id: number, isPublic: boolean): Promise<R
     body: JSON.stringify({ is_public: isPublic }),
   }) as Promise<ReadingRecord>
 }
+
+export async function discardReading(id: number): Promise<void> {
+  await api(`/api/practice/${id}`, { method: 'DELETE' })
+}

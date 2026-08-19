@@ -204,7 +204,7 @@ def day_report(date: str = Query(...), user: User = Depends(get_current_user), d
                 "recordDone": row.record_done,
                 "recordScore": row.record_score,
                 "recordingId": row.recording_id,
-                "videoUrl": rec.video_url if rec else "",
+                "videoUrl": rec.video_url if rec and rec.video_url else "",
             }
         )
     payload = {"date": day.isoformat(), "items": items, "server_now": server_now_iso()}

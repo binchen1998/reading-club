@@ -95,7 +95,7 @@ onUnmounted(() => document.removeEventListener('click', closeTip))
         >{{ recordTip }}</span>
       </button>
       <button
-        v-if="item.videoUrl"
+        v-if="item.videoUrl && item.recordingId"
         type="button"
         class="relative grid h-8 min-w-8 place-items-center rounded-xl bg-white px-1.5 text-sm font-black text-candy"
         title="看这页朗读"

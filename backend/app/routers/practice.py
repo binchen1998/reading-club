@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 
 from .. import qiniu_upload
 from ..auth import assert_user_not_muted, get_current_user, is_guest
-from ..cache_invalidate import invalidate_on_publish
+from ..cache_invalidate import invalidate_on_publish, invalidate_reports
 from ..config import RECORDINGS
 from ..db import get_db
-from ..models import Recording, User
+from ..models import PageProgress, Recording, User
 from ..routers.progress import ProgressIn, upsert_progress
 from ..timeutil import shanghai_today
 
@@ -269,6 +269,33 @@ def set_visibility(
     db.refresh(rec)
     invalidate_on_publish(user.username, rec.id)
     return serialize_recording(rec)
+
+
+@router.delete("/{practice_id}")
+def discard_practice(
+    practice_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    rec = _own_recording(db, practice_id, user)
+    was_public = bool(rec.is_public)
+    rec.status = "discarded"
+    rec.is_public = False
+    rec.video_url = ""
+    rec.thumb_url = ""
+    progress = db.execute(
+        select(PageProgress).where(
+            PageProgress.username == user.username,
+            PageProgress.recording_id == practice_id,
+        )
+    ).scalar_one_or_none()
+    if progress is not None:
+        progress.recording_id = 0
+    db.commit()
+    invalidate_reports(user.username)
+    if was_public:
+        invalidate_on_publish(user.username, practice_id)
+    return {"ok": True}
 
 
 @router.post("/{practice_id}/complete")

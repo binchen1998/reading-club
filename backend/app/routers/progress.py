@@ -88,6 +88,8 @@ def upsert_progress(db: Session, username: str, payload: ProgressIn) -> PageProg
         row.phrase_retries = max(0, int(payload.phrase_retries))
     if payload.record_done is not None:
         row.record_done = payload.record_done
+        if payload.record_done:
+            row.lesson_date = shanghai_today()
     if payload.record_score is not None:
         row.record_score = max(0, min(100, int(payload.record_score)))
     if payload.recording_id is not None:

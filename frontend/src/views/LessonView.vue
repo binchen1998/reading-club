@@ -24,7 +24,7 @@ import { waitJobResult } from '../utils/jobSse'
 import { stopSpeak } from '../utils/speak'
 import { boxesFor, inflateBox, mergeShortSegments, needlesOf, sleep, splitSentences, type Box } from '../utils/text'
 import { sound } from '../utils/sound'
-import { saveReadingLocal, uploadReadingCloud } from '../utils/uploadReading'
+import { discardReading, saveReadingLocal, uploadReadingCloud } from '../utils/uploadReading'
 
 type Item = { en: string; zh: string }
 type Choice = { key: string; text: string; ok: boolean }
@@ -574,7 +574,7 @@ function pageMeta() {
 }
 
 function saveProgress(extra: Record<string, unknown>) {
-  apiPost('/api/progress', { ...pageMeta(), ...extra }).catch(() => undefined)
+  return apiPost('/api/progress', { ...pageMeta(), ...extra }).catch(() => undefined)
 }
 
 function saveCursor() {
@@ -733,24 +733,38 @@ function pageClipScore(clips = pageClips.value) {
   return Math.round(clips.reduce((sum, item) => sum + item.score, 0) / clips.length)
 }
 
-function skipMergeKeepProgress(page?: number) {
-  const score = pageClipScore()
-  pageClips.value = []
+async function keepPageProgress(page?: number, score?: number) {
+  const nextScore = score ?? pageClipScore()
   recordDone.value = true
-  saveProgress({ record_done: true, record_score: score, ...(page != null ? { page } : {}) })
-  uploadHint.value = '已跳过合并，本页朗读进度已保留'
+  await saveProgress({
+    record_done: true,
+    record_score: nextScore,
+    recording_id: 0,
+    ...(page != null ? { page } : {}),
+  })
 }
 
-function showAskMerge(hint?: string) {
+async function skipMergeKeepProgress(page?: number) {
+  const score = pageClipScore()
+  pageClips.value = []
+  await keepPageProgress(page, score)
+  uploadHint.value = '本页朗读已记录，未保存视频'
+}
+
+function showAskMerge(hint?: string, needMerge = true) {
   mergePhase.value = 'ask-merge'
   mergeTitle.value = '本页朗读已完成'
-  mergeHint.value = hint || '是否合成完整视频？多段合并可能需要很长时间，期间可以取消。跳过也会保留本页朗读进度。'
+  mergeHint.value =
+    hint ||
+    (needMerge
+      ? '是否合成完整视频？多段合并可能需要很长时间，期间可以取消。跳过也会留下本页朗读记录和分数，只是不能回放。'
+      : '要保存本页朗读视频吗？跳过也会留下本页朗读记录和分数，只是没有播放按钮。')
 }
 
 function showAskUpload() {
   mergePhase.value = 'ask-upload'
   mergeTitle.value = '本页朗读已保存在本地'
-  mergeHint.value = '要上传到云端吗？勾选后会同时公开到广场，之后也可在视频详情页更改。'
+  mergeHint.value = '要上传到云端吗？舍弃视频后仍保留本页朗读记录和分数，只是不能回放。勾选后会同时公开到广场。'
 }
 
 function cancelMerge() {
@@ -782,15 +796,15 @@ async function flushPageRecording() {
   const bookSlug = String(route.params.bookSlug)
   const bookTitle = String(lesson.value?.title_zh || lesson.value?.title || '')
   const chapterId = String(route.params.chapterId)
+  const score = pageClipScore()
   try {
+    await keepPageProgress(page, score)
     const needMerge = pageClips.value.filter((item) => item.blob.size > 1000).length > 1
-    if (needMerge) {
-      showAskMerge()
-      const mergePick = await waitMergeChoice()
-      if (mergePick !== 'merge') {
-        skipMergeKeepProgress(page)
-        return
-      }
+    showAskMerge(undefined, needMerge)
+    const mergePick = await waitMergeChoice()
+    if (mergePick !== 'merge') {
+      await skipMergeKeepProgress(page)
+      return
     }
     while (true) {
       mergeFailed.value = false
@@ -812,14 +826,14 @@ async function flushPageRecording() {
           },
           mergeAbort.signal,
         )
-        merged.score = pageClipScore()
+        merged.score = score
         pageClips.value = []
         recordDone.value = true
-        saveProgress({ record_done: true, record_score: merged.score, page })
+        await saveProgress({ record_done: true, record_score: merged.score, page })
         if (user.isGuest) {
-          uploadHint.value = '本页朗读已保存在本地'
-          mergeTitle.value = '合成完成'
-          mergeHint.value = '本页朗读已保存在本地'
+          uploadHint.value = '本页朗读已记录'
+          mergeTitle.value = '已记录'
+          mergeHint.value = '游客不能保存视频，本页朗读分数已留下'
           mergePercent.value = 100
           await sleep(400)
           return
@@ -850,7 +864,9 @@ async function flushPageRecording() {
         showAskUpload()
         const uploadPick = await waitMergeChoice()
         if (uploadPick !== 'upload') {
-          uploadHint.value = '本页朗读已保存在本地'
+          await discardReading(saved.id)
+          await saveProgress({ record_done: true, record_score: merged.score, page, recording_id: 0 })
+          uploadHint.value = '本页朗读已记录，未保存视频'
           return
         }
         mergePhase.value = 'uploading'
@@ -873,10 +889,10 @@ async function flushPageRecording() {
         return
       } catch (err) {
         if (isMergeAborted(err)) {
-          showAskMerge('已取消合成。再次合并仍可能需要较长时间，也可以先跳过。')
-          const mergePick = await waitMergeChoice()
-          if (mergePick !== 'merge') {
-            skipMergeKeepProgress(page)
+          showAskMerge('已取消合成。再次保存仍可能需要较长时间，也可以先跳过。', needMerge)
+          const again = await waitMergeChoice()
+          if (again !== 'merge') {
+            await skipMergeKeepProgress(page)
             return
           }
           continue
@@ -1473,8 +1489,8 @@ onUnmounted(() => {
             {{ mergeCanceling ? '正在取消…' : '取消合并' }}
           </button>
           <div v-else-if="mergePhase === 'ask-merge'" class="mt-5 flex flex-col gap-2">
-            <button class="btn-primary w-full" type="button" @click="pickMerge('merge')">开始合并</button>
-            <button class="btn-ghost w-full" type="button" @click="pickMerge('skip')">暂不合并</button>
+            <button class="btn-primary w-full" type="button" @click="pickMerge('merge')">保存视频</button>
+            <button class="btn-ghost w-full" type="button" @click="pickMerge('skip')">暂不保存</button>
           </div>
           <div v-else-if="mergePhase === 'ask-upload'" class="mt-5 flex flex-col gap-2">
             <label class="flex items-center gap-2 rounded-2xl bg-brand-50 px-3 py-2 text-sm font-bold text-brand-700">
