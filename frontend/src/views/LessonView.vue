@@ -1277,7 +1277,7 @@ onUnmounted(() => {
         </section>
 
         <section class="card space-y-2 p-3 lg:space-y-3 lg:p-5">
-          <p class="text-base font-extrabold text-brand-700">这一页重点</p>
+          <p class="text-sm font-extrabold text-brand-700 lg:text-base">这一页重点</p>
           <div>
             <p class="mb-1 text-[11px] font-extrabold text-brand-500 lg:mb-2 lg:text-xs">词</p>
             <div class="flex flex-wrap gap-1 lg:gap-2">
@@ -1318,37 +1318,37 @@ onUnmounted(() => {
       @close="pauseFlow"
     >
       <template v-if="currentQuestion">
-        <div class="mb-4 flex items-center justify-between">
-          <span class="chip bg-brand-100 text-brand-700">第 {{ quizCursor + 1 }} / {{ currentQuiz.length }} 题</span>
-          <button class="text-sm font-bold text-brand-600" type="button" @click="playOne(currentQuestion.item.en)">
+        <div class="mb-2 flex items-center justify-between lg:mb-4">
+          <span class="chip bg-brand-100 text-brand-700 max-lg:px-2 max-lg:py-0.5 max-lg:text-xs">第 {{ quizCursor + 1 }} / {{ currentQuiz.length }} 题</span>
+          <button class="text-xs font-bold text-brand-600 lg:text-sm" type="button" @click="playOne(currentQuestion.item.en)">
             🔊 听单词
           </button>
         </div>
-        <p class="mb-1 text-center text-xs font-bold text-brand-600/70">
+        <p class="mb-0.5 text-center text-[11px] font-bold text-brand-600/70 lg:mb-1 lg:text-xs">
           有错要整轮重来，全对才算过
           <span v-if="(step === 'phrase' ? phraseRetries : vocabRetries) > 0">
             · 已重试 {{ step === 'phrase' ? phraseRetries : vocabRetries }} 次
           </span>
         </p>
-        <p class="mb-3 text-center text-2xl font-extrabold text-brand-700 sm:mb-4 sm:text-3xl">{{ currentQuestion.item.en }}</p>
-        <div class="flex flex-col gap-2">
+        <p class="mb-2 text-center text-lg font-extrabold leading-snug text-brand-700 lg:mb-4 lg:text-3xl">{{ currentQuestion.item.en }}</p>
+        <div class="flex flex-col gap-1.5 lg:gap-2">
           <button
             v-for="opt in currentQuestion.options"
             :key="opt.key"
             type="button"
-            class="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-base font-bold transition active:scale-95 sm:px-4 sm:py-3 sm:text-lg"
+            class="flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-left text-sm font-bold transition active:scale-95 lg:gap-3 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-lg"
             :class="optionClass(opt)"
             :disabled="celebrating || (wrongKeys[quizCursor] || []).includes(opt.key)"
             @click="pickOption(opt.key)"
           >
             <span
-              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base font-extrabold"
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold lg:h-8 lg:w-8 lg:text-base"
               :class="(celebrating && opt.ok) || (wrongKeys[quizCursor] || []).includes(opt.key) ? 'bg-white/25' : 'bg-brand-100 text-brand-700'"
             >{{ opt.key }}</span>
             <span>{{ opt.text }}</span>
           </button>
         </div>
-        <p class="mt-auto h-5 text-center text-xs font-bold leading-5 text-candy">
+        <p class="mt-2 h-4 text-center text-[11px] font-bold leading-4 text-candy lg:mt-auto lg:h-5 lg:text-xs lg:leading-5">
           <span :class="lastWrong ? '' : 'invisible'">不对，再选一次</span>
         </p>
       </template>

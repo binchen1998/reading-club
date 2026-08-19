@@ -132,7 +132,7 @@ const cardStyle = computed(() => {
     <transition name="fade">
       <div
         v-if="open"
-        class="fixed z-[60] p-2 sm:p-4"
+        class="fixed z-[60] p-2 lg:p-4"
         :class="
           pos
             ? 'inset-0 pointer-events-none'
@@ -146,13 +146,13 @@ const cardStyle = computed(() => {
       >
         <div
           ref="cardEl"
-          class="card relative w-full"
+          class="card relative w-full max-lg:p-3"
           :class="[
             wide ? 'max-w-2xl' : 'max-w-md',
             'pointer-events-auto shadow-pop',
             fixed && dock === 'side' && !pos ? 'flex max-h-[40vh] flex-col overflow-hidden lg:h-[32rem] lg:max-h-[32rem]' : '',
             fixed && dock !== 'side' && !pos ? 'flex h-[32rem] flex-col overflow-hidden' : '',
-            !fixed ? 'max-h-[80dvh] overflow-y-auto sm:max-h-[88vh]' : '',
+            !fixed ? 'max-h-[92dvh] overflow-y-auto lg:max-h-[88vh]' : '',
             !pos ? 'animate-pop-in' : '',
             dragging ? 'cursor-grabbing' : '',
           ]"
@@ -163,17 +163,17 @@ const cardStyle = computed(() => {
           <button class="game-result-close" type="button" aria-label="关闭" @click="emit('close')">×</button>
           <div
             ref="handleEl"
-            class="mb-4 -mx-2 -mt-1 flex items-center gap-2 rounded-2xl px-2 py-2 pr-10"
+            class="mb-2 -mx-2 -mt-1 flex items-center gap-1.5 rounded-2xl px-2 py-1 pr-10 lg:mb-4 lg:gap-2 lg:py-2"
             :class="draggable ? 'select-none touch-none' : ''"
             :style="draggable ? { cursor: dragging ? 'grabbing' : 'grab' } : undefined"
             @pointerdown="onDragStart"
           >
-            <span v-if="draggable" class="grid h-8 w-6 shrink-0 place-items-center text-brand-400" aria-hidden="true">
+            <span v-if="draggable" class="grid h-6 w-5 shrink-0 place-items-center text-brand-400 lg:h-8 lg:w-6" aria-hidden="true">
               <span class="leading-none tracking-tight">⋮⋮</span>
             </span>
-            <span v-if="emoji" class="text-2xl">{{ emoji }}</span>
-            <h2 class="text-xl font-extrabold text-brand-700">{{ title }}</h2>
-            <span v-if="draggable" class="ml-auto text-xs font-bold text-brand-600/50">按住拖走</span>
+            <span v-if="emoji" class="text-lg lg:text-2xl">{{ emoji }}</span>
+            <h2 class="text-base font-extrabold text-brand-700 lg:text-xl">{{ title }}</h2>
+            <span v-if="draggable" class="ml-auto text-[10px] font-bold text-brand-600/50 lg:text-xs">按住拖走</span>
           </div>
           <div :class="fixed ? 'flex min-h-0 flex-1 flex-col' : ''">
             <slot />
