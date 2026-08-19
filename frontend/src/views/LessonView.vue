@@ -1446,7 +1446,7 @@ onUnmounted(() => {
     <Teleport to="body">
       <div
         v-if="mergeOpen"
-        class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
+        class="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4"
       >
         <div class="card w-full max-w-md px-6 py-6 shadow-pop" role="dialog" aria-modal="true" aria-live="polite">
           <p class="text-center text-4xl">{{ mergeFailed ? '😵' : mergePhase === 'ask-discard' ? '🗑️' : mergePhase === 'ask-upload' ? '☁️' : mergePhase === 'ask-merge' ? '⏳' : '🎬' }}</p>
