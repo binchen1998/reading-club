@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 import logging
 import queue
-import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -22,7 +21,6 @@ from .tts import audio_id
 from .worker_log import attach_worker_logging
 
 logger = logging.getLogger("lesson_worker")
-WORD_RE = re.compile(r"[A-Za-z']+")
 TTS_WORKERS = 6
 INTERACTIVE_WORKERS = 4
 RETRY_AFTER_SEC = 90
@@ -148,17 +146,9 @@ def _loop() -> None:
 
 
 def _merge_short_segments(segments: list, min_words: int = 3) -> list[str]:
-    out: list[str] = []
-    i = 0
-    items = [str(s).strip() for s in segments or [] if str(s).strip()]
-    while i < len(items):
-        cur = items[i]
-        while len(WORD_RE.findall(cur)) < min_words and i + 1 < len(items):
-            i += 1
-            cur = f"{cur} {items[i]}".strip()
-        out.append(cur)
-        i += 1
-    return out
+    from .routers.lessons import merge_short_segments
+
+    return merge_short_segments(segments, min_words=min_words)
 
 
 def _generate_one(series_id: str, book_slug: str, chapter: int, key: str) -> None:

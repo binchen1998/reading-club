@@ -151,7 +151,7 @@ def _fallback_segments(english: str) -> list[str]:
     text = (english or "").strip()
     if not text:
         return []
-    parts = [part.strip() for part in re.split(r"(?<=[.!?…])\s+|\n+", text) if part.strip()]
+    parts = [part.strip() for part in re.split(r"(?<=[.!?…。！？])\s+", text.replace("\n", " ")) if part.strip()]
     return parts or [text]
 
 

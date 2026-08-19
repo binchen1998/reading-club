@@ -15,6 +15,11 @@ router = APIRouter(prefix="/api")
 logger = logging.getLogger("lesson_worker")
 WORD_RE = re.compile(r"[A-Za-z']+")
 CHAPTER_ID_RE = re.compile(r"^ch(\d+)$", re.I)
+SENTENCE_END_RE = re.compile(r'(?:[.!?。！？…]|\.\.\.)["\'”’)]*$')
+
+
+def _ends_with_sentence_punct(text: str) -> bool:
+    return bool(SENTENCE_END_RE.search((text or "").rstrip()))
 
 
 def merge_short_segments(segments: list, min_words: int = 3) -> list[str]:
@@ -23,7 +28,9 @@ def merge_short_segments(segments: list, min_words: int = 3) -> list[str]:
     items = [str(s).strip() for s in segments or [] if str(s).strip()]
     while i < len(items):
         cur = items[i]
-        while len(WORD_RE.findall(cur)) < min_words and i + 1 < len(items):
+        while i + 1 < len(items):
+            if _ends_with_sentence_punct(cur) and len(WORD_RE.findall(cur)) >= min_words:
+                break
             i += 1
             cur = f"{cur} {items[i]}".strip()
         out.append(cur)

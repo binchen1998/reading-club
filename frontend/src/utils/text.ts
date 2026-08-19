@@ -6,14 +6,25 @@ function wordCount(text: string): number {
   return (text.match(WORD_RE) || []).length
 }
 
+const SENTENCE_END_RE = /(?:[.!?。！？…]|\.\.\.)["'”’)]*$/
+
+export function endsWithSentencePunct(text: string): boolean {
+  return SENTENCE_END_RE.test((text || '').trim())
+}
+
 export function mergeShortSegments(segments: string[], minWords = 3): string[] {
   const out: string[] = []
   let i = 0
   while (i < segments.length) {
     let cur = (segments[i] || '').trim()
-    while (cur && wordCount(cur) < minWords && i + 1 < segments.length) {
+    while (cur && i + 1 < segments.length) {
+      const next = (segments[i + 1] || '').trim()
+      if (!next) {
+        i += 1
+        continue
+      }
+      if (endsWithSentencePunct(cur) && wordCount(cur) >= minWords) break
       i += 1
-      const next = (segments[i] || '').trim()
       cur = [cur, next].filter(Boolean).join(' ')
     }
     if (cur) out.push(cur)
