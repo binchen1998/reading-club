@@ -8,6 +8,8 @@ import { useUserStore } from './stores/user'
 import { syncUsernameFromUrl } from './utils/username'
 import './style.css'
 
+document.addEventListener('dblclick', (event) => event.preventDefault())
+
 ;(async () => {
   const urlParams = new URLSearchParams(window.location.search)
   if (await resolveToken(urlParams)) return
