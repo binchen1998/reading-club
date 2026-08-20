@@ -389,6 +389,8 @@ async function playExplain(from = 0) {
   if (gen === playGen) {
     explainPlaying.value = false
     explainPaused.value = false
+    sentIndex.value = -1
+    overlay.value = []
   }
 }
 
