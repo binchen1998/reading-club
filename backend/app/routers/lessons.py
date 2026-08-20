@@ -10,32 +10,12 @@ from ..gen_jobs import job_payload
 from ..lesson_gen import page_lesson_exists, page_lesson_file
 from ..lesson_worker import enqueue_lesson_job, is_generating
 from ..remote_book import book_exists, load_book, load_one_page, page_image_url
+from ..text_split import merge_short_segments
 
 router = APIRouter(prefix="/api")
 logger = logging.getLogger("lesson_worker")
-WORD_RE = re.compile(r"[A-Za-z']+")
+
 CHAPTER_ID_RE = re.compile(r"^ch(\d+)$", re.I)
-SENTENCE_END_RE = re.compile(r'(?:[.!?。！？…]|\.\.\.)["\'”’)]*$')
-
-
-def _ends_with_sentence_punct(text: str) -> bool:
-    return bool(SENTENCE_END_RE.search((text or "").rstrip()))
-
-
-def merge_short_segments(segments: list, min_words: int = 3) -> list[str]:
-    out: list[str] = []
-    i = 0
-    items = [str(s).strip() for s in segments or [] if str(s).strip()]
-    while i < len(items):
-        cur = items[i]
-        while i + 1 < len(items):
-            if _ends_with_sentence_punct(cur) and len(WORD_RE.findall(cur)) >= min_words:
-                break
-            i += 1
-            cur = f"{cur} {items[i]}".strip()
-        out.append(cur)
-        i += 1
-    return out
 
 
 def _chapter_num(chapter_id: str) -> int:

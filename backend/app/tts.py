@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 from pathlib import Path
 
 import requests
 
 from .config import AUDIO, FISH_AUDIO_URL, FISH_TEACHER, LESSONS
-
-SENT_SPLIT = re.compile(r"(?<=[。！？!?])\s*")
+from .text_split import split_sentences
 
 
 def audio_id(text: str) -> str:
@@ -22,10 +20,6 @@ def audio_path(text: str) -> Path:
 
 def audio_url(text: str) -> str:
     return f"/media/audio/{audio_id(text)}.mp3"
-
-
-def split_sentences(text: str) -> list[str]:
-    return [part.strip() for part in SENT_SPLIT.split(text or "") if len(part.strip()) > 1]
 
 
 def collect_lesson_texts(lesson: dict) -> list[str]:

@@ -371,7 +371,7 @@ async function playExplain(from = 0) {
   explainPlaying.value = true
   explainPaused.value = false
   const gen = playGen
-  const list = sentences.value
+  const list = sentences.value.slice()
   const start = Math.min(Math.max(0, from), Math.max(0, list.length - 1))
   for (let i = start; i < list.length; i++) {
     if (gen !== playGen) return

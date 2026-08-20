@@ -1,31 +1,54 @@
 export type Box = { text: string; left: number; top: number; width: number; height: number; active?: boolean }
 
 const WORD_RE = /[A-Za-z']+/g
+const ABBREV_RE = /(?:^|[\s"'“‘(\[])(?:Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|vs|etc|U\.S|U\.K|a\.m|p\.m)\.$/i
+const SENTENCE_END_RE = /[.!?。！？]["'”’)]*$/
+const OPEN_QUOTE = /[“「『]/
+const CLOSE_QUOTE = /[”」』]/
+const TRAIL_CLOSE = /["”’」』)]/
 
 function wordCount(text: string): number {
   return (text.match(WORD_RE) || []).length
 }
 
-const SENTENCE_END_RE = /(?:[.!?。！？…]|\.\.\.)["'”’)]*$/
+function compact(text: string): string {
+  return (text || '').replace(/\s+/g, ' ').trim()
+}
+
+function isAbbrev(text: string): boolean {
+  return ABBREV_RE.test((text || '').trim())
+}
 
 export function endsWithSentencePunct(text: string): boolean {
-  return SENTENCE_END_RE.test((text || '').trim())
+  const value = (text || '').trim()
+  if (!value || isAbbrev(value)) return false
+  return SENTENCE_END_RE.test(value)
+}
+
+export function startsWithLowercase(text: string): boolean {
+  const value = (text || '').trim().replace(/^["'“‘(\[]+/, '')
+  return /^[a-z]/.test(value)
+}
+
+function shouldMergeNext(cur: string, next: string, minWords: number): boolean {
+  if (!next) return true
+  if (startsWithLowercase(next)) return true
+  if (/^[”’」』]/.test(next.trim())) return true
+  if (!endsWithSentencePunct(cur)) return true
+  const words = wordCount(cur)
+  if (!words) return false
+  return words === 1 && words < minWords
 }
 
 export function mergeShortSegments(segments: string[], minWords = 3): string[] {
+  const items = (segments || []).map((item) => compact(item)).filter(Boolean)
   const out: string[] = []
   let i = 0
-  while (i < segments.length) {
-    let cur = (segments[i] || '').trim()
-    while (cur && i + 1 < segments.length) {
-      const next = (segments[i + 1] || '').trim()
-      if (!next) {
-        i += 1
-        continue
-      }
-      if (endsWithSentencePunct(cur) && wordCount(cur) >= minWords) break
+  while (i < items.length) {
+    let cur = items[i]
+    while (i + 1 < items.length && shouldMergeNext(cur, items[i + 1], minWords)) {
       i += 1
-      cur = [cur, next].filter(Boolean).join(' ')
+      cur = compact(`${cur} ${items[i]}`)
     }
     if (cur) out.push(cur)
     i += 1
@@ -33,11 +56,56 @@ export function mergeShortSegments(segments: string[], minWords = 3): string[] {
   return out
 }
 
+function glueSentenceParts(parts: string[]): string[] {
+  return mergeShortSegments(parts, 1)
+}
+
 export function splitSentences(text: string): string[] {
-  return (text || '')
-    .split(/(?<=[。！？!?])\s*/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 1)
+  const src = String(text || '').replace(/\r\n?/g, '\n')
+  const raw: string[] = []
+  let buf = ''
+  let asciiDbl = false
+  let curly = 0
+
+  const inQuote = () => asciiDbl || curly > 0
+
+  const applyQuote = (ch: string) => {
+    if (ch === '"') asciiDbl = !asciiDbl
+    else if (OPEN_QUOTE.test(ch)) curly += 1
+    else if (CLOSE_QUOTE.test(ch)) curly = Math.max(0, curly - 1)
+  }
+
+  const pushBuf = () => {
+    const piece = compact(buf)
+    buf = ''
+    if (piece) raw.push(piece)
+  }
+
+  for (let i = 0; i < src.length; i += 1) {
+    const ch = src[i]
+    if (ch === '\n') {
+      if (!inQuote() && endsWithSentencePunct(buf)) pushBuf()
+      else if (buf && !buf.endsWith(' ')) buf += ' '
+      continue
+    }
+
+    applyQuote(ch)
+    buf += ch
+
+    const chineseEnd = ch === '。' || ch === '！' || ch === '？'
+    const englishEnd = (ch === '.' || ch === '!' || ch === '?') && !inQuote() && !isAbbrev(buf)
+    if (!chineseEnd && !englishEnd) continue
+
+    while (i + 1 < src.length && TRAIL_CLOSE.test(src[i + 1])) {
+      i += 1
+      applyQuote(src[i])
+      buf += src[i]
+    }
+    const next = src[i + 1]
+    if (chineseEnd || next === undefined || /\s/.test(next)) pushBuf()
+  }
+  pushBuf()
+  return glueSentenceParts(raw)
 }
 
 export function normalize(text: string): string {

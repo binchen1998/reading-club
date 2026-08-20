@@ -151,8 +151,9 @@ def _fallback_segments(english: str) -> list[str]:
     text = (english or "").strip()
     if not text:
         return []
-    parts = [part.strip() for part in re.split(r"(?<=[.!?…。！？])\s+", text.replace("\n", " ")) if part.strip()]
-    return parts or [text]
+    from backend.app.text_split import split_sentences
+
+    return split_sentences(text) or [text]
 
 
 def fallback_page_beat(page: dict) -> dict[str, Any]:
